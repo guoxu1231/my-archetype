@@ -79,8 +79,12 @@
             http://activemq.apache.org/persistence.html
         -->
         <persistenceAdapter>
-              <jdbcPersistenceAdapter dataSource="#oracle-ds"/>
-	</persistenceAdapter>
+              <jdbcPersistenceAdapter dataSource="#oracle-ds" lockKeepAlivePeriod="5000">
+                  <locker>
+                      <lease-database-locker lockAcquireSleepInterval="10000"/>
+                  </locker>
+              </jdbcPersistenceAdapter>
+	    </persistenceAdapter>
 
           <!--
             The systemUsage controls the maximum amount of space the broker will
