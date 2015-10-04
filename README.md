@@ -1,2 +1,1 @@
-# java_ext
-ext usage in java
+J2EE Architecture Laboratory
