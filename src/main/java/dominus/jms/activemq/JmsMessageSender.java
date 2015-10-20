@@ -1,4 +1,4 @@
-package dominus.jms;
+package dominus.jms.activemq;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +27,7 @@ public class JmsMessageSender {
     /**
      * Notice that the methods to be scheduled must have void returns and must not expect any arguments.
      */
-    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRate = 200, initialDelay = 0)
     public void sendMsg_1() {
         jmsTemplate.send(JmsConstant.DESTINATION, new MessageCreator() {
             @Override
@@ -39,13 +39,25 @@ public class JmsMessageSender {
         });
     }
 
-    @Scheduled(fixedRate = 1000, initialDelay = 0)
+    @Scheduled(fixedRate = 100, initialDelay = 0)
     public void sendMsg_2() {
         jmsTemplate.send(JmsConstant.DESTINATION, new MessageCreator() {
             @Override
             public Message createMessage(Session session) throws JMSException {
                 TextMessage msg = session.createTextMessage("ping!");
                 logger.info(Thread.currentThread().getName() + " / sending text message [2]");
+                return msg;
+            }
+        });
+    }
+
+    @Scheduled(fixedRate = 50, initialDelay = 0)
+    public void sendMsg_3() {
+        jmsTemplate.send(JmsConstant.DESTINATION, new MessageCreator() {
+            @Override
+            public Message createMessage(Session session) throws JMSException {
+                TextMessage msg = session.createTextMessage("ping!");
+                logger.info(Thread.currentThread().getName() + " / sending text message [3]");
                 return msg;
             }
         });

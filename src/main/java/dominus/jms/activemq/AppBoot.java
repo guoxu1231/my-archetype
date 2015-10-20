@@ -1,4 +1,4 @@
-package dominus.jms;
+package dominus.jms.activemq;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,5 +20,4 @@ public class AppBoot {
                 new ClassPathXmlApplicationContext(new String[]{"jms_context.xml"});
 
     }
-
 }

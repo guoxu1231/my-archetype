@@ -25,7 +25,7 @@
 
     <bean id="jmsConnFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
         <property name="brokerURL">
-            <value>tcp://localhost:61616</value>
+            <value>tcp://slc07pbj.us.oracle.com:61616</value>
         </property>
     </bean>
 

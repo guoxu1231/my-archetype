@@ -1,4 +1,4 @@
-package dominus.jms;
+package dominus.jms.activemq;
 
 /**
  * Created by shawguo on 10/4/15.
