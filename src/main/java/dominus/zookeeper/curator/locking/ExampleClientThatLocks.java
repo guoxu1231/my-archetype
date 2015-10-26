@@ -22,10 +22,10 @@ public class ExampleClientThatLocks {
             throw new IllegalStateException(clientName + " could not acquire the lock");
         }
         try {
-            System.out.println(clientName + " has the lock");
+            System.out.println(clientName + " has the lock ["+Thread.currentThread().getName()+"]");
             resource.use();
         } finally {
-            System.out.println(clientName + " releasing the lock");
+            System.out.println(clientName + " releasing the lock ["+Thread.currentThread().getName()+"]");
             lock.release(); // always release the lock in a finally block
         }
     }
