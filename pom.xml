@@ -138,6 +138,15 @@
             <version>5.1.37</version>
         </dependency>
 
+        <dependency>
+            <groupId>oracle.jdbc</groupId>
+            <artifactId>ojdbc</artifactId>
+            <version>6</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/ojdbc/ojdbc6.jar</systemPath>
+            <!-- must match file name -->
+        </dependency>
+
 
     </dependencies>
     <build>
