@@ -23,7 +23,26 @@
         <property name="url" value="${oracle.jdbc.url}"/>
         <property name="username" value="${oracle.jdbc.username}"/>
         <property name="password" value="${oracle.jdbc.password}"/>
+        <!--<property name="connectionInitSqls">-->
+            <!--<list>-->
+                <!--<value>delete from employees</value>-->
+            <!--</list>-->
+        <!--</property>-->
     </bean>
+
+    <bean id="mysql_dataSource_cdc_iops" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url.cdc.iops}"/>
+        <property name="username" value="${jdbc.username.cdc.iops}"/>
+        <property name="password" value="${jdbc.password.cdc.iops}"/>
+    </bean>
+    <bean id="mysql_dataSource_local_iops" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url.local.iops}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
 
     <context:property-placeholder location="jdbc.properties"/>
 
