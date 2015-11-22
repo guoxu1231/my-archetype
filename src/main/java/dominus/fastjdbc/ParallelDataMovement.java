@@ -17,6 +17,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
+ *
+ * fast insert performance test
+ *
  * Local Read Thread MAX
  * Total Records: 300024 Total Seconds: 36 IOPS:8322/n
  * Total Records: 300024 Total Seconds: 35 IOPS:8487/n
