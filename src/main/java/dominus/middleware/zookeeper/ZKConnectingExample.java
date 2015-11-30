@@ -1,4 +1,4 @@
-package dominus.zookeeper;
+package dominus.middleware.zookeeper;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;

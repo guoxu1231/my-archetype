@@ -1,4 +1,4 @@
-package dominus.jms.activemq;
+package dominus.middleware.jms.activemq;
 
 import java.io.File;
 

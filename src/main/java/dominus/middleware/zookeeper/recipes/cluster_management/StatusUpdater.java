@@ -1,4 +1,4 @@
-package dominus.zookeeper.recipes.cluster_management;
+package dominus.middleware.zookeeper.recipes.cluster_management;
 
 
 import dominus.RAVI_CDH_CONN;

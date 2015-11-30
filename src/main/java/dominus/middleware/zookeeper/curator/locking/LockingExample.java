@@ -1,4 +1,4 @@
-package dominus.zookeeper.curator.locking;
+package dominus.middleware.zookeeper.curator.locking;
 
 import dominus.RAVI_CDH_CONN;
 import org.apache.curator.utils.CloseableUtils;

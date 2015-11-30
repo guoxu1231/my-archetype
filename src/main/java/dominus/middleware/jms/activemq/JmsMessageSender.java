@@ -1,4 +1,4 @@
-package dominus.jms.activemq;
+package dominus.middleware.jms.activemq;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

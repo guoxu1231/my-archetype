@@ -1,16 +1,17 @@
-package dominus.zookeeper.recipes.cluster_management;
+package dominus.middleware.zookeeper.recipes.cluster_management;
 
 
-import dominus.RAVI_CDH_CONN;
-import org.apache.zookeeper.*;
-import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
+import dominus.RAVI_CDH_CONN;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooKeeper;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
 
 /**
  * Recipe #1: Cluster Management

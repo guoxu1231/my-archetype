@@ -1,4 +1,4 @@
-package dominus.hotspot;
+package dominus.language.hotspot;
 
 
 import java.io.IOException;

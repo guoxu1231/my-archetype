@@ -1,4 +1,4 @@
-package dominus.jms.activemq;
+package dominus.middleware.jms.activemq;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;

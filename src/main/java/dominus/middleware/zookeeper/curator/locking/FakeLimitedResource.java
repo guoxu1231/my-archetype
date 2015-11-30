@@ -1,4 +1,4 @@
-package dominus.zookeeper.curator.locking;
+package dominus.middleware.zookeeper.curator.locking;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
