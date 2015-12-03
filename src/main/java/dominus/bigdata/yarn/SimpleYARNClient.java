@@ -29,8 +29,26 @@ import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
 
 /**
- * YARN client to submit application to the YARN framework
+ * Simple YARN application to run n copies of a unix command - deliberately kept simple (with minimal error handling etc.)
+ * hortonworks/simple-yarn-app
+ * https://github.com/hortonworks/simple-yarn-app
+ * <p/>
+ * Usage:
+ * Unmanaged mode
+ * $ bin/hadoop jar $HADOOP_YARN_HOME/share/hadoop/yarn/hadoop-yarn-applications-unmanaged-am-launcher-2.1.1-SNAPSHOT.jar Client -classpath simple-yarn-app-1.0-SNAPSHOT.jar -cmd "java com.hortonworks.simpleyarnapp.ApplicationMaster /bin/date 2"
  *
+ *
+ * [Managed mode]
+ * cd /opt/Development/github_repo/archetype-helloworld/target/classes
+ * jar cf simple-yarn-app-1.0-SNAPSHOT.jar dominus/bigdata/yarn/*.class
+ * $ bin/hadoop fs -copyFromLocal simple-yarn-app-1.0-SNAPSHOT.jar /user/shawguo/simple-yarn-app-1.0-SNAPSHOT.jar
+ * $ bin/hadoop jar simple-yarn-app-1.0-SNAPSHOT.jar dominus.bigdata.yarn.SimpleYARNClient /bin/date 2 hdfs://user/shawguo/simple-yarn-app-1.0-SNAPSHOT.jar
+ * $ bin/hadoop jar simple-yarn-app-1.0-SNAPSHOT.jar dominus.bigdata.yarn.SimpleYARNClient /bin/date 4 hdfs://scaj31cdh-ns/user/shawguo/simple-yarn-app-1.0-SNAPSHOT.jar
+ * [Program Arguments]
+ * /bin/date 4 hdfs:///user/shawguo/simple-yarn-app-1.0-SNAPSHOT.jar
+ *
+ * [Debug]
+ * export HADOOP_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,address=4000
  * @author AmolFasale
  */
 public class SimpleYARNClient {
@@ -46,6 +64,9 @@ public class SimpleYARNClient {
          * Create yarnClient
          */
         YarnConfiguration conf = new YarnConfiguration();
+//        conf.addResource("yarn-clientconfig-cdh/core-site.xml");
+//        conf.addResource("yarn-clientconfig-cdh/hdfs-site.xml");
+//        conf.addResource("yarn-clientconfig-cdh/yarn-site.xml");
         YarnClient yarnClient = YarnClient.createYarnClient();
         yarnClient.init(conf);
         yarnClient.start();
@@ -62,7 +83,7 @@ public class SimpleYARNClient {
                 .newRecord(ContainerLaunchContext.class);
         amContainer.setCommands(Collections.singletonList("$JAVA_HOME/bin/java"
                 + " -Xmx256M"
-                + " com.hortonworks.simpleyarnapp.ApplicationMaster" + " "
+                + " dominus.bigdata.yarn.SimpleYARNApplicationClient" + " "
                 + command + " " + String.valueOf(n) + " 1>"
                 + ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout"
                 + " 2>" + ApplicationConstants.LOG_DIR_EXPANSION_VAR
