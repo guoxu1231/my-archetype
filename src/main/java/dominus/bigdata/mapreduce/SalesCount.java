@@ -154,7 +154,7 @@ public class SalesCount {
          * In this case the outputs of the map-tasks go directly to the FileSystem, into the output path set by FileOutputFormat.setOutputPath(Job, Path).
          * The framework does not sort the map-outputs before writing them out to the FileSystem.
          */
-        job.setNumReduceTasks(2);
+        job.setNumReduceTasks(1);
 
         String outputSuffix = new SimpleDateFormat("yyyy_MM_dd_mm").format(new Date());
         FileInputFormat.addInputPath(job, new Path("/user/shawguo/data/SalesLog/sales1.dat"));
