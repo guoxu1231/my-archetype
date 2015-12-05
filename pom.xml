@@ -16,6 +16,9 @@
         <spring.version>4.2.1.RELEASE</spring.version>
         <!-- AssertJ is not a part of Spring IO platform, so the version must be provided explicitly -->
         <assertj-core-version>3.1.0</assertj-core-version>
+        <scala.version>2.10.5</scala.version>
+        <scala.binary.version>2.10</scala.binary.version>
+        <spark.home>/opt/Development/middleware/bigdata/spark-1.5.2-bin-hadoop2.6</spark.home>
     </properties>
 
     <parent>
@@ -32,6 +35,7 @@
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        <!---->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -80,7 +84,7 @@
                     <artifactId>jmxtools</artifactId>
                     <groupId>com.sun.jdmk</groupId>
                 </exclusion>
-                <!--Detected both log4j-over-slf4j.jar AND slf4j-log4j12.jar on the class path, preempting StackOverflowError.  -->
+                <!--Detected both log4j-over-slf4j.jar AND slf4j-log4j12.jar on the class path, preempting StackOverflowError.-->
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
@@ -155,11 +159,55 @@
         </dependency>
 
         <!--hdfs & mapreduce also match CDH 5.4.x-->
+        <!-- Hadoop main client artifact -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
             <version>2.6.2</version>
+            <exclusions><!-- find out how log4j is getting on your path run mvn dependency:tree and comb through -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-yarn-client</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+
+
+        <!--Apache Spark -->
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-assembly</artifactId>
+            <version>1.5.2</version>
+            <scope>system</scope>
+            <!-- symlink does not work, use real path-->
+            <systemPath>${spark.home}/lib/spark-assembly-1.5.2-hadoop2.6.0.jar</systemPath>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.10.2</version>
+        </dependency>
+        <!--<dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.10</artifactId>
+            <version>1.5.2</version>
+        </dependency>-->
+
 
     </dependencies>
     <build>
@@ -214,6 +262,12 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <!-- Apache Spark
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.14.2</version>
+            </plugin>-->
         </plugins>
     </build>
 
@@ -237,6 +291,11 @@
             <releases>
                 <enabled>true</enabled>
             </releases>
+        </repository>
+        <!--CDH Repository -->
+        <repository>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
         </repository>
     </repositories>
 
