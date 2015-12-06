@@ -30,13 +30,11 @@ object SparkSalesCount {
 
     distFile.map(s => s.split("\\|")).
       map(a => (a(0), Integer.valueOf(a(5)))).
-      reduceByKey(_+_).
+      reduceByKey(_ + _).
       repartition(1).
       sortByKey(true).
-//      map(a => a.get(0) + "," + a(1)).
-    saveAsTextFile("hdfs://scaj31cdh-ns/user/shawguo/data/SalesOutput_" + outputSuffix)
-
-
+      map(a => a._1 + "," + a._2).
+      saveAsTextFile("hdfs://scaj31cdh-ns/user/shawguo/data/SalesOutput_" + outputSuffix)
     sc.stop()
   }
 }
