@@ -1,7 +1,8 @@
 package dominus.bigdata.spark
 
 import java.io.{FileNotFoundException, IOException, FileInputStream}
-import java.util.Properties
+import java.text.{SimpleDateFormat, ParseException}
+import java.util.{Date, Properties}
 
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkConf
@@ -52,8 +53,41 @@ object SparkJDBCSourceTest {
     //big data
     val salaryDF = sc.textFile("hdfs://scaj31cdh-ns/user/shawguo/data/salaries.txt")
 
-    println(employeeDF.count())
-    println(salaryDF.count())
+
+    val format = new java.text.SimpleDateFormat("yyyy-MM-dd")
+
+    //emp salary report
+    salaryDF.map(line => line.split("\\|")).
+      // get effective salary
+      filter(row => {
+        try {
+          val fromDate = format.parse(row(2))
+          val toDate = format.parse(row(3))
+          val today = new Date()
+          if (today.getTime() > fromDate.getTime() && today.getTime() < toDate.getTime())
+            true
+          else
+            false
+        } catch {
+          case e: ParseException => false
+        }
+      }).
+      // join with master data
+      keyBy(row => Integer.valueOf(row(0))).join(employeeDF.rdd.keyBy(row => row(0).asInstanceOf[Integer])).
+      // format output
+      mapValues(row => row._2(2) + "," + row._2(3) + "    " + row._1(1) + "  [from_date] " + row._1(2) + "  [to_date] " + row._1(3))
+      .values.repartition(1).
+      saveAsTextFile("hdfs://scaj31cdh-ns/user/shawguo/data/emp_salary_report_"
+        + new SimpleDateFormat("yyyy_MM_dd_mm").format(new Date))
+
+    /**
+     * Sample output
+     * Georgi,Facello    88958  [from_date] 2002-06-22  [to_date] 9999-01-01
+     * Parto,Bamford    43311  [from_date] 2001-12-01  [to_date] 9999-01-01
+     */
+
+    //    println(employeeDF.count())
+    //    println(salaryDF.count())
 
     sc.stop()
 
