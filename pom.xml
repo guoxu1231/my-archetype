@@ -28,188 +28,231 @@
     </parent>
 
 
-    <dependencies>
-        <!-- Spring -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <!---->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
+    <profiles>
+        <profile>
+            <id>apache-spark/scala</id>
+            <dependencies>
+                <!--Apache Spark -->
+                <dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-assembly</artifactId>
+                    <version>1.5.2</version>
+                    <scope>system</scope>
+                    <!-- symlink does not work, use real path-->
+                    <systemPath>${spark.home}/lib/spark-assembly-1.5.2-hadoop2.6.0.jar</systemPath>
+                </dependency>
+                <dependency>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                    <version>2.10.2</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-client</artifactId>
+                    <version>2.6.2</version>
+                    <exclusions><!-- find out how log4j is getting on your path run mvn dependency:tree and comb through -->
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-yarn-client</artifactId>
+                    <version>2.6.2</version>
+                </dependency>
+            </dependencies>
+        </profile>
 
-        <!-- JMS -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jms</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-        </dependency>
-        <!--<dependency>-->
-        <!--<groupId>org.apache.activemq</groupId>-->
-        <!--<artifactId>activemq-pool</artifactId>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-        <!--<groupId>org.apache.activemq</groupId>-->
-        <!--<artifactId>activemq-jms-pool</artifactId>-->
-        <!--</dependency>-->
+        <profile>
+            <id>core java</id>
+            <dependencies>
+                <!-- Spring -->
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                    <version>${spring.version}</version>
+                </dependency>
+                <!---->
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jdbc</artifactId>
+                    <version>${spring.version}</version>
+                </dependency>
 
-        <!-- Apache Kafka-->
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.9.2</artifactId>
-            <version>0.8.2.0</version>
-            <scope>compile</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>jmxri</artifactId>
-                    <groupId>com.sun.jmx</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jms</artifactId>
-                    <groupId>javax.jms</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jmxtools</artifactId>
-                    <groupId>com.sun.jdmk</groupId>
-                </exclusion>
-                <!--Detected both log4j-over-slf4j.jar AND slf4j-log4j12.jar on the class path, preempting StackOverflowError.-->
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+                <!-- JMS -->
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jms</artifactId>
+                    <version>${spring.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>activemq-broker</artifactId>
+                </dependency>
+                <!--<dependency>-->
+                <!--<groupId>org.apache.activemq</groupId>-->
+                <!--<artifactId>activemq-pool</artifactId>-->
+                <!--</dependency>-->
+                <!--<dependency>-->
+                <!--<groupId>org.apache.activemq</groupId>-->
+                <!--<artifactId>activemq-jms-pool</artifactId>-->
+                <!--</dependency>-->
 
-        <!-- NIO framework -->
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <!-- Use 'netty-all' for 4.0 or above -->
-            <version>4.0.32.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-core</artifactId>
-            <version>2.0.9</version>
-        </dependency>
+                <!-- Apache Kafka-->
+                <dependency>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka_2.9.2</artifactId>
+                    <version>0.8.2.0</version>
+                    <scope>compile</scope>
+                    <exclusions>
+                        <exclusion>
+                            <artifactId>jmxri</artifactId>
+                            <groupId>com.sun.jmx</groupId>
+                        </exclusion>
+                        <exclusion>
+                            <artifactId>jms</artifactId>
+                            <groupId>javax.jms</groupId>
+                        </exclusion>
+                        <exclusion>
+                            <artifactId>jmxtools</artifactId>
+                            <groupId>com.sun.jdmk</groupId>
+                        </exclusion>
+                        <!--Detected both log4j-over-slf4j.jar AND slf4j-log4j12.jar on the class path, preempting StackOverflowError.-->
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>log4j</groupId>
+                            <artifactId>log4j</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
 
-        <!--memcached client -->
-        <dependency>
-            <groupId>net.spy</groupId>
-            <artifactId>spymemcached</artifactId>
-            <version>2.12.0</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.mina</groupId>
-            <artifactId>mina-core</artifactId>
-            <version>2.0.4</version>
-        </dependency>
+                <!-- NIO framework -->
+                <dependency>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-all</artifactId>
+                    <!-- Use 'netty-all' for 4.0 or above -->
+                    <version>4.0.32.Final</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.mina</groupId>
+                    <artifactId>mina-core</artifactId>
+                    <version>2.0.9</version>
+                </dependency>
 
-        <!-- Distributed Coordination -->
-        <dependency>
-            <groupId>org.apache.curator</groupId>
-            <artifactId>curator-recipes</artifactId>
-            <version>2.9.0</version>
-        </dependency>
+                <!--memcached client -->
+                <dependency>
+                    <groupId>net.spy</groupId>
+                    <artifactId>spymemcached</artifactId>
+                    <version>2.12.0</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.mina</groupId>
+                    <artifactId>mina-core</artifactId>
+                    <version>2.0.4</version>
+                </dependency>
 
-        <!-- JDBC -->
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-dbcp2</artifactId>
-            <version>2.1.1</version>
-        </dependency>
+                <!-- Distributed Coordination -->
+                <dependency>
+                    <groupId>org.apache.curator</groupId>
+                    <artifactId>curator-recipes</artifactId>
+                    <version>2.9.0</version>
+                </dependency>
 
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.37</version>
-        </dependency>
+                <!-- JDBC -->
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-dbcp2</artifactId>
+                    <version>2.1.1</version>
+                </dependency>
 
-        <dependency>
-            <groupId>oracle.jdbc</groupId>
-            <artifactId>ojdbc</artifactId>
-            <version>6</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/ojdbc/ojdbc6.jar</systemPath>
-            <!-- must match file name -->
-        </dependency>
+                <dependency>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>5.1.37</version>
+                </dependency>
 
-        <!--mongodb -->
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-mongodb</artifactId>
-            <!--<version>1.8.1.RELEASE</version>-->
-        </dependency>
+                <dependency>
+                    <groupId>oracle.jdbc</groupId>
+                    <artifactId>ojdbc</artifactId>
+                    <version>6</version>
+                    <scope>system</scope>
+                    <systemPath>${basedir}/lib/ojdbc/ojdbc6.jar</systemPath>
+                    <!-- must match file name -->
+                </dependency>
 
-        <!--hdfs & mapreduce also match CDH 5.4.x-->
-        <!-- Hadoop main client artifact -->
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-            <version>2.6.2</version>
-            <exclusions><!-- find out how log4j is getting on your path run mvn dependency:tree and comb through -->
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-yarn-client</artifactId>
-            <version>2.6.2</version>
-        </dependency>
+                <!--mongodb -->
+                <dependency>
+                    <groupId>org.springframework.data</groupId>
+                    <artifactId>spring-data-mongodb</artifactId>
+                    <!--<version>1.8.1.RELEASE</version>-->
+                </dependency>
 
-
-        <!--Apache Spark -->
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-assembly</artifactId>
-            <version>1.5.2</version>
-            <scope>system</scope>
-            <!-- symlink does not work, use real path-->
-            <systemPath>${spark.home}/lib/spark-assembly-1.5.2-hadoop2.6.0.jar</systemPath>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>2.10.2</version>
-        </dependency>
-        <!--<dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.10</artifactId>
-            <version>1.5.2</version>
-        </dependency>-->
+                <!--hdfs & mapreduce also match CDH 5.4.x-->
+                <!-- Hadoop main client artifact -->
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-client</artifactId>
+                    <version>2.6.2</version>
+                    <exclusions><!-- find out how log4j is getting on your path run mvn dependency:tree and comb through -->
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-yarn-client</artifactId>
+                    <version>2.6.2</version>
+                </dependency>
 
 
-    </dependencies>
+                <!--&lt;!&ndash;Apache Spark &ndash;&gt;-->
+                <!--<dependency>-->
+                    <!--<groupId>org.apache.spark</groupId>-->
+                    <!--<artifactId>spark-assembly</artifactId>-->
+                    <!--<version>1.5.2</version>-->
+                    <!--<scope>system</scope>-->
+                    <!--&lt;!&ndash; symlink does not work, use real path&ndash;&gt;-->
+                    <!--<systemPath>${spark.home}/lib/spark-assembly-1.5.2-hadoop2.6.0.jar</systemPath>-->
+                    <!--<exclusions>-->
+                        <!--<exclusion>-->
+                            <!--<groupId>org.slf4j</groupId>-->
+                            <!--<artifactId>slf4j-log4j12</artifactId>-->
+                        <!--</exclusion>-->
+                        <!--<exclusion>-->
+                            <!--<groupId>log4j</groupId>-->
+                            <!--<artifactId>log4j</artifactId>-->
+                        <!--</exclusion>-->
+                    <!--</exclusions>-->
+                <!--</dependency>-->
+                <!--<dependency>-->
+                    <!--<groupId>org.scala-lang</groupId>-->
+                    <!--<artifactId>scala-library</artifactId>-->
+                    <!--<version>2.10.2</version>-->
+                <!--</dependency>-->
+                <!--<dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-core_2.10</artifactId>
+                    <version>1.5.2</version>
+                </dependency>-->
+
+
+            </dependencies>
+        </profile>
+    </profiles>
+
+
     <build>
         <plugins>
             <plugin>
