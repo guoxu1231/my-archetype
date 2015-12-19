@@ -3,7 +3,6 @@ package dominus.bigdata.spark.apis
 import java.net.URLClassLoader
 import java.util.Properties
 
-import dominus.bigdata.spark.SparkJDBCSourceTest._
 import org.apache.spark.{SparkConf, SparkContext}
 
 
