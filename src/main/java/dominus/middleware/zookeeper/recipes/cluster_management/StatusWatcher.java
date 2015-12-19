@@ -1,9 +1,10 @@
 package dominus.middleware.zookeeper.recipes.cluster_management;
 
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
+
 import dominus.RAVI_CDH_CONN;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
