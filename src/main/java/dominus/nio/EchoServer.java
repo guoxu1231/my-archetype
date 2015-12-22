@@ -7,7 +7,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SelectableChannel;
 
-import java.net.Socket;
 import java.net.ServerSocket;
 import java.net.InetSocketAddress;
 import java.util.Iterator;
@@ -21,12 +20,12 @@ import java.util.Iterator;
  * @author Ron Hitchens (ron@ronsoft.com)
  * @version $Id: SelectSockets.java,v 1.5 2002/05/20 07:24:29 ron Exp $
  */
-public class SelectSockets {
+public class EchoServer {
     public static int PORT_NUMBER = 1234;
 
     public static void main(String[] argv)
             throws Exception {
-        new SelectSockets().go(argv);
+        new EchoServer().go(argv);
     }
 
     public void go(String[] argv)
@@ -45,6 +44,8 @@ public class SelectSockets {
         ServerSocket serverSocket = serverChannel.socket();
         // create a new Selector for use below
         Selector selector = Selector.open();
+        //NOTE: sun.nio.ch.EPollSelectorProvider
+        System.out.println(selector.provider());
 
         // set the port the server channel will listen to
         serverSocket.bind(new InetSocketAddress(port));
@@ -63,6 +64,15 @@ public class SelectSockets {
             if (n == 0) {
                 continue;    // nothing to do
             }
+
+            //NOTE: Managing Selection Keys
+            /**
+             * The conventional approach is to perform a select( ) call on the selector (which updates the selected key set)
+             * then iterate over the set of keys returned by selectedKeys( ).
+             * As each key is examined in turn, the associated channel is dealt with according to the key's ready set.
+             * The key is then removed from the selected key set (by calling remove( ) on the Iterator object), and the next key is examined.
+             * When complete, the cycle repeats by calling select( ) again.
+             */
 
             // get an iterator over the set of selected keys
             Iterator it = selector.selectedKeys().iterator();
