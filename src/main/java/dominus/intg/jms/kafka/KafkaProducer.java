@@ -1,4 +1,4 @@
-package dominus.middleware.jms.kafka;
+package dominus.intg.jms.kafka;
 
 
 import kafka.javaapi.producer.Producer;
