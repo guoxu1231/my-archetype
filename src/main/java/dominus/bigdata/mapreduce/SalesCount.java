@@ -9,6 +9,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
@@ -41,8 +42,17 @@ public class SalesCount {
         ) throws IOException, InterruptedException {
 
             String[] fields = value.toString().split("\\|");
+
+
+            FileSplit fileSplit = (FileSplit) context.getInputSplit();
+            /**
+             * stdout
+             [FileSplit] hdfs://scaj31cdh-ns/user/shawguo/data/SalesLog/sales1.dat:268435456+268435456
+             [Path] hdfs://scaj31cdh-ns/user/shawguo/data/SalesLog/sales1.dat
+             [Locations]
+             */
+            System.out.printf("[FileSplit] %s\n[Path] %s\n[Locations]\n", fileSplit, fileSplit.getPath(), fileSplit.getLocations().length);
 //            System.out.println("Key:" + key + " Fields Length:" + fields.length + " " + ToStringBuilder.reflectionToString(fields));
-            //TODO row validation
             product_id.set(fields[0]);
             quantity_sold.set(Integer.valueOf(fields[5]));
             context.write(product_id, quantity_sold);
@@ -125,15 +135,14 @@ public class SalesCount {
 //        conf.set("mapred.job.tracker", "local");
         conf.set("keep.task.files.pattern", ".*_m_0000.*");
 
-
         Job job = Job.getInstance(conf, "SalesCount");
         /**
          *
-         * cd /opt/Development/github_repo/archetype-helloworld/target/classes
+         * cd /opt/Development/github_repo/my-charetype/archetype-helloworld/target/classes
          * rm /opt/Development/github_repo/archetype-helloworld/target/classes/wc.jar
-         * jar cf wc.jar dominus/bigdata/mapreduce/SalesCount*.class
+         * jar cf wc.jar dominus/bigdata/mapreduce/SalesCount*.class log4j.properties
          */
-        job.setJar("target/classes/wc.jar");
+        job.setJar("archetype-helloworld/target/classes/wc.jar");
         job.setInputFormatClass(TextInputFormat.class);
 
         job.setMapperClass(TokenizerMapper.class);
