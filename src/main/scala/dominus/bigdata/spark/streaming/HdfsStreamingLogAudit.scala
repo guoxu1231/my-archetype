@@ -14,7 +14,7 @@ import org.apache.spark.streaming.dstream.{DStream, PairDStreamFunctions}
 import scala.util.matching.Regex
 
 /**
- * NameNode :tail -f hdfs-audit.log | nc -lk 9999
+ * NameNode :tail -F hdfs-audit.log | nc -lk 9999   //log rotation
  * -k Forces nc to stay listening for another connection after its current connection is completed.
  */
 object HdfsStreamingLogAudit {
