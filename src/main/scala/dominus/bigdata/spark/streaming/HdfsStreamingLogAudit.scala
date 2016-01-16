@@ -5,6 +5,7 @@ import java.util.{TimeZone, Date}
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.SparkConf
+import org.apache.spark.deploy.SparkHadoopUtil
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming._
@@ -21,6 +22,24 @@ object HdfsStreamingLogAudit {
 
   val BATCH_DURATION = Seconds(10)
   val WINDOW_DURATION = BATCH_DURATION * 6
+  val CHECKPOINT_DIR = "hdfs:///user/shawguo/spark-checkpointing"
+
+
+  def createContext(args: Array[String]): StreamingContext = {
+    val sparkConf = new SparkConf().setAppName("HDFS StreamingLog Audit").setMaster("yarn-cluster")
+    val ssc = new StreamingContext(sparkConf, BATCH_DURATION)
+    //NOTE: Checkpointing must be enabled for applications with usage of stateful transformations
+    ssc.checkpoint("hdfs:///user/shawguo/spark-checkpointing")
+
+    val hdfsAuditLog = ssc.socketTextStream(args(0), args(1).toInt, StorageLevel.MEMORY_AND_DISK_SER)
+    //demo 1
+    //cmdCount(ssc, hdfsAuditLog)
+
+    //demo 2
+    cmdStat(ssc, hdfsAuditLog)
+
+    ssc
+  }
 
   def main(args: Array[String]) {
 
@@ -31,19 +50,9 @@ object HdfsStreamingLogAudit {
 
     Logger.getRootLogger.setLevel(Level.WARN)
 
-
-    val sparkConf = new SparkConf().setAppName("HDFS StreamingLog Audit").setMaster("yarn-cluster")
-    val ssc = new StreamingContext(sparkConf, BATCH_DURATION)
-    //NOTE: Checkpointing must be enabled for applications with usage of stateful transformations
-    ssc.checkpoint("hdfs:///user/shawguo/spark-checkpointing")
-    val hdfsAuditLog = ssc.socketTextStream(args(0), args(1).toInt, StorageLevel.MEMORY_AND_DISK_SER)
-
-    //demo 1
-    //cmdCount(ssc, hdfsAuditLog)
-
-    //demo 2
-    cmdStat(ssc, hdfsAuditLog)
-
+    val ssc = StreamingContext.getOrCreate(CHECKPOINT_DIR, () => {
+      createContext(args)
+    })
 
     ssc.start()
     println("Hello HDFS StreamingLog Audit")
