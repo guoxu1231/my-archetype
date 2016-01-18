@@ -3,6 +3,7 @@ package dominus.bigdata.spark.sql
 import java.text.{ParseException, SimpleDateFormat}
 import java.util.{Date, Properties}
 
+import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
@@ -38,7 +39,7 @@ object SparkJDBCSourceTest {
   def main(args: Array[String]) {
 
     val sc = new SparkContext(new SparkConf().setAppName("Spark JDBC Source Test").setMaster("yarn-cluster"))
-    val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+    val sqlContext = new SQLContext(sc)
     println(sc.version)
 
     //mysql master data
