@@ -1,11 +1,9 @@
-package dominus.bigdata.spark
+package dominus.bigdata.spark.sql
 
-import java.io.{FileNotFoundException, IOException, FileInputStream}
-import java.text.{SimpleDateFormat, ParseException}
+import java.text.{ParseException, SimpleDateFormat}
 import java.util.{Date, Properties}
 
-import org.apache.spark.SparkContext
-import org.apache.spark.SparkConf
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * User story:
