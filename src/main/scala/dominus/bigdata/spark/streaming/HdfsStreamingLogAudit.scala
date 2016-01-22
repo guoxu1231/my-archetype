@@ -17,6 +17,11 @@ import scala.util.matching.Regex
 /**
  * NameNode :tail -F hdfs-audit.log | nc -lk 9999   //log rotation
  * -k Forces nc to stay listening for another connection after its current connection is completed.
+ *
+ * Stateful APIs;
+ * Checkpointing Restart;
+ * Socket Receiver;
+ *
  */
 object HdfsStreamingLogAudit {
 
