@@ -17,18 +17,19 @@ import java.util.Random;
  * bin/zookeeper-server-start.sh config/zookeeper.properties
  * bin/kafka-server-start.sh config/server.properties
  * bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic page_visits
- *
+ * <p/>
  * Check data:
  * bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic page_visits --from-beginning
  */
 public class KafkaProducer {
 
     public static void main(String[] args) {
-        long events = 1L;
+        long events = 1000L;
         Random rnd = new Random();
 
         Properties props = new Properties();
-        props.put("metadata.broker.list", "localhost:9092");
+        //EE "host_name:9092"
+        props.put("metadata.broker.list", args[0]);
         props.put("serializer.class", "kafka.serializer.StringEncoder");
 //        props.put("partitioner.class", "example.producer.SimplePartitioner");
         props.put("request.required.acks", "1");
@@ -42,6 +43,7 @@ public class KafkaProducer {
             String ip = "192.168.2." + rnd.nextInt(255);
             String msg = runtime + ",www.example.com," + ip;
             KeyedMessage<String, String> data = new KeyedMessage<String, String>("page_visits", ip, msg);
+            System.out.println("[Message Producer]:" + data);
             producer.send(data);
         }
         producer.close();
