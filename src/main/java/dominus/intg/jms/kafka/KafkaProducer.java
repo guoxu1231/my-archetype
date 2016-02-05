@@ -41,6 +41,7 @@ public class KafkaProducer {
         props.put("serializer.class", "kafka.serializer.StringEncoder");
         props.put("partitioner.class", "dominus.intg.jms.kafka.KafkaProducer$SimplePartitioner");
         //EE: Without this setting the Producer will 'fire and forget' possibly leading to data loss.
+
         props.put("request.required.acks", "1");
         props.put("request.timeout.ms", "600000"); //for kafka server debug purpose
 
