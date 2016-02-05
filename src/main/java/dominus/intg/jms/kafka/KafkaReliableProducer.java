@@ -12,8 +12,9 @@ import java.util.Properties;
 import java.util.Random;
 
 /**
- * Kafka 0.8.2.0
+ * Kafka 0.8.2.2 Legacy Scala producer API
  */
+@Deprecated
 public class KafkaReliableProducer {
 
     public static void main(String[] args) {

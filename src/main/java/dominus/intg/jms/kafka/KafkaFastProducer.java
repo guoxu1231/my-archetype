@@ -19,8 +19,9 @@ import java.util.Random;
  * StopWatch '[KafkaFastProducer] events:1000': running time (millis) = 1942; [] took 1942 = 100%
  * StopWatch '[KafkaReliableProducer] events:1000': running time (millis) = 214664; [] took 214664 = 100%
  *
- * Kafka 0.8.2.0
+ * Kafka 0.8.2.2 Legacy Scala producer API
  */
+@Deprecated
 public class KafkaFastProducer {
 
     public static void main(String[] args) {
