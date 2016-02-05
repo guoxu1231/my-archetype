@@ -11,6 +11,9 @@ import java.util.Properties;
 import java.util.Random;
 
 /**
+ *
+ * Kafka 0.8.2.0
+ *
  */
 public class KafkaReliableProducer {
 

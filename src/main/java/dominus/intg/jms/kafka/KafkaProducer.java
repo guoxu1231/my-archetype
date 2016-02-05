@@ -23,6 +23,9 @@ import java.util.Random;
  * <p/>
  * Check data:
  * bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic page_visits --from-beginning
+ *
+ * Kafka 0.8.2.0
+ *
  */
 public class KafkaProducer {
 
