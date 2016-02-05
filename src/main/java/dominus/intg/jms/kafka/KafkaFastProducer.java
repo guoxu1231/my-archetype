@@ -1,6 +1,7 @@
 package dominus.intg.jms.kafka;
 
 
+import dominus.PropertiesLoader;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.Partitioner;
@@ -26,9 +27,10 @@ public class KafkaFastProducer {
         long events = 1000L;
         Random rnd = new Random();
 
+        Properties cdhProps = PropertiesLoader.loadCDHProperties();
         Properties props = new Properties();
         //EE "host_name:9092"
-        props.put("metadata.broker.list", args[0]);
+        props.put("metadata.broker.list", cdhProps.getProperty("kafka.metadata.broker.list"));
         props.put("serializer.class", "kafka.serializer.StringEncoder");
         props.put("partitioner.class", "dominus.intg.jms.kafka.KafkaProducer$SimplePartitioner");
         //EE: This option provides the lowest latency but the weakest durability guarantees (some data will be lost when a server fails).
@@ -46,7 +48,7 @@ public class KafkaFastProducer {
             long runtime = new Date().getTime();
             String ip = "192.168.2." + rnd.nextInt(255);
             String msg = runtime + ",www.example.com," + ip;
-            KeyedMessage<String, String> data = new KeyedMessage<String, String>("page_visits", ip, msg);
+            KeyedMessage<String, String> data = new KeyedMessage<String, String>(cdhProps.getProperty("kafka.test.topic"), ip, msg);
             System.out.println("[Message Producer]:" + data);
             producer.send(data);
         }
