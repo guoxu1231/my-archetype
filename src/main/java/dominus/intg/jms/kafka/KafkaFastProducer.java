@@ -25,7 +25,6 @@ import java.util.Random;
 public class KafkaFastProducer {
 
     public static void main(String[] args) {
-        long events = 1000L;
         Random rnd = new Random();
 
         Properties cdhProps = PropertiesLoader.loadCDHProperties();
@@ -39,6 +38,7 @@ public class KafkaFastProducer {
         props.put("request.timeout.ms", "600000"); //for kafka server debug purpose
         //EE: By setting the producer to async we allow batching together of requests (which is great for throughput) but open the possibility of a failure of the client machine dropping unsent data.
         props.put("producer.type", "async");
+        long events = Long.valueOf(cdhProps.getProperty("kafka.test.topic.msgCount"));
 
         ProducerConfig config = new ProducerConfig(props);
         Producer<String, String> producer = new Producer<String, String>(config);
