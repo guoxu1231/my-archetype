@@ -1,11 +1,9 @@
-package dominus.scala.language
+package dominus.scala.language.closure
 
 import java.io._
-import java.nio.ByteBuffer
-
-import scala.reflect.ClassTag
 import java.nio.file.{Files, Paths}
 
+import scala.reflect.ClassTag
 import scala.reflect.io.File
 
 
