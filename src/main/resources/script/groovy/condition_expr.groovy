@@ -1,0 +1,1 @@
+return (UICondition)?"show=true,enable=true":"show=false,enable=false";
