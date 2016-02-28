@@ -2,7 +2,6 @@ package dominus.junit;
 
 
 import junit.framework.TestCase;
-import org.apache.commons.lang.reflect.FieldUtils;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -33,6 +32,14 @@ public class DominusBaseTestCase extends TestCase {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
+    public DominusBaseTestCase() {
+        super();
+    }
+
+    public DominusBaseTestCase(String name) {
+        super(name);
+    }
+
     @Override
     protected void setUp() throws Exception {
         properties = PropertiesLoaderUtils.loadProperties(resourceLoader.getResource("classpath:cdh.properties"));
@@ -44,7 +51,8 @@ public class DominusBaseTestCase extends TestCase {
     @Override
     protected void tearDown() throws Exception {
 
-
+        //console color workaround
+        Thread.sleep(500);
     }
 
     @Override
