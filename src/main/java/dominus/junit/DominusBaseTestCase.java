@@ -2,10 +2,13 @@ package dominus.junit;
 
 
 import junit.framework.TestCase;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Properties;
 
@@ -13,13 +16,16 @@ import java.util.Properties;
 /**
  * EE:
  * [Spring] ResourceLoader
+ * [HDFS] hdfs client
  */
 public class DominusBaseTestCase extends TestCase {
 
 
-    protected ResourceLoader resourceLoader = new DefaultResourceLoader();
-    protected PrintStream out = System.out;
-    protected Properties properties;
+    protected static ResourceLoader resourceLoader = new DefaultResourceLoader();
+    protected static PrintStream out = System.out;
+    protected static Properties properties;
+    protected static FileSystem hdfsClient;
+    private static Boolean isInitialized = false;
 
     //color stdout
     public static final String ANSI_RESET = "\u001B[0m";
@@ -32,6 +38,10 @@ public class DominusBaseTestCase extends TestCase {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
+    protected static final int KB = 1024;
+    protected static final int MB = 1048576;
+    protected static final long GB = 1073741824L;
+
     public DominusBaseTestCase() {
         super();
     }
@@ -42,10 +52,31 @@ public class DominusBaseTestCase extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        properties = PropertiesLoaderUtils.loadProperties(resourceLoader.getResource("classpath:cdh.properties"));
-        PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:jdbc.properties"));
-        assertTrue(properties.size() > 0);
-        out.println("[Global Properties]:" + properties.size());
+
+        synchronized (isInitialized) {
+            if (!isInitialized) {
+                properties = PropertiesLoaderUtils.loadProperties(resourceLoader.getResource("classpath:cdh.properties"));
+                PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:jdbc.properties"));
+                assertTrue(properties.size() > 0);
+                out.println("[Global Properties]:" + properties.size());
+
+                //EE: hdfs client
+                Configuration conf = new Configuration();
+                conf.addResource("hdfs-clientconfig-cdh/core-site.xml");
+                conf.addResource("hdfs-clientconfig-cdh/hdfs-site.xml");
+                try {
+                    hdfsClient = FileSystem.get(conf);
+                    out.printf("[Global] HDFS File System Capacity:%sG\n", hdfsClient.getStatus().getCapacity() / GB);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                isInitialized = true;
+            }
+        }
+        assertNotNull(properties);
+        assertNotNull(hdfsClient);
+
     }
 
     @Override
