@@ -3,21 +3,26 @@ package dominus.intg.jms.kafka;
 
 import dominus.PropertiesLoader;
 import dominus.junit.DominusBaseTestCase;
-import junit.framework.TestCase;
+import kafka.admin.AdminUtils;
+import kafka.utils.ZKStringSerializer$;
+import org.I0Itec.zkclient.ZkClient;
 
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 /**
- *
- * EE: Consumer API, Producer API
- *
+ * EE: Consumer API, Producer API, Admin API
+ * <p/>
  * [External Dependencies]
  * CDH Cluster(Kafka Cluster, Zookeeper);
  * Kafka Test Topic;
  */
 public class KafkaClientTestcase extends DominusBaseTestCase {
 
+    int sessionTimeoutMs = 10000;
+    int connectionTimeoutMs = 10000;
+    int replicationFactor = 3;
+    String topicName;
+    ZkClient zkClient;
 
     @Override
     protected void setUp() throws Exception {
@@ -26,6 +31,18 @@ public class KafkaClientTestcase extends DominusBaseTestCase {
         //TODO delete topics
         //junit.framework.AssertionFailedError: expected:<4000> but was:<4969>
 
+        // Create a ZooKeeper client
+        // Note: You must initialize the ZkClient with ZKStringSerializer.  If you don't, then
+        // createTopic() will only seem to work (it will return without error).  The topic will exist in
+        // only ZooKeeper and will be returned when listing topics, but Kafka itself does not create the topic.
+        zkClient = new ZkClient(properties.getProperty("zkQuorum"), sessionTimeoutMs, connectionTimeoutMs,
+                ZKStringSerializer$.MODULE$);
+
+        topicName = properties.getProperty("kafka.test.topic");
+        int numPartitions = Integer.valueOf(properties.getProperty("kafka.test.topic.partition"));
+        AdminUtils.createTopic(zkClient, topicName, numPartitions, replicationFactor, new Properties());
+        out.printf("Kafka Topic[%s] is created!\n", topicName);
+        assertTrue("Kafka Topic[%s] does not exist!", AdminUtils.topicExists(zkClient, topicName));
     }
 
     public void testKafkaClient() throws InterruptedException {
@@ -34,6 +51,8 @@ public class KafkaClientTestcase extends DominusBaseTestCase {
         long events = Long.valueOf(cdhProps.getProperty("kafka.test.topic.msgCount"));
 
         KafkaConsumerConnector.main(null);
+        //junit.framework.AssertionFailedError:Expected :500 Actual :244
+        Thread.sleep(5000);
         new Thread() {
             @Override
             public void run() {
@@ -55,6 +74,8 @@ public class KafkaClientTestcase extends DominusBaseTestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
+        AdminUtils.deleteTopic(zkClient, topicName);
+        out.printf("Kafka Topic[%s] is deleted!\n", topicName);
     }
 
 
