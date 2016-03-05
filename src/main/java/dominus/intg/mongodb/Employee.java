@@ -1,4 +1,4 @@
-package dominus.fastjdbc.mongodb;
+package dominus.intg.mongodb;
 
 
 import org.springframework.data.annotation.Id;
