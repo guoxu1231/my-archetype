@@ -84,7 +84,7 @@ public class ParallelDataMovementTest extends DominusBaseTestCase {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        assertEquals(totalSourceCount, totalInsertCount);
+        assertEquals(totalSourceCount.longValue(), totalInsertCount.longValue());
     }
 
     static class RowProducer implements Runnable {
