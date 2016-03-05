@@ -2,49 +2,27 @@ package dominus.fastjdbc;
 
 
 import dominus.junit.DominusBaseTestCase;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import dominus.junit.annotation.MySqlDataSource;
 import org.springframework.util.StringUtils;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * EE: mysql test_db(local)
- * EE: DatabaseMetaData
+ * EE: mysql test_db(local) is required
+ * EE: database model reverse engineering
+ * JDBC Standard: DatabaseMetaData / ResultSetMetaData
+ * database medadata tables
  * This interface is implemented by driver vendors to let users know the capabilities of a Database Management System (DBMS) in combination with the driver based on JDBCTM technology ("JDBC driver") that is used with it;
  * A user for this interface is commonly a tool that needs to discover how to deal with the underlying DBMS.
  * <p/>
  * Works on any ISO database, as well as 'non-standard' technologies,
  * such as ODBC for Sage, Rdb, Datacom or any other JDBC or ODBC Driver.
  */
+@MySqlDataSource
 public class MySqlMetaDataTest extends DominusBaseTestCase {
-
-    ApplicationContext context;
-    DataSource localMysqlDS;
-    String TEST_SCHEMA = "employees";
-    String TEST_TABLE = "employees";
-
-    @Override
-    public boolean isHdfsClientEnabled() {
-        return false;
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        context = new ClassPathXmlApplicationContext(new String[]{"jdbc_context.xml"});
-        localMysqlDS = (DataSource) context.getBean("mysql_dataSource");
-        out.println(localMysqlDS.toString());
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
 
     public void testDatabaseMetaData_getTables() throws SQLException {
         DatabaseMetaData metaData = localMysqlDS.getConnection().getMetaData();
@@ -122,7 +100,6 @@ public class MySqlMetaDataTest extends DominusBaseTestCase {
     public void testDatabaseMetaData_getKeys() {
 
     }
-
 
     public void testResultSetMetaData() throws SQLException {
 
