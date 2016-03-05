@@ -1,0 +1,3 @@
+select COL1, SUBSTR(COL2, :MY_VAR1, COL3), :MY_VAR2
+ from MY_TABLE
+where COL4 = :MY_VAR2 and COL5 =:MY_VAR3
