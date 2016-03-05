@@ -7,9 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +24,7 @@ import java.util.List;
 public class MySqlMetaDataTest extends DominusBaseTestCase {
 
     ApplicationContext context;
-    DataSource localMysqlDataSource;
+    DataSource localMysqlDS;
     String TEST_SCHEMA = "employees";
     String TEST_TABLE = "employees";
 
@@ -39,8 +37,8 @@ public class MySqlMetaDataTest extends DominusBaseTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         context = new ClassPathXmlApplicationContext(new String[]{"jdbc_context.xml"});
-        localMysqlDataSource = (DataSource) context.getBean("mysql_dataSource");
-        out.println(localMysqlDataSource.toString());
+        localMysqlDS = (DataSource) context.getBean("mysql_dataSource");
+        out.println(localMysqlDS.toString());
     }
 
     @Override
@@ -48,8 +46,8 @@ public class MySqlMetaDataTest extends DominusBaseTestCase {
         super.tearDown();
     }
 
-    public void testGetTables() throws SQLException {
-        DatabaseMetaData metaData = localMysqlDataSource.getConnection().getMetaData();
+    public void testDatabaseMetaData_getTables() throws SQLException {
+        DatabaseMetaData metaData = localMysqlDS.getConnection().getMetaData();
         out.println(metaData);
         ResultSet tables = metaData.getTables(TEST_SCHEMA, "%", "%", new String[]{"TABLE"});
         List<String> tableList = new ArrayList<>();
@@ -69,8 +67,8 @@ public class MySqlMetaDataTest extends DominusBaseTestCase {
                 StringUtils.collectionToDelimitedString(tableList, ","));
     }
 
-    public void testGetColumns() throws SQLException {
-        DatabaseMetaData metaData = localMysqlDataSource.getConnection().getMetaData();
+    public void testDatabaseMetaData_getColumns() throws SQLException {
+        DatabaseMetaData metaData = localMysqlDS.getConnection().getMetaData();
         ResultSet columns = metaData.getColumns(TEST_SCHEMA, "", TEST_TABLE, "%");
         List<String> columnList = new ArrayList<>();
         while (columns.next()) {
@@ -121,7 +119,24 @@ public class MySqlMetaDataTest extends DominusBaseTestCase {
      * pspk.executeUpdate()
      * self.logger.log(java.util.logging.Level.INFO, '     Primary Column: %d, %s' %  (keyseq, colname))
      */
-    public void testGetKeys() {
+    public void testDatabaseMetaData_getKeys() {
 
+    }
+
+
+    public void testResultSetMetaData() throws SQLException {
+
+        Connection conn = localMysqlDS.getConnection();
+        Statement stmt = null;
+        String query = "select birth_date, first_name, last_name, gender, hire_date, emp_no from employees";
+
+        stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+        ResultSetMetaData rsm = rs.getMetaData();
+
+        for (int i = 1; i <= rsm.getColumnCount(); i++) {
+            out.printf("[Column Label] %s, [Column Name] %s, [Column Type] %s\n", rsm.getColumnLabel(i), rsm.getColumnName(i), rsm.getColumnType(i));
+        }
+        assertEquals(rsm.getColumnLabel(rsm.getColumnCount()), "emp_no");
     }
 }
