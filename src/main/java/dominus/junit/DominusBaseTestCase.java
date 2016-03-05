@@ -1,13 +1,18 @@
 package dominus.junit;
 
 
+import dominus.junit.annotation.HdfsClient;
+import dominus.junit.annotation.MySqlDataSource;
 import junit.framework.TestCase;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Properties;
@@ -25,7 +30,8 @@ public class DominusBaseTestCase extends TestCase {
     protected static PrintStream out = System.out;
     protected static Properties properties;
     protected static FileSystem hdfsClient;
-    private static Boolean isInitialized = false;
+    protected DataSource localMysqlDS;
+//    private static Boolean isInitialized = false;
 
     //color stdout
     public static final String ANSI_RESET = "\u001B[0m";
@@ -50,34 +56,50 @@ public class DominusBaseTestCase extends TestCase {
         super(name);
     }
 
+
+    private boolean isHdfsClientEnabled() {
+        return this.getClass().getAnnotation(HdfsClient.class) != null;
+    }
+
+    private boolean isMySqlDataSourceEnabled() {
+        return this.getClass().getAnnotation(MySqlDataSource.class) != null;
+    }
+
     @Override
     protected void setUp() throws Exception {
 
-        synchronized (isInitialized) {
-            if (!isInitialized) {
-                properties = PropertiesLoaderUtils.loadProperties(resourceLoader.getResource("classpath:cdh.properties"));
-                PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:jdbc.properties"));
-                assertTrue(properties.size() > 0);
-                out.println("[Global Properties]:" + properties.size());
+//        synchronized (isInitialized) {
+//            if (!isInitialized) {
 
-                //EE: hdfs client
-                Configuration conf = new Configuration();
-                conf.addResource("hdfs-clientconfig-cdh/core-site.xml");
-                conf.addResource("hdfs-clientconfig-cdh/hdfs-site.xml");
-                try {
-                    hdfsClient = FileSystem.get(conf);
-                    out.printf("[Global] HDFS File System Capacity:%sG\n", hdfsClient.getStatus().getCapacity() / GB);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        properties = PropertiesLoaderUtils.loadProperties(resourceLoader.getResource("classpath:cdh.properties"));
+        PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:jdbc.properties"));
+        assertTrue(properties.size() > 0);
+        out.println("[Global Properties]:" + properties.size());
 
-                isInitialized = true;
+        //EE: hdfs client
+        if (isHdfsClientEnabled()) {
+            Configuration conf = new Configuration();
+            conf.addResource("hdfs-clientconfig-cdh/core-site.xml");
+            conf.addResource("hdfs-clientconfig-cdh/hdfs-site.xml");
+            try {
+                hdfsClient = FileSystem.get(conf);
+                out.printf("[Global] HDFS File System Capacity:%sG\n", hdfsClient.getStatus().getCapacity() / GB);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            assertNotNull(hdfsClient);
         }
-        assertNotNull(properties);
-        assertNotNull(hdfsClient);
 
+        if (isMySqlDataSourceEnabled()) {
+            ApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"jdbc_context.xml"});
+            localMysqlDS = (DataSource) context.getBean("mysql_dataSource");
+            out.println("[DataSource] mysql_dataSource is initialized..");
+        }
+
+        assertNotNull(properties);
+//                isInitialized = true;
     }
+
 
     @Override
     protected void tearDown() throws Exception {
