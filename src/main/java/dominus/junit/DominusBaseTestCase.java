@@ -30,6 +30,8 @@ public class DominusBaseTestCase extends TestCase {
     protected static PrintStream out = System.out;
     protected static Properties properties;
     protected static FileSystem hdfsClient;
+    protected static final String TEST_SCHEMA = "employees";
+    protected static final String TEST_TABLE = "employees";
     protected DataSource localMysqlDS;
 //    private static Boolean isInitialized = false;
 
