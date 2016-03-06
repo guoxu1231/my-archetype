@@ -1,8 +1,8 @@
 package dominus.fastjdbc;
 
 
-import dominus.junit.DominusBaseTestCase;
-import dominus.junit.annotation.MySqlDataSource;
+import dominus.framework.junit.DominusBaseTestCase;
+import dominus.framework.junit.annotation.MySqlDataSource;
 import org.springframework.util.StringUtils;
 
 import java.sql.*;
@@ -25,7 +25,7 @@ import java.util.List;
 public class MySqlMetaDataTest extends DominusBaseTestCase {
 
     public void testDatabaseMetaData_getTables() throws SQLException {
-        DatabaseMetaData metaData = localMysqlDS.getConnection().getMetaData();
+        DatabaseMetaData metaData = sourceMysqlDS.getConnection().getMetaData();
         out.println(metaData);
         ResultSet tables = metaData.getTables(TEST_SCHEMA, "%", "%", new String[]{"TABLE"});
         List<String> tableList = new ArrayList<>();
@@ -46,7 +46,7 @@ public class MySqlMetaDataTest extends DominusBaseTestCase {
     }
 
     public void testDatabaseMetaData_getColumns() throws SQLException {
-        DatabaseMetaData metaData = localMysqlDS.getConnection().getMetaData();
+        DatabaseMetaData metaData = sourceMysqlDS.getConnection().getMetaData();
         ResultSet columns = metaData.getColumns(TEST_SCHEMA, "", TEST_TABLE, "%");
         List<String> columnList = new ArrayList<>();
         while (columns.next()) {
@@ -103,7 +103,7 @@ public class MySqlMetaDataTest extends DominusBaseTestCase {
 
     public void testResultSetMetaData() throws SQLException {
 
-        Connection conn = localMysqlDS.getConnection();
+        Connection conn = sourceMysqlDS.getConnection();
         Statement stmt = null;
         String query = "select birth_date, first_name, last_name, gender, hire_date, emp_no from employees";
 
@@ -115,5 +115,10 @@ public class MySqlMetaDataTest extends DominusBaseTestCase {
             out.printf("[Column Label] %s, [Column Name] %s, [Column Type] %s\n", rsm.getColumnLabel(i), rsm.getColumnName(i), rsm.getColumnType(i));
         }
         assertEquals(rsm.getColumnLabel(rsm.getColumnCount()), "emp_no");
+    }
+
+    //create stage/tmp table for target table
+    public void testCreateStageTable() {
+
     }
 }

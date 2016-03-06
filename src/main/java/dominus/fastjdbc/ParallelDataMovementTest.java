@@ -2,7 +2,7 @@ package dominus.fastjdbc;
 
 
 import com.google.common.io.Files;
-import dominus.junit.DominusBaseTestCase;
+import dominus.framework.junit.DominusBaseTestCase;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;

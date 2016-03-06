@@ -2,8 +2,8 @@ package dominus.fastjdbc;
 
 
 import com.google.common.io.Files;
-import dominus.junit.DominusBaseTestCase;
-import dominus.junit.annotation.MySqlDataSource;
+import dominus.framework.junit.DominusBaseTestCase;
+import dominus.framework.junit.annotation.MySqlDataSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterUtils;
 import org.springframework.jdbc.core.namedparam.ParsedSql;
 

@@ -1,8 +1,8 @@
-package dominus.junit;
+package dominus.framework.junit;
 
 
-import dominus.junit.annotation.HdfsClient;
-import dominus.junit.annotation.MySqlDataSource;
+import dominus.framework.junit.annotation.HdfsClient;
+import dominus.framework.junit.annotation.MySqlDataSource;
 import junit.framework.TestCase;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -32,7 +32,8 @@ public class DominusBaseTestCase extends TestCase {
     protected static FileSystem hdfsClient;
     protected static final String TEST_SCHEMA = "employees";
     protected static final String TEST_TABLE = "employees";
-    protected DataSource localMysqlDS;
+    protected DataSource sourceMysqlDS;
+    protected DataSource stageMysqlDS;
 //    private static Boolean isInitialized = false;
 
     //color stdout
@@ -94,8 +95,10 @@ public class DominusBaseTestCase extends TestCase {
 
         if (isMySqlDataSourceEnabled()) {
             ApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"jdbc_context.xml"});
-            localMysqlDS = (DataSource) context.getBean("mysql_dataSource");
-            out.println("[DataSource] mysql_dataSource is initialized..");
+            sourceMysqlDS = (DataSource) context.getBean("mysql_dataSource");
+            stageMysqlDS = (DataSource) context.getBean("mysql_dataSource_local_iops");
+            out.println("[Source Connection] mysql_dataSource is initialized..");
+            out.println("[Stage Connection] mysql_dataSource_local_iops is initialized..");
         }
 
         assertNotNull(properties);
