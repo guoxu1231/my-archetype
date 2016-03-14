@@ -6,6 +6,8 @@ import dominus.framework.junit.annotation.MySqlDataSource;
 import junit.framework.TestCase;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -13,8 +15,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.Properties;
 
 
@@ -26,11 +27,14 @@ import java.util.Properties;
 public class DominusBaseTestCase extends TestCase {
 
 
+    final Logger logger = LoggerFactory.getLogger(DominusBaseTestCase.class);
+
     protected static ResourceLoader resourceLoader = new DefaultResourceLoader();
     protected static PrintStream out = System.out;
     protected static Properties properties;
     protected static FileSystem hdfsClient;
     protected static final String TEST_SCHEMA = "employees";
+    protected static final String STAGE_SCHEMA = "iops_schema";
     protected static final String TEST_TABLE = "employees";
     protected DataSource sourceMysqlDS;
     protected DataSource stageMysqlDS;
@@ -66,6 +70,21 @@ public class DominusBaseTestCase extends TestCase {
 
     private boolean isMySqlDataSourceEnabled() {
         return this.getClass().getAnnotation(MySqlDataSource.class) != null;
+    }
+
+    protected File createSampleFile(int size) throws IOException {
+        File file = File.createTempFile("DominusBaseTestCase", ".txt");
+        file.deleteOnExit();
+
+        Writer writer = new OutputStreamWriter(new FileOutputStream(file));
+        //total 50 char
+        for (int i = 0; i < size / 50; i++) {
+            writer.write("abcdefghijklmnopqrstuvwxyz\n");
+            writer.write("0123456789011234567890\n");
+        }
+        writer.close();
+        out.printf("Create Sample File: %sb\n", size);
+        return file;
     }
 
     @Override
