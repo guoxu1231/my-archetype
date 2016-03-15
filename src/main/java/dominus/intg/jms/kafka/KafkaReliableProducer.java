@@ -17,7 +17,7 @@ import java.util.Random;
 @Deprecated
 public class KafkaReliableProducer {
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
 
         Random rnd = new Random();
 
@@ -48,7 +48,7 @@ public class KafkaReliableProducer {
             long runtime = new Date().getTime();
             String ip = "192.168.2." + rnd.nextInt(255);
             String msg = runtime + ",www.example.com," + ip;
-            KeyedMessage<String, String> data = new KeyedMessage<String, String>(cdhProps.getProperty("kafka.test.topic"), ip, msg);
+            KeyedMessage<String, String> data = new KeyedMessage<String, String>(args[0], ip, msg);
             System.out.println("[Message Producer]:" + data);
             producer.send(data);
         }

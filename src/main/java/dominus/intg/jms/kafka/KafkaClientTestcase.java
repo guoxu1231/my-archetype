@@ -2,7 +2,7 @@ package dominus.intg.jms.kafka;
 
 
 import dominus.PropertiesLoader;
-import dominus.junit.DominusBaseTestCase;
+import dominus.framework.junit.DominusBaseTestCase;
 import kafka.admin.AdminUtils;
 import kafka.utils.ZKStringSerializer$;
 import org.I0Itec.zkclient.ZkClient;
@@ -21,7 +21,7 @@ public class KafkaClientTestcase extends DominusBaseTestCase {
     int sessionTimeoutMs = 10000;
     int connectionTimeoutMs = 10000;
     int replicationFactor = 3;
-    String topicName;
+    final String topicName = "page_visits_1458017754893";
     ZkClient zkClient;
 
     @Override
@@ -38,8 +38,12 @@ public class KafkaClientTestcase extends DominusBaseTestCase {
         zkClient = new ZkClient(properties.getProperty("zkQuorum"), sessionTimeoutMs, connectionTimeoutMs,
                 ZKStringSerializer$.MODULE$);
 
-        topicName = properties.getProperty("kafka.test.topic");
+//        topicName = properties.getProperty("kafka.test.topic");
         int numPartitions = Integer.valueOf(properties.getProperty("kafka.test.topic.partition"));
+        if (AdminUtils.topicExists(zkClient, topicName)) {
+            AdminUtils.deleteTopic(zkClient, topicName);
+            out.printf("Kafka Topic[%s] is deleted!\n", topicName);
+        }
         AdminUtils.createTopic(zkClient, topicName, numPartitions, replicationFactor, new Properties());
         out.printf("Kafka Topic[%s] is created!\n", topicName);
         assertTrue("Kafka Topic[%s] does not exist!", AdminUtils.topicExists(zkClient, topicName));
@@ -50,19 +54,19 @@ public class KafkaClientTestcase extends DominusBaseTestCase {
         Properties cdhProps = PropertiesLoader.loadCDHProperties();
         long events = Long.valueOf(cdhProps.getProperty("kafka.test.topic.msgCount"));
 
-        KafkaConsumerConnector.main(null);
+        KafkaConsumerConnector.main(topicName);
         //junit.framework.AssertionFailedError:Expected :500 Actual :244
         Thread.sleep(5000);
         new Thread() {
             @Override
             public void run() {
-                KafkaFastProducer.main(null);
+                KafkaFastProducer.main(topicName);
             }
         }.start();
         new Thread() {
             @Override
             public void run() {
-                KafkaReliableProducer.main(null);
+                KafkaReliableProducer.main(topicName);
             }
         }.start();
 

@@ -30,7 +30,7 @@ import java.util.Random;
 @Deprecated
 public class KafkaProducer {
 
-    public static void main(String[] args) {
+    public static void main(String... args) {
         long events = 1000L;
         Random rnd = new Random();
 
@@ -56,7 +56,7 @@ public class KafkaProducer {
             long runtime = new Date().getTime();
             String ip = "192.168.2." + rnd.nextInt(255);
             String msg = runtime + ",www.example.com," + ip;
-            KeyedMessage<String, String> data = new KeyedMessage<String, String>("page_visits", ip, msg);
+            KeyedMessage<String, String> data = new KeyedMessage<String, String>(args[0], ip, msg);
             System.out.println("[Message Producer]:" + data);
             producer.send(data);
         }

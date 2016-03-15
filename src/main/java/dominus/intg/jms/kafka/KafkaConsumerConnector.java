@@ -32,7 +32,7 @@ public class KafkaConsumerConnector {
     protected static Integer exitCount;
     protected static Thread shutdownThread;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String... args) throws InterruptedException {
 
         Properties cdhProps = PropertiesLoader.loadCDHProperties();
         Properties props = new Properties();
@@ -55,7 +55,7 @@ public class KafkaConsumerConnector {
 
         //variables
         int numThreads = new Integer(cdhProps.getProperty("kafka.test.topic.partition"));
-        String topic = cdhProps.getProperty("kafka.test.topic");
+        String topic = args[0];
         Decoder decoder = new StringDecoder(consumerConfig.props());
 
 
