@@ -11,10 +11,7 @@ import kafka.serializer.StringDecoder;
 import kafka.utils.VerifiableProperties;
 
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -66,8 +63,9 @@ public class KafkaConsumerConnector {
         List<KafkaStream<String, String>> streams = consumerMap.get(topic);
         executor = Executors.newFixedThreadPool(numThreads);
 
+        System.out.printf("KafkaStream Count:%s\n", streams.size());
         // now create an object to consume the messages
-        final List<Future<?>> futures = new ArrayList<Future<?>>();
+        final List<Future<String>> futures = new ArrayList<Future<String>>();
         for (final KafkaStream stream : streams) {
             futures.add(executor.submit(new MessageHandler(stream)));
         }
@@ -76,14 +74,17 @@ public class KafkaConsumerConnector {
         shutdownThread = new Thread() {
             @Override
             public void run() {
+                List<String> streamInfo = new ArrayList<String>(futures.size());
                 //blocking call
                 for (int i = 0; i < futures.size(); i++) {
                     try {
-                        futures.get(i).get();
+                        streamInfo.add(futures.get(i).get());
                     } catch (InterruptedException | ExecutionException e) {
                         e.printStackTrace();
                     }
                 }
+                for (String info : streamInfo)
+                    System.out.println(info);
                 //EE clean shutdown
                 consumer.shutdown();
                 executor.shutdown();
@@ -92,26 +93,28 @@ public class KafkaConsumerConnector {
         shutdownThread.start();
     }
 
-    public static class MessageHandler implements Runnable {
+    public static class MessageHandler implements Callable<String> {
         private KafkaStream m_stream;
+        AtomicInteger streamCount = new AtomicInteger(0);
 
         public MessageHandler(KafkaStream a_stream) {
             m_stream = a_stream;
         }
 
         @Override
-        public void run() {
+        public String call() {
             ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
             try {
                 while (it.hasNext()) {
                     System.out.println("[Message Consumer] [Thread] " + Thread.currentThread().getName() + ": " + it.next().message());
                     count.incrementAndGet();
+                    streamCount.incrementAndGet();
                 }
             } catch (ConsumerTimeoutException e) {
                 e.printStackTrace();
                 System.out.println(" No message is available for consumption after the specified interval: " + Thread.currentThread().getName());
-                return;
             }
+            return String.format("[MessageHandler %s] %d", m_stream.clientId(), streamCount.get());
         }
     }
 

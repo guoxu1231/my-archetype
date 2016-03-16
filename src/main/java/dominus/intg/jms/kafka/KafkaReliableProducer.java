@@ -17,18 +17,17 @@ import java.util.Random;
 @Deprecated
 public class KafkaReliableProducer {
 
+    //args[0]=topic args[1]=msgCount args[2]=metadata.broker.list
     public static void main(String... args) {
 
         Random rnd = new Random();
 
-
-        Properties cdhProps = PropertiesLoader.loadCDHProperties();
         Properties props = new Properties();
         //EE "host_name:9092"
-        props.put("metadata.broker.list", cdhProps.getProperty("kafka.metadata.broker.list"));
+        props.put("metadata.broker.list", args[2]);
         props.put("serializer.class", "kafka.serializer.StringEncoder");
-        props.put("partitioner.class", "dominus.intg.jms.kafka.KafkaProducer$SimplePartitioner");
-        long events = Long.valueOf(cdhProps.getProperty("kafka.test.topic.msgCount"));
+        props.put("partitioner.class", "dominus.intg.jms.kafka.ext.RoundRobinPartitioner");
+        long events = Long.valueOf(args[1]);
 
         //EE: -1, which means that the producer gets an acknowledgement after all in-sync replicas have received the data.
         //EE This option provides the best durability, we guarantee that no messages will be lost as long as at least one in sync replica remains.

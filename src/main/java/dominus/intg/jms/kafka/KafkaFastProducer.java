@@ -27,18 +27,17 @@ public class KafkaFastProducer {
     public static void main(String... args) {
         Random rnd = new Random();
 
-        Properties cdhProps = PropertiesLoader.loadCDHProperties();
         Properties props = new Properties();
         //EE "host_name:9092"
-        props.put("metadata.broker.list", cdhProps.getProperty("kafka.metadata.broker.list"));
+        props.put("metadata.broker.list", args[2]);
         props.put("serializer.class", "kafka.serializer.StringEncoder");
-        props.put("partitioner.class", "dominus.intg.jms.kafka.KafkaProducer$SimplePartitioner");
+        props.put("partitioner.class", "dominus.intg.jms.kafka.ext.RoundRobinPartitioner");
         //EE: This option provides the lowest latency but the weakest durability guarantees (some data will be lost when a server fails).
         props.put("request.required.acks", "0");
         props.put("request.timeout.ms", "600000"); //for kafka server debug purpose
         //EE: By setting the producer to async we allow batching together of requests (which is great for throughput) but open the possibility of a failure of the client machine dropping unsent data.
         props.put("producer.type", "async");
-        long events = Long.valueOf(cdhProps.getProperty("kafka.test.topic.msgCount"));
+        long events = Long.valueOf(args[1]);
 
         ProducerConfig config = new ProducerConfig(props);
         Producer<String, String> producer = new Producer<String, String>(config);
