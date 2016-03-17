@@ -66,10 +66,23 @@ public class DominusJUnit4TestBase {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
+    public void println(String color, Object x) {
+        out.print(color);
+        out.println(x);
+        out.print(ANSI_RESET);
+    }
+
+    public void printf(String color, String format, Object... args) {
+        out.print(color);
+        out.printf(format, args);
+        out.print(ANSI_RESET);
+    }
+
     protected static final int KB = 1024;
     protected static final int MB = 1048576;
     protected static final long GB = 1073741824L;
 
+    protected static final long Minute = 60000;
 
     public DominusJUnit4TestBase() {
         super();
@@ -132,7 +145,7 @@ public class DominusJUnit4TestBase {
 
         assertNotNull(properties);
         doSetUp();
-        out.printf("*************************[%s] setUp*************************\n" + ANSI_RESET, this.getClass().getSimpleName());
+        out.printf("*************************[%s] %s setUp*************************\n" + ANSI_RESET, this.getClass().getSimpleName(), name.getMethodName());
     }
 
     protected void doSetUp() throws Exception {
@@ -147,11 +160,11 @@ public class DominusJUnit4TestBase {
     @After
     public void tearDown() throws Exception {
 
-        out.printf(ANSI_CYAN + "*************************[%s] tearDown*************************\n", this.getClass().getSimpleName());
+        out.printf(ANSI_CYAN + "*************************[%s] %s tearDown*************************\n", this.getClass().getSimpleName(), name.getMethodName());
         doTearDown();
         //console color workaround
         Thread.sleep(500);
-        out.printf("*************************[%s] tearDown*************************\n" + ANSI_RESET, this.getClass().getSimpleName());
+        out.printf("*************************[%s] %s tearDown*************************\n" + ANSI_RESET, this.getClass().getSimpleName(), name.getMethodName());
     }
 
 

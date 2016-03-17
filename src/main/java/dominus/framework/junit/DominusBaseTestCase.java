@@ -20,10 +20,12 @@ import java.util.Properties;
 
 
 /**
+ * For Junit 3.x
  * EE:
  * [Spring] ResourceLoader
  * [HDFS] hdfs client
  */
+@Deprecated
 public class DominusBaseTestCase extends TestCase {
 
 
@@ -54,6 +56,7 @@ public class DominusBaseTestCase extends TestCase {
     protected static final int KB = 1024;
     protected static final int MB = 1048576;
     protected static final long GB = 1073741824L;
+
 
     public DominusBaseTestCase() {
         super();
@@ -152,4 +155,17 @@ public class DominusBaseTestCase extends TestCase {
             out.printf("*************************[%s] %s.tearDown*************************\n" + ANSI_RESET, this.getClass().getSimpleName(), super.getName());
         }
     }
+
+
+    //Redirect console output to string
+    protected static ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    protected static PrintStream ps = new PrintStream(baos);
+    protected static PrintStream old = System.out;
+
+    public static String capturedStdout() {
+        System.out.flush();
+        System.setOut(old);
+        return baos.toString();
+    }
+
 }
