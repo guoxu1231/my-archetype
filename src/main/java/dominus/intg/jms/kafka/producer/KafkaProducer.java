@@ -1,4 +1,4 @@
-package dominus.intg.jms.kafka;
+package dominus.intg.jms.kafka.producer;
 
 
 import kafka.javaapi.producer.Producer;
@@ -43,7 +43,7 @@ public class KafkaProducer {
          */
         props.put("metadata.broker.list", args[0]);
         props.put("serializer.class", "kafka.serializer.StringEncoder");
-        props.put("partitioner.class", "dominus.intg.jms.kafka.KafkaProducer$SimplePartitioner");
+        props.put("partitioner.class", "dominus.intg.jms.kafka.producer.KafkaProducer$SimplePartitioner");
         //EE: Without this setting the Producer will 'fire and forget' possibly leading to data loss.
 
         props.put("request.required.acks", "1");

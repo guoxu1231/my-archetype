@@ -1,4 +1,4 @@
-package dominus.intg.jms.kafka;
+package dominus.intg.jms.kafka.consumer;
 
 import dominus.PropertiesLoader;
 import kafka.consumer.ConsumerConfig;
@@ -9,6 +9,8 @@ import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.serializer.Decoder;
 import kafka.serializer.StringDecoder;
 import kafka.utils.VerifiableProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -25,16 +27,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class KafkaConsumerConnector {
 
     protected static ExecutorService executor;
-    protected static AtomicInteger count = new AtomicInteger(0);
+    public static AtomicInteger count = new AtomicInteger(0);
     protected static Integer exitCount;
-    protected static Thread shutdownThread;
+    public static Thread shutdownThread;
+    static final Logger logger = LoggerFactory.getLogger(KafkaConsumerConnector.class);
 
     public static void main(String... args) throws InterruptedException {
 
         Properties cdhProps = PropertiesLoader.loadCDHProperties();
         Properties props = new Properties();
         props.put("zookeeper.connect", cdhProps.getProperty("zkQuorum"));
-        props.put("group.id", "dominus.kafka.consumer.test");
+        props.put("group.id", args[1]);
         props.put("zookeeper.session.timeout.ms", "10000");
         props.put("zookeeper.sync.time.ms", "200");
         props.put("auto.commit.interval.ms", "1000");
@@ -45,9 +48,9 @@ public class KafkaConsumerConnector {
          at kafka.consumer.ConsumerIterator.makeNext(ConsumerIterator.scala:33)
          at kafka.utils.IteratorTemplate.maybeComputeNext(IteratorTemplate.scala:66)
          at kafka.utils.IteratorTemplate.hasNext(IteratorTemplate.scala:58)
-         at dominus.intg.jms.kafka.KafkaConsumerConnector$MessageHandler.run(KafkaConsumerConnector.java:79)
+         at dominus.intg.jms.kafka.consumer.KafkaConsumerConnector$MessageHandler.run(KafkaConsumerConnector.java:79)
          */
-        props.put("consumer.timeout.ms", "10000");
+        props.put("consumer.timeout.ms", "30000");
         ConsumerConfig consumerConfig = new ConsumerConfig(props);
 
         //variables
@@ -106,7 +109,7 @@ public class KafkaConsumerConnector {
             ConsumerIterator<byte[], byte[]> it = m_stream.iterator();
             try {
                 while (it.hasNext()) {
-                    System.out.println("[Message Consumer] [Thread] " + Thread.currentThread().getName() + ": " + it.next().message());
+                    logger.trace("[Message Consumer] [Thread] " + Thread.currentThread().getName() + ": " + it.next().message());
                     count.incrementAndGet();
                     streamCount.incrementAndGet();
                 }
