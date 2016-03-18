@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import java.util.Date;
 import java.util.Properties;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -71,10 +72,15 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     //sum all partition offset by using kafka tool(GetOffsetShell)
     protected long sumPartitionOffset() {
         // Tell Java to use your special stream
-        System.setOut(ps);
+        preCapturedStdout();
         GetOffsetShell.main(String.format("--broker-list %s --topic %s --time -1", brokerList, testTopicName).split(" "));
         String output = capturedStdout();
-        out.println(output);
+        if (!StringUtils.hasText(output)) {
+            println(ANSI_RED, "No output from GetOffsetShell!!!");
+            return sumPartitionOffset();
+        }
+        println(ANSI_RED, "GetOffsetShell  " + String.format("--broker-list %s --topic %s --time -1 --max-wait-ms 10000", brokerList, testTopicName));
+        println(ANSI_RED, output);
         long count = 0;
         for (String partitionOffset : output.split("\n")) {
             if (StringUtils.hasText(partitionOffset) && partitionOffset.startsWith(testTopicName))

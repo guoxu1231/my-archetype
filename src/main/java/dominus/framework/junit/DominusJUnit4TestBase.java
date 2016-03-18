@@ -18,7 +18,6 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.sql.DataSource;
@@ -66,13 +65,13 @@ public class DominusJUnit4TestBase {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
 
-    public void println(String color, Object x) {
+    public static void println(String color, Object x) {
         out.print(color);
         out.println(x);
         out.print(ANSI_RESET);
     }
 
-    public void printf(String color, String format, Object... args) {
+    public static void printf(String color, String format, Object... args) {
         out.print(color);
         out.printf(format, args);
         out.print(ANSI_RESET);
@@ -170,13 +169,27 @@ public class DominusJUnit4TestBase {
 
     //Redirect console output to string
     protected static ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    protected static PrintStream ps = new PrintStream(baos);
-    protected static PrintStream old = System.out;
+    protected static PrintStream ps1 = new PrintStream(baos);
+    protected static ByteArrayOutputStream errors = new ByteArrayOutputStream();
+    protected static PrintStream ps2 = new PrintStream(errors);
+    protected static PrintStream stdOut = System.out;
+    protected static PrintStream stdError = System.err;
+
+    public static void preCapturedStdout() {
+        System.setOut(ps1);
+        System.setErr(ps2);
+    }
 
     public static String capturedStdout() {
         System.out.flush();
-        System.setOut(old);
-        return baos.toString();
+        System.err.flush();
+        System.setOut(stdOut);
+        System.setErr(stdError);
+        String output = baos.toString();
+        String error = errors.toString();
+        baos.reset();
+        errors.reset();
+        println(ANSI_RED, error);
+        return output;
     }
-
 }
