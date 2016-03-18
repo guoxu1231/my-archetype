@@ -21,11 +21,11 @@ import static org.junit.Assert.assertTrue;
 public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
 
     String brokerList;
-    int replicationFactor = 3;
+    static int replicationFactor = 3;
 
     //ZK
-    int zkSessionTimeout = 6000;
-    int zkConnectionTimeout = 10000;
+    static int zkSessionTimeout = 6000;
+    static int zkConnectionTimeout = 10000;
     ZkClient zkClient;
 
     //test topic
@@ -70,14 +70,14 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
 
 
     //sum all partition offset by using kafka tool(GetOffsetShell)
-    protected long sumPartitionOffset() {
+    protected static long sumPartitionOffset(String brokerList, String testTopicName) {
         // Tell Java to use your special stream
         preCapturedStdout();
         GetOffsetShell.main(String.format("--broker-list %s --topic %s --time -1", brokerList, testTopicName).split(" "));
         String output = capturedStdout();
         if (!StringUtils.hasText(output)) {
             println(ANSI_RED, "No output from GetOffsetShell!!!");
-            return sumPartitionOffset();
+            return sumPartitionOffset(brokerList, testTopicName);
         }
         println(ANSI_RED, "GetOffsetShell  " + String.format("--broker-list %s --topic %s --time -1 --max-wait-ms 10000", brokerList, testTopicName));
         println(ANSI_RED, output);

@@ -18,7 +18,7 @@ public class KafkaPerformanceTestCase extends KafkaZBaseTestCase {
         KafkaFastProducer.main(testTopicName, String.valueOf(events), brokerList);
         Thread.sleep(5000);//EE: wait for message got flushed in broker
         //total partition offset should be equal with events count.
-        assertEquals(events, sumPartitionOffset());
+        assertEquals(events, sumPartitionOffset(brokerList, testTopicName));
         println(ANSI_RED, "assertEquals passed");
     }
 

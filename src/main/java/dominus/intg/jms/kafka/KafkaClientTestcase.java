@@ -25,7 +25,7 @@ public class KafkaClientTestcase extends KafkaZBaseTestCase {
         long events = Long.valueOf(properties.getProperty("kafka.test.topic.msgCount"));
         KafkaFastProducer.main(testTopicName, String.valueOf(events), brokerList);
         //total partition offset should be equal with events count.
-        assertEquals(events, sumPartitionOffset());
+        assertEquals(events, sumPartitionOffset(brokerList, testTopicName));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class KafkaClientTestcase extends KafkaZBaseTestCase {
         }.start();
 
         KafkaConsumerConnector.shutdownThread.join();
-        assertEquals("client produced != server offset", events * 2, sumPartitionOffset());
+        assertEquals("client produced != server offset", events * 2, sumPartitionOffset(brokerList, testTopicName));
         assertEquals("produced != consumed", events * 2, KafkaConsumerConnector.count.intValue());
         KafkaConsumerConnector.count.set(0);
     }
