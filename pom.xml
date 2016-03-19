@@ -11,9 +11,6 @@
     <name>archetype-helloworld</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java-version>1.7</java-version>
-        <!-- Override Spring version -->
-        <spring.version>4.2.1.RELEASE</spring.version>
         <!-- AssertJ is not a part of Spring IO platform, so the version must be provided explicitly -->
         <assertj-core-version>3.1.0</assertj-core-version>
         <scala.version>2.10.5</scala.version>
@@ -101,6 +98,13 @@
             <id>Java Core/All</id>
             <dependencies>
 
+                <!-- slf4j logging -->
+                <dependency>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                    <version>1.1.6</version>
+                </dependency>
+
                 <!--Utility -->
                 <!-- Google Core Libraries for Java
                 http://google.github.io/guava/releases/19.0/api/docs/-->
@@ -122,6 +126,12 @@
                     <artifactId>spring-jdbc</artifactId>
                     <version>${spring.version}</version>
                 </dependency>
+                <dependency>
+                    <groupId>org.springframework.batch</groupId>
+                    <artifactId>spring-batch-core</artifactId>
+                    <version>3.0.6.RELEASE</version>
+                </dependency>
+
 
                 <!-- JMS -->
                 <dependency>
@@ -143,6 +153,21 @@
                 <!--<artifactId>activemq-jms-pool</artifactId>-->
                 <!--</dependency>-->
 
+                <!-- Zookeeper, 3.3.1 is used in org.I0Itec.zkclient 0.4
+                     Zookeeper, 3.4.6 is used in org.I0Itec.zkclient 0.7
+                -->
+                <dependency>
+                    <groupId>org.apache.zookeeper</groupId>
+                    <artifactId>zookeeper</artifactId>
+                    <version>3.4.6</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
                 <!-- Apache Kafka
                 scala2.11 java.lang.NoSuchMethodError: scala.Predef$.ArrowAssoc(Ljava/lang/Object;)Ljava/lang/Object;
                 -->
@@ -151,6 +176,24 @@
                     <artifactId>kafka_2.10</artifactId>
                     <version>0.8.2.2</version>
                     <scope>compile</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <!-- 0.4 with kafka 0.8.2.2, 0.7 with kafka 0.9-->
+                <dependency>
+                    <groupId>com.101tec</groupId>
+                    <artifactId>zkclient</artifactId>
+                    <version>0.7</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
                 <!--
                         <exclusions>
@@ -280,12 +323,56 @@
                     <version>1.99.6</version>
                 </dependency>
 
+                <!-- Oozie Java Client API-->
+                <dependency>
+                    <groupId>org.apache.oozie</groupId>
+                    <artifactId>oozie-client</artifactId>
+                    <version>4.2.0</version>
+                    <!--
+                    SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/opt/Development/maven_repo/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/Development/maven_repo/org/slf4j/slf4j-simple/1.6.6/slf4j-simple-1.6.6.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+                    -->
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-simple</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <!-- template engine -->
+                <dependency>
+                    <groupId>org.apache.velocity</groupId>
+                    <artifactId>velocity</artifactId>
+                    <version>1.7</version>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <testSourceDirectory>${basedir}/src/main/java/</testSourceDirectory>
+                    <testClassesDirectory>${project.build.directory}/classes/</testClassesDirectory>
+                    <includes>
+                        <!-- JDBC begin-->
+                        <include>dominus.fastjdbc.MySqlDDLTest</include>
+                        <include>dominus.fastjdbc.MySqlMetaDataTest</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 
