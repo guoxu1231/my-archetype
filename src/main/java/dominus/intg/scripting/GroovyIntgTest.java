@@ -1,4 +1,4 @@
-package dominus.language.scripting;
+package dominus.intg.scripting;
 
 
 import com.google.common.io.Files;
