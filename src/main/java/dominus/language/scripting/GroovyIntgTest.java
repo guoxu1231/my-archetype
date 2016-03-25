@@ -1,11 +1,14 @@
-package dominus.language.script;
+package dominus.language.scripting;
 
 
 import com.google.common.io.Files;
-import dominus.junit.DominusBaseTestCase;
+import dominus.framework.junit.DominusJUnit4TestBase;
+import org.junit.Test;
 
 import javax.script.*;
 import java.nio.charset.StandardCharsets;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * EE: Integrating Groovy in a Java application
@@ -15,14 +18,13 @@ import java.nio.charset.StandardCharsets;
  * EE: JSR223
  * Scripting for the Java Platform is a framework for embedding scripts into Java source code.
  */
-public class GroovyIntgTest extends DominusBaseTestCase {
+public class GroovyIntgTest extends DominusJUnit4TestBase {
 
     ScriptEngine scriptEngine;
     String conditionExprScript;
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void doSetUp() throws Exception {
         //TODO classloader
         scriptEngine = new ScriptEngineManager().getEngineByName("groovy");
         System.out.printf("EngineName: %s\n", scriptEngine.getFactory().getEngineName());
@@ -34,11 +36,9 @@ public class GroovyIntgTest extends DominusBaseTestCase {
 
         conditionExprScript = Files.toString(resourceLoader.getResource("classpath:script/groovy/condition_expr.groovy").getFile(), StandardCharsets.UTF_8);
         System.out.printf("ConditionExprScript: %s\n", conditionExprScript);
-
     }
 
-
-
+    @Test
     public void testConditionalExpr() throws ScriptException {
         ScriptContext newContext = new SimpleScriptContext();
         newContext.setBindings(scriptEngine.createBindings(), ScriptContext.ENGINE_SCOPE);
@@ -48,13 +48,4 @@ public class GroovyIntgTest extends DominusBaseTestCase {
         // evaluate the same code but in a different script context (x = "world")
         assertEquals("show=false,enable=false", scriptEngine.eval(conditionExprScript, newContext));
     }
-
-
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-
 }
