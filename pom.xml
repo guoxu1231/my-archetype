@@ -1,386 +1,125 @@
-<project
-        xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
-        >
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>dominus</groupId>
-    <artifactId>archetype-helloworld</artifactId>
-    <packaging>jar</packaging>
-    <version>0.2</version>
-    <name>archetype-helloworld</name>
+    <artifactId>my-archetype</artifactId>
+    <version>0.0.2</version>
+    <packaging>pom</packaging>
+    <name>my-archetype</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java-version>1.7</java-version>
+        <!-- Override Spring version -->
+        <spring.version>4.2.1.RELEASE</spring.version>
         <!-- AssertJ is not a part of Spring IO platform, so the version must be provided explicitly -->
-        <assertj-core-version>3.1.0</assertj-core-version>
-        <scala.version>2.10.5</scala.version>
-        <scala.binary.version>2.10</scala.binary.version>
-        <spark.home>/opt/Development/middleware/bigdata/spark-1.5.2-bin-hadoop2.6</spark.home>
-        <spark.snapshot.assemblePath>
-            /opt/Development/github_repo/spark/dist/lib/spark-assembly-2.0.0-SNAPSHOT-hadoop2.6.0.jar
-        </spark.snapshot.assemblePath>
-        <cxf.version>3.1.4</cxf.version>
     </properties>
-    <parent>
-        <groupId>dominus</groupId>
-        <artifactId>my-archetype</artifactId>
-        <version>0.0.2</version>
-    </parent>
 
-    <profiles>
-        <profile>
-            <id>apache-spark-1.5.2/scala</id>
-            <dependencies>
-                <!--Apache Spark -->
-                <dependency>
-                    <groupId>org.apache.spark</groupId>
-                    <artifactId>spark-assembly</artifactId>
-                    <version>1.5.2</version>
-                    <scope>system</scope>
-                    <!-- symlink does not work, use real path-->
-                    <systemPath>${spark.home}/lib/spark-assembly-1.5.2-hadoop2.6.0.jar</systemPath>
-                </dependency>
-                <dependency>
-                    <groupId>org.scala-lang</groupId>
-                    <artifactId>scala-library</artifactId>
-                    <version>2.10.2</version>
-                </dependency>
-                <!-- used in streaming example-->
-                <dependency>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                    <version>19.0</version>
-                </dependency>
-            </dependencies>
-        </profile>
+    <modules>
+        <module>archetype-helloworld</module>
+        <module>archetype-www</module>
+    </modules>
 
-        <profile>
-            <id>apache-spark-snapshot/scala</id>
-            <dependencies>
-                <!--Apache Spark -->
-                <dependency>
-                    <groupId>org.apache.spark</groupId>
-                    <artifactId>spark-assembly</artifactId>
-                    <version>latest-snapshot</version>
-                    <scope>system</scope>
-                    <!-- symlink does not work, use real path-->
-                    <systemPath>
-                        ${spark.snapshot.assemblePath}
-                    </systemPath>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.spark</groupId>
-                    <artifactId>spark-streaming-kafka-assembly</artifactId>
-                    <version>1.6</version>
-                    <scope>system</scope>
-                    <systemPath>${basedir}/lib/spark-streaming-kafka-assembly_2.10-1.6.0.jar</systemPath>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.kafka</groupId>
-                    <artifactId>kafka-clients</artifactId>
-                    <version>0.8.2.0</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.scala-lang</groupId>
-                    <artifactId>scala-library</artifactId>
-                    <version>2.10.2</version>
-                </dependency>
-                <!-- used in streaming example-->
-                <dependency>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                    <version>19.0</version>
-                </dependency>
-            </dependencies>
-        </profile>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+        <!-- used in org.I0Itec.zkclient-->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>1.8.0</version>
+        </dependency>
 
-        <profile>
-            <id>Java Core/All</id>
-            <dependencies>
-
-                <!-- slf4j logging -->
-                <dependency>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                    <version>1.1.6</version>
-                </dependency>
-
-                <!--Utility -->
-                <!-- Google Core Libraries for Java
-                http://google.github.io/guava/releases/19.0/api/docs/-->
-                <dependency>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                    <version>19.0</version>
-                </dependency>
-
-
-                <!-- Spring -->
-                <dependency>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-context</artifactId>
-                    <version>${spring.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-jdbc</artifactId>
-                    <version>${spring.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.springframework.batch</groupId>
-                    <artifactId>spring-batch-core</artifactId>
-                    <version>3.0.6.RELEASE</version>
-                </dependency>
-
-
-                <!-- JMS -->
-                <dependency>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-jms</artifactId>
-                    <version>${spring.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.activemq</groupId>
-                    <artifactId>activemq-broker</artifactId>
-                    <version>5.10.2</version>
-                </dependency>
-                <!--<dependency>-->
-                <!--<groupId>org.apache.activemq</groupId>-->
-                <!--<artifactId>activemq-pool</artifactId>-->
-                <!--</dependency>-->
-                <!--<dependency>-->
-                <!--<groupId>org.apache.activemq</groupId>-->
-                <!--<artifactId>activemq-jms-pool</artifactId>-->
-                <!--</dependency>-->
-
-                <!-- Zookeeper, 3.3.1 is used in org.I0Itec.zkclient 0.4
-                     Zookeeper, 3.4.6 is used in org.I0Itec.zkclient 0.7
-                -->
-                <dependency>
-                    <groupId>org.apache.zookeeper</groupId>
-                    <artifactId>zookeeper</artifactId>
-                    <version>3.4.6</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <!-- Apache Kafka
-                scala2.11 java.lang.NoSuchMethodError: scala.Predef$.ArrowAssoc(Ljava/lang/Object;)Ljava/lang/Object;
-                -->
-                <dependency>
-                    <groupId>org.apache.kafka</groupId>
-                    <artifactId>kafka_2.10</artifactId>
-                    <version>0.8.2.2</version>
-                    <scope>compile</scope>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <!-- 0.4 with kafka 0.8.2.2, 0.7 with kafka 0.9-->
-                <dependency>
-                    <groupId>com.101tec</groupId>
-                    <artifactId>zkclient</artifactId>
-                    <version>0.7</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <!--
-                        <exclusions>
-                        <exclusion>
-                            <artifactId>jmxri</artifactId>
-                            <groupId>com.sun.jmx</groupId>
-                        </exclusion>
-                        <exclusion>
-                            <artifactId>jms</artifactId>
-                            <groupId>javax.jms</groupId>
-                        </exclusion>
-                        <exclusion>
-                            <artifactId>jmxtools</artifactId>
-                            <groupId>com.sun.jdmk</groupId>
-                        </exclusion>
-                        <Detected both log4j-over-slf4j.jar AND slf4j-log4j12.jar on the class path, preempting StackOverflowError.
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                        </exclusion>
-                        <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                        </exclusion>
-                        </exclusions>
-                -->
-
-                <!--memcached client -->
-                <dependency>
-                    <groupId>net.spy</groupId>
-                    <artifactId>spymemcached</artifactId>
-                    <version>2.12.0</version>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.mina</groupId>
-                    <artifactId>mina-core</artifactId>
-                    <version>2.0.4</version>
-                </dependency>
-
-                <!-- Distributed Coordination -->
-                <dependency>
-                    <groupId>org.apache.curator</groupId>
-                    <artifactId>curator-recipes</artifactId>
-                    <version>2.9.0</version>
-                </dependency>
-
-                <!-- JDBC -->
-                <dependency>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-dbcp2</artifactId>
-                    <version>2.1.1</version>
-                </dependency>
-                <!-- JDBC Mybatis -->
-                <dependency>
-                    <groupId>org.mybatis</groupId>
-                    <artifactId>mybatis</artifactId>
-                    <version>3.3.0</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>mysql</groupId>
-                    <artifactId>mysql-connector-java</artifactId>
-                    <version>5.1.37</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>oracle.jdbc</groupId>
-                    <artifactId>ojdbc</artifactId>
-                    <version>6</version>
-                    <scope>system</scope>
-                    <systemPath>${basedir}/lib/ojdbc/ojdbc6.jar</systemPath>
-                    <!-- must match file name -->
-                </dependency>
-
-                <!--mongodb -->
-                <dependency>
-                    <groupId>org.springframework.data</groupId>
-                    <artifactId>spring-data-mongodb</artifactId>
-                    <version>1.6.3.RELEASE</version>
-                </dependency>
-
-                <!--hdfs & mapreduce also match CDH 5.4.x-->
-                <!-- Hadoop main client artifact -->
-                <dependency>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-client</artifactId>
-                    <version>2.6.2</version>
-                    <exclusions><!-- find out how log4j is getting on your path run mvn dependency:tree and comb through -->
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-yarn-client</artifactId>
-                    <version>2.6.2</version>
-                </dependency>
-
-                <!-- NIO framework -->
-                <dependency>
-                    <groupId>io.netty</groupId>
-                    <artifactId>netty-all</artifactId>
-                    <!-- Use 'netty-all' for 4.0 or above -->
-                    <version>4.0.32.Final</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.mina</groupId>
-                    <artifactId>mina-core</artifactId>
-                    <version>2.0.9</version>
-                </dependency>
-
-                <!--Groovy Shell -->
-                <dependency>
-                    <groupId>org.codehaus.groovy</groupId>
-                    <artifactId>groovy-jsr223</artifactId>
-                    <version>2.4.6</version>
-                </dependency>
-
-                <!--Sqoop Java Client API-->
-                <dependency>
-                    <groupId>org.apache.sqoop</groupId>
-                    <artifactId>sqoop-client</artifactId>
-                    <version>1.99.6</version>
-                </dependency>
-
-                <!-- Oozie Java Client API-->
-                <dependency>
-                    <groupId>org.apache.oozie</groupId>
-                    <artifactId>oozie-client</artifactId>
-                    <version>4.2.0</version>
-                    <!--
-                    SLF4J: Class path contains multiple SLF4J bindings.
-SLF4J: Found binding in [jar:file:/opt/Development/maven_repo/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-SLF4J: Found binding in [jar:file:/opt/Development/maven_repo/org/slf4j/slf4j-simple/1.6.6/slf4j-simple-1.6.6.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
-SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
-                    -->
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-simple</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <!-- template engine -->
-                <dependency>
-                    <groupId>org.apache.velocity</groupId>
-                    <artifactId>velocity</artifactId>
-                    <version>1.7</version>
-                </dependency>
-
-                <!-- alibaba dubbo rpc framework -->
-                <dependency>
-                    <groupId>com.alibaba</groupId>
-                    <artifactId>dubbo</artifactId>
-                    <version>2.5.4-SNAPSHOT</version>
-                </dependency>
-
-            </dependencies>
-        </profile>
-    </profiles>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Test & Test Report -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.19.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-report-plugin</artifactId>
+                    <version>2.19.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
                 <configuration>
-                    <testSourceDirectory>${basedir}/src/main/java/</testSourceDirectory>
-                    <testClassesDirectory>${project.build.directory}/classes/</testClassesDirectory>
-                    <includes>
-                        <!-- JDBC begin-->
-                        <include>dominus.fastjdbc.MySqlDDLTest</include>
-                        <include>dominus.fastjdbc.MySqlMetaDataTest</include>
-                    </includes>
+                    <source>${java-version}</source>
+                    <target>${java-version}</target>
+                    <executable>${env.JAVA_HOME}/bin/javac</executable>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-report-plugin</artifactId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>sources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
             </plugin>
         </plugins>
     </build>
+
+
+    <repositories>
+        <repository>
+            <id>central repository</id>
+            <url>http://repo1.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>mvnrepository</id>
+            <url>http://www.mvnrepository.com</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <!--CDH Repository -->
+        <repository>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>
