@@ -1,12 +1,9 @@
 package dominus.intg.jms.kafka.producer;
 
 
-import dominus.PropertiesLoader;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
-import kafka.producer.Partitioner;
 import kafka.producer.ProducerConfig;
-import kafka.utils.VerifiableProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StopWatch;

@@ -1,7 +1,6 @@
 package dominus.intg.jms.kafka.producer;
 
 
-import dominus.PropertiesLoader;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
