@@ -1,3 +1,9 @@
+/archetype-helloworld/derby.log
+/archetype-helloworld/archetype-helloworld.iml
+/archetype-helloworld/.idea
+/my-archetype.iml
+/derby.log
+/metastore_db
 *.class
 
 # Mobile Tools for Java (J2ME)
@@ -8,6 +14,9 @@
 # Package Files #
 *.war
 *.ear
+/archetype-helloworld/metastore_db
 
+/archetype-www/target
+/archetype-helloworld/target
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
