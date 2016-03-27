@@ -1,0 +1,95 @@
+<project
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+        >
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>dominus</groupId>
+    <artifactId>archetype-spark</artifactId>
+    <packaging>jar</packaging>
+    <version>0.2</version>
+    <name>archetype-spark</name>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <scala.version>2.10.5</scala.version>
+        <scala.binary.version>2.10</scala.binary.version>
+        <spark.home>/opt/Development/middleware/bigdata/spark-1.5.2-bin-hadoop2.6</spark.home>
+        <spark.snapshot.assemblePath>
+            /opt/Development/github_repo/spark/dist/lib/spark-assembly-2.0.0-SNAPSHOT-hadoop2.6.0.jar
+        </spark.snapshot.assemblePath>
+    </properties>
+    <parent>
+        <groupId>dominus</groupId>
+        <artifactId>my-archetype</artifactId>
+        <version>0.0.2</version>
+    </parent>
+
+    <profiles>
+
+        <profile>
+            <id>scala_spark-1.5.2</id>
+            <dependencies>
+                <!--Apache Spark -->
+                <dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-assembly</artifactId>
+                    <version>1.5.2</version>
+                    <scope>system</scope>
+                    <!-- symlink does not work, use real path-->
+                    <systemPath>${spark.home}/lib/spark-assembly-1.5.2-hadoop2.6.0.jar</systemPath>
+                </dependency>
+                <dependency>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                    <version>2.10.2</version>
+                </dependency>
+                <!-- used in streaming example-->
+                <dependency>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                    <version>19.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>scala_spark_snapshot</id>
+            <dependencies>
+                <!--Apache Spark -->
+                <dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-assembly</artifactId>
+                    <version>latest-snapshot</version>
+                    <scope>system</scope>
+                    <!-- symlink does not work, use real path-->
+                    <systemPath>
+                        ${spark.snapshot.assemblePath}
+                    </systemPath>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-streaming-kafka-assembly</artifactId>
+                    <version>1.6</version>
+                    <scope>system</scope>
+                    <systemPath>${basedir}/lib/spark-streaming-kafka-assembly_2.10-1.6.0.jar</systemPath>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-clients</artifactId>
+                    <version>0.8.2.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                    <version>2.10.2</version>
+                </dependency>
+                <!-- used in streaming example-->
+                <dependency>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                    <version>19.0</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+</project>
