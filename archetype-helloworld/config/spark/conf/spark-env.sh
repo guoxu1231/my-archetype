@@ -58,3 +58,5 @@
 #submit with --jars
 #SPARK_CLASSPATH=mysql-connector-java-5.1.37.jar
 #SPARK_CLASSPATH=ojdbc6.jar
+
+#SPARK_YARN_APP_NAME=Spark Test
