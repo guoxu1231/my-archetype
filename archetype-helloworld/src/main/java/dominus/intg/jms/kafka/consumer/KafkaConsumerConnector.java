@@ -1,6 +1,5 @@
 package dominus.intg.jms.kafka.consumer;
 
-import dominus.PropertiesLoader;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.ConsumerTimeoutException;
@@ -8,7 +7,6 @@ import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.serializer.Decoder;
 import kafka.serializer.StringDecoder;
-import kafka.utils.VerifiableProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +32,8 @@ public class KafkaConsumerConnector {
 
     public static void main(String... args) throws InterruptedException {
 
-        Properties cdhProps = PropertiesLoader.loadCDHProperties();
         Properties props = new Properties();
-        props.put("zookeeper.connect", cdhProps.getProperty("zkQuorum"));
+        props.put("zookeeper.connect", args[2]);
         props.put("group.id", args[1]);
         props.put("zookeeper.session.timeout.ms", "10000");
         props.put("zookeeper.sync.time.ms", "200");
@@ -54,7 +51,7 @@ public class KafkaConsumerConnector {
         ConsumerConfig consumerConfig = new ConsumerConfig(props);
 
         //variables
-        int numThreads = new Integer(cdhProps.getProperty("kafka.test.topic.partition"));
+        int numThreads = new Integer(args[3]);
         String topic = args[0];
         Decoder decoder = new StringDecoder(consumerConfig.props());
 

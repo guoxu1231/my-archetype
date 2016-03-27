@@ -53,7 +53,8 @@ public class KafkaClientTestcase extends KafkaZBaseTestCase {
 
         final long events = Long.valueOf(properties.getProperty("kafka.test.topic.msgCount"));
 
-        KafkaConsumerConnector.main(testTopicName, groupId);
+        KafkaConsumerConnector.main(testTopicName, groupId, properties.getProperty("zkQuorum"),
+                properties.getProperty("kafka.test.topic.partition"));
         //junit.framework.AssertionFailedError:Expected :500 Actual :244
         Thread.sleep(5000);
         new Thread() {
