@@ -28,8 +28,9 @@
     </parent>
 
     <profiles>
+
         <profile>
-            <id>apache-spark-1.5.2/scala</id>
+            <id>scala_spark-1.5.2</id>
             <dependencies>
                 <!--Apache Spark -->
                 <dependency>
@@ -55,7 +56,7 @@
         </profile>
 
         <profile>
-            <id>apache-spark-snapshot/scala</id>
+            <id>scala_spark_snapshot</id>
             <dependencies>
                 <!--Apache Spark -->
                 <dependency>
@@ -95,7 +96,10 @@
         </profile>
 
         <profile>
-            <id>Java Core/All</id>
+            <id>java</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <dependencies>
 
                 <!-- slf4j logging -->
