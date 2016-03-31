@@ -7,5 +7,6 @@ os:
 
 before_script:
   - ./ci_script/before_script.sh
-
+install:
+  - echo 'install'
 script: mvn clean compile
