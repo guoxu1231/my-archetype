@@ -117,8 +117,8 @@ public class DominusJUnit4TestBase {
 
         out.printf(ANSI_CYAN + "*************************[%s] %s setUp*************************\n", this.getClass().getSimpleName(), name.getMethodName());
 
-        properties = PropertiesLoaderUtils.loadProperties(resourceLoader.getResource("classpath:cdh.properties"));
-        PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:jdbc.properties"));
+        properties = PropertiesLoaderUtils.loadProperties(resourceLoader.getResource("classpath:spring-container/props/cdh.properties"));
+        PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:spring-container/props/jdbc.properties"));
         assertTrue(properties.size() > 0);
         out.println("[Global Properties]:" + properties.size());
 
