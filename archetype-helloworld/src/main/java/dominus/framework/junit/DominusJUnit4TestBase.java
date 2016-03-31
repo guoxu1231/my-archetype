@@ -119,7 +119,7 @@ public class DominusJUnit4TestBase {
 
         properties = PropertiesLoaderUtils.loadProperties(resourceLoader.getResource("classpath:spring-container/props/cdh.properties"));
         PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:spring-container/props/jdbc.properties"));
-        assertTrue(properties.size() > 0);
+        assertTrue("[Global Properties] is empty",properties.size() > 0);
         out.println("[Global Properties]:" + properties.size());
 
         //EE: hdfs client
