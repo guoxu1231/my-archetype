@@ -1,12 +1,12 @@
 language: java
 
 jdk:
-    - openjdk7
+  - openjdk7
 os:
   - linux
 
 before_script:
-    - git clone https://github.com/alibaba/dubbo.git dubbo
-    - cd dubbo
-    - mvn clean install -Dmaven.test.skip
+  - git clone https://github.com/alibaba/dubbo.git dubbo
+  - cd dubbo
+  - mvn clean install -Dmaven.test.skip
 script: mvn clean compile
