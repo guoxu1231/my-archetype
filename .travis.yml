@@ -12,7 +12,7 @@ before_script:
   - ./ci_script/before_script.sh
 
 script:
-  - mvn clean -pl archetype-helloworld test
+  - mvn clean -pl archetype-helloworld test -X
 
 cache:
   directories:
