@@ -6,10 +6,7 @@ os:
   - linux
 
 install:
-  - echo 'install'
-
-before_script:
-  - ./ci_script/before_script.sh
+  - ./ci_script/install.sh
 
 script:
   - mvn clean -pl archetype-helloworld test
