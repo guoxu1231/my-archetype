@@ -1,6 +1,6 @@
 package dominus.fastjdbc;
 
-import dominus.intg.mongodb.Employee;
+import dominus.intg.datastore.mongodb.Employee;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.mongodb.core.MongoOperations;
