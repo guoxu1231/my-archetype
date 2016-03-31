@@ -5,8 +5,5 @@ jdk:
 os:
   - linux
 
-before_script:
-    - git clone https://github.com/alibaba/dubbo.git dubbo
-    - cd dubbo
-    - mvn clean install -Dmaven.test.skip
+before_script: ci_script/before_script.sh
 script: mvn clean compile
