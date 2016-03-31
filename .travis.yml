@@ -13,3 +13,7 @@ before_script:
 
 script:
   - mvn clean compile
+
+cache:
+  directories:
+    - $HOME/.m2
