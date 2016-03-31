@@ -8,4 +8,5 @@ os:
 before_script:
   - ./ci_script/before_script.sh
 
-script: mvn clean compile
+script:
+  - mvn clean compile
