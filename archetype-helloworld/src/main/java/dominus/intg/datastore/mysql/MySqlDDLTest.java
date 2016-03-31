@@ -1,32 +1,32 @@
 package dominus.intg.datastore.mysql;
 
 
-import dominus.framework.junit.DominusBaseTestCase;
-import dominus.framework.junit.annotation.MySqlDataSource;
+import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@MySqlDataSource
-public class MySqlDDLTest extends DominusBaseTestCase {
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+
+public class MySqlDDLTest extends MySqlZBaseTestCase {
 
     JdbcTemplate stageDSTemplate;
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void doSetUp() throws Exception {
         stageDSTemplate = new JdbcTemplate(stageMysqlDS);
     }
 
     @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    protected void doTearDown() throws Exception {
         stageDSTemplate.execute("DROP TABLE IF EXISTS iops_schema.test_employees");
     }
 
     //CREATE TABLE ... LIKE Syntax
+    @Test
     public void testCreateStageTable() throws SQLException {
         stageDSTemplate.execute("DROP TABLE IF EXISTS iops_schema.test_employees");
         stageDSTemplate.execute("CREATE TABLE iops_schema.test_employees LIKE employees.employees");
@@ -47,6 +47,4 @@ public class MySqlDDLTest extends DominusBaseTestCase {
             assertEquals(sourceColumns.getString("COLUMN_SIZE"), stageColumns.getString("COLUMN_SIZE"));
         }
     }
-
-
 }

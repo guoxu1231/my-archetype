@@ -1,14 +1,15 @@
 package dominus.intg.datastore.mysql;
 
 
-import dominus.framework.junit.DominusBaseTestCase;
-import dominus.framework.junit.annotation.MySqlDataSource;
+import org.junit.Test;
 import org.springframework.util.StringUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static junit.framework.TestCase.assertEquals;
 
 /**
  * EE: mysql test_db(local) is required
@@ -21,9 +22,9 @@ import java.util.List;
  * Works on any ISO database, as well as 'non-standard' technologies,
  * such as ODBC for Sage, Rdb, Datacom or any other JDBC or ODBC Driver.
  */
-@MySqlDataSource
-public class MySqlMetaDataTest extends DominusBaseTestCase {
+public class MySqlMetaDataTest extends MySqlZBaseTestCase {
 
+    @Test
     public void testDatabaseMetaData_getTables() throws SQLException {
         DatabaseMetaData metaData = sourceMysqlDS.getConnection().getMetaData();
         out.println(metaData);
@@ -45,6 +46,7 @@ public class MySqlMetaDataTest extends DominusBaseTestCase {
                 StringUtils.collectionToDelimitedString(tableList, ","));
     }
 
+    @Test
     public void testDatabaseMetaData_getColumns() throws SQLException {
         DatabaseMetaData metaData = sourceMysqlDS.getConnection().getMetaData();
         ResultSet columns = metaData.getColumns(TEST_SCHEMA, "", TEST_TABLE, "%");
@@ -101,6 +103,7 @@ public class MySqlMetaDataTest extends DominusBaseTestCase {
 
     }
 
+    @Test
     public void testResultSetMetaData() throws SQLException {
 
         Connection conn = sourceMysqlDS.getConnection();
@@ -115,10 +118,5 @@ public class MySqlMetaDataTest extends DominusBaseTestCase {
             out.printf("[Column Label] %s, [Column Name] %s, [Column Type] %s\n", rsm.getColumnLabel(i), rsm.getColumnName(i), rsm.getColumnType(i));
         }
         assertEquals(rsm.getColumnLabel(rsm.getColumnCount()), "emp_no");
-    }
-
-    //create stage/tmp table for target table
-    public void testCreateStageTable() {
-
     }
 }
