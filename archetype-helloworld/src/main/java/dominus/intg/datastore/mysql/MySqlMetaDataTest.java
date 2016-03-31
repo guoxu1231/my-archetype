@@ -1,4 +1,4 @@
-package dominus.fastjdbc;
+package dominus.intg.datastore.mysql;
 
 
 import dominus.framework.junit.DominusBaseTestCase;

@@ -1,4 +1,4 @@
-package dominus.intg.mongodb;
+package dominus.intg.datastore.mongodb;
 
 
 import dominus.framework.junit.DominusBaseTestCase;
