@@ -7,6 +7,10 @@
         http://www.springframework.org/schema/context/spring-context.xsd">
 
     <beans profile="local">
+        <context:property-placeholder location="classpath:spring-container/props/jdbc.properties"/>
+    </beans>
+
+    <beans profile="cluster">
         <context:property-placeholder location="classpath:spring-container/props/cdh.properties,spring-container/props/jdbc.properties"/>
     </beans>
 
