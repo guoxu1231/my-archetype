@@ -15,7 +15,7 @@
     </beans>
 
     <beans profile="travis-ci">
-        <context:property-placeholder location="classpath:spring-container/props/jdbc_travis_ci.properties"/>
+        <context:property-placeholder location="classpath:spring-container/props/jdbc_travis_ci.properties,classpath:spring-container/props/cdh_travis_ci.properties"/>
     </beans>
 
 </beans>
