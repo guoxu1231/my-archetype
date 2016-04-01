@@ -12,7 +12,7 @@ script:
   - mvn clean -pl archetype-helloworld test
 
 after_failure:
-  - cat target/surefire-reports/*.txt
+  - cat archetype-helloworld/target/surefire-reports/*.txt
 
 cache:
   directories:

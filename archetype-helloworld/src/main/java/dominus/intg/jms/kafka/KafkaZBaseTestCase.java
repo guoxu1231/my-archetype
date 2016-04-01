@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
 
     String brokerList;
-    static int replicationFactor = 3;
+    int replicationFactor;
 
     //ZK
     static int zkSessionTimeout = 6000;
@@ -38,6 +38,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     @Override
     protected void doSetUp() throws Exception {
         brokerList = properties.getProperty("bootstrap.servers");
+        replicationFactor = Integer.valueOf(properties.getProperty("kafka.replication.factor"));
 
         // Create a ZooKeeper client
         // Note: You must initialize the ZkClient with ZKStringSerializer.  If you don't, then
