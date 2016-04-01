@@ -13,26 +13,34 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package dominus.nio.netty4.echo;
+package dominus.intg.nio.netty4.discard;
 
-import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.ReferenceCountUtil;
 
 /**
- * Handler implementation for the echo server.
+ * Handles a server-side channel.
  */
-@Sharable
-public class EchoServerHandler extends ChannelInboundHandlerAdapter {
+public class DiscardServerHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        ctx.write(msg);
+    public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+        // discard
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) {
-        ctx.flush();
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        ByteBuf in = (ByteBuf) msg;
+        try {
+            while (in.isReadable()) { // (1)
+                System.out.print((char) in.readByte());
+                System.out.flush();
+            }
+        } finally {
+            ReferenceCountUtil.release(msg); // (2)
+        }
     }
 
     @Override

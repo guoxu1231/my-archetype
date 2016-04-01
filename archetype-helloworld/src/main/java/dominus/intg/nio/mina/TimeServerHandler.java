@@ -1,4 +1,4 @@
-package dominus.nio.mina;
+package dominus.intg.nio.mina;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IdleStatus;

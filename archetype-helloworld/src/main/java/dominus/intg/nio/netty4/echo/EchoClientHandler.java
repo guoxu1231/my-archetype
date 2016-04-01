@@ -13,34 +13,45 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package dominus.nio.netty4.discard;
+package dominus.intg.nio.netty4.echo;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.ReferenceCountUtil;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
 /**
- * Handles a server-side channel.
+ * Handler implementation for the echo client.  It initiates the ping-pong
+ * traffic between the echo client and server by sending the first message to
+ * the server.
  */
-public class DiscardServerHandler extends SimpleChannelInboundHandler<Object> {
+public class EchoClientHandler extends ChannelInboundHandlerAdapter {
+
+    private final ByteBuf firstMessage;
+
+    /**
+     * Creates a client-side handler.
+     */
+    public EchoClientHandler() {
+        firstMessage = Unpooled.buffer(EchoClient.SIZE);
+        for (int i = 0; i < firstMessage.capacity(); i ++) {
+            firstMessage.writeByte((byte) i);
+        }
+    }
 
     @Override
-    public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        // discard
+    public void channelActive(ChannelHandlerContext ctx) {
+        ctx.writeAndFlush(firstMessage);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        ByteBuf in = (ByteBuf) msg;
-        try {
-            while (in.isReadable()) { // (1)
-                System.out.print((char) in.readByte());
-                System.out.flush();
-            }
-        } finally {
-            ReferenceCountUtil.release(msg); // (2)
-        }
+        ctx.write(msg);
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+       ctx.flush();
     }
 
     @Override
