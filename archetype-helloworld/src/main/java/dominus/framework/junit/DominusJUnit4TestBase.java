@@ -44,7 +44,7 @@ public class DominusJUnit4TestBase {
 
 
     @Autowired
-    protected static Environment properties;
+    protected Environment properties;
 
     @Rule //The TestName Rule makes the current test name available inside test methods
     public TestName name = new TestName();

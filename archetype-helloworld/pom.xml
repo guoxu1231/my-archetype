@@ -313,6 +313,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.datastore.mysql.MySqlMetaDataTest</include>
                         <!-- Misc -->
                         <include>dominus.intg.scripting.GroovyIntgTest</include>
+                        <include>dominus.intg.ws.jaxb.XmlBindingTest</include>
                         <!-- RPC -->
                         <include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>
                         <!-- Kafka & ZK -->
