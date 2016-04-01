@@ -22,5 +22,5 @@ nohup bash -c "cd kafka && bin/zookeeper-server-start.sh config/zookeeper.proper
 nohup bash -c "cd kafka && bin/kafka-server-start.sh config/server.properties &"
 
 #list current directory
-ll .
+ls -l
 
