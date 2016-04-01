@@ -317,6 +317,9 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <!-- RPC -->
                         <include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>
                         <!-- Kafka & ZK -->
+                        <include>dominus.intg.jms.kafka.KafkaServerTestCase</include>
+                        <include>dominus.intg.jms.kafka.KafkaClientTestcase</include>
+                        <include>dominus.intg.jms.kafka.KafkaAdminTestCase</include>
                     </includes>
                 </configuration>
             </plugin>

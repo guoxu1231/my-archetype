@@ -126,7 +126,7 @@ public class DominusJUnit4TestBase {
 //        PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:spring-container/props/jdbc.properties"));
 //        assertTrue("[Global Properties] is empty",properties.size() > 0);
 //        out.println("[Global Properties]:" + properties.size());
-        printf(ANSI_RED, "[Spring Active Profile] %s", properties.getActiveProfiles()[0]);
+        printf(ANSI_RED, "[Spring Active Profile] %s\n", properties.getActiveProfiles()[0]);
 
         //EE: hdfs client
         if (isHdfsClientEnabled()) {
