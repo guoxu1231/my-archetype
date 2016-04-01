@@ -120,6 +120,11 @@
                         </exclusion>
                     </exclusions>
                 </dependency>
+                <dependency>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                    <version>2.10.4</version>
+                </dependency>
                 <!-- 0.4 with kafka 0.8.2.2, 0.7 with kafka 0.9-->
                 <dependency>
                     <groupId>com.101tec</groupId>
