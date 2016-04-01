@@ -10,12 +10,12 @@
         <context:property-placeholder location="classpath:spring-container/props/jdbc.properties"/>
     </beans>
 
-    <beans profile="cluster">
-        <context:property-placeholder location="classpath:spring-container/props/cdh.properties,spring-container/props/jdbc.properties"/>
+    <beans profile="intg">
+        <context:property-placeholder location="classpath:spring-container/props/intg/*.properties"/>
     </beans>
 
     <beans profile="travis-ci">
-        <context:property-placeholder location="classpath:spring-container/props/jdbc_travis_ci.properties,classpath:spring-container/props/cdh_travis_ci.properties"/>
+        <context:property-placeholder location="classpath:spring-container/props/travis-ci/*.properties"/>
     </beans>
 
 </beans>
