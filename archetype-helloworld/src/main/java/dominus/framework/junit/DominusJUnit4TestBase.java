@@ -117,7 +117,7 @@ public class DominusJUnit4TestBase {
 
         out.print(ANSI_CYAN);
         out.printf("*************************[%s] %s setUp*************************\n", this.getClass().getSimpleName(), name.getMethodName());
-        printf(ANSI_RED, "[Spring Active Profile] %s\n", environment.getActiveProfiles()[0]);
+        out.printf("[Spring Active Profile] %s\n", environment.getActiveProfiles()[0]);
         assertTrue("[Global Properties] is empty", properties.size() > 0);
         out.println("[Global Properties]:" + properties.size());
 
