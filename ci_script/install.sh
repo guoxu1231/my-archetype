@@ -13,6 +13,7 @@ mysql -t < test_employees_md5.sql
 #create staging schema
 mysql -u root -e "create database IF NOT EXISTS iops_schema;"
 mysql -u root -e "show schemas"
+cd ..
 
 #install kafka & standalone zookeeper
 mkdir $HOME/download -p
@@ -21,6 +22,7 @@ mkdir -p kafka && tar xzf $HOME/download/kafka.tgz -C kafka --strip-components 1
 nohup bash -c "cd kafka && bin/zookeeper-server-start.sh config/zookeeper.properties &"
 nohup bash -c "cd kafka && bin/kafka-server-start.sh config/server.properties &"
 
-#list current directory
+#debug dir info
+pwd
 ls -l
 
