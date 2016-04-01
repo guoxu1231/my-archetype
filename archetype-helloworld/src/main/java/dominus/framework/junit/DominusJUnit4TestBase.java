@@ -39,7 +39,7 @@ import static org.junit.Assert.assertTrue;
 @ActiveProfiles("travis-ci")
 public class DominusJUnit4TestBase {
 
-    @Resource(name="globalProps")
+    @Resource(name = "globalProps")
     protected Properties properties;
 
     @Autowired
@@ -115,7 +115,8 @@ public class DominusJUnit4TestBase {
     @Before
     public void setUp() throws Exception {
 
-        out.printf(ANSI_CYAN + "*************************[%s] %s setUp*************************\n", this.getClass().getSimpleName(), name.getMethodName());
+        out.print(ANSI_CYAN);
+        out.printf("*************************[%s] %s setUp*************************\n", this.getClass().getSimpleName(), name.getMethodName());
         printf(ANSI_RED, "[Spring Active Profile] %s\n", environment.getActiveProfiles()[0]);
         assertTrue("[Global Properties] is empty", properties.size() > 0);
         out.println("[Global Properties]:" + properties.size());
@@ -137,7 +138,8 @@ public class DominusJUnit4TestBase {
 
         assertNotNull(properties);
         doSetUp();
-        out.printf("*************************[%s] %s setUp*************************\n" + ANSI_RESET, this.getClass().getSimpleName(), name.getMethodName());
+        out.printf("*************************[%s] %s setUp*************************\n", this.getClass().getSimpleName(), name.getMethodName());
+        out.print(ANSI_RESET);
     }
 
     protected void doSetUp() throws Exception {
@@ -152,11 +154,13 @@ public class DominusJUnit4TestBase {
     @After
     public void tearDown() throws Exception {
 
-        out.printf(ANSI_CYAN + "*************************[%s] %s tearDown*************************\n", this.getClass().getSimpleName(), name.getMethodName());
+        out.print(ANSI_CYAN);
+        out.printf("*************************[%s] %s tearDown*************************\n", this.getClass().getSimpleName(), name.getMethodName());
         doTearDown();
         //console color workaround
         Thread.sleep(500);
-        out.printf("*************************[%s] %s tearDown*************************\n" + ANSI_RESET, this.getClass().getSimpleName(), name.getMethodName());
+        out.printf("*************************[%s] %s tearDown*************************\n", this.getClass().getSimpleName(), name.getMethodName());
+        out.print(ANSI_RESET);
     }
 
 
