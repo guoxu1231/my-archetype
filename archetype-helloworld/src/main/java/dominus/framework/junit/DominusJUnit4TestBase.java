@@ -12,8 +12,10 @@ import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -41,6 +43,9 @@ import static org.junit.Assert.assertTrue;
 public class DominusJUnit4TestBase {
 
 
+    @Autowired
+    protected static Environment properties;
+
     @Rule //The TestName Rule makes the current test name available inside test methods
     public TestName name = new TestName();
 
@@ -48,7 +53,7 @@ public class DominusJUnit4TestBase {
 
     protected static ResourceLoader resourceLoader = new DefaultResourceLoader();
     protected static PrintStream out = System.out;
-    protected static Properties properties;
+
     protected static FileSystem hdfsClient;
     protected static final String TEST_SCHEMA = "employees";
     protected static final String STAGE_SCHEMA = "iops_schema";
@@ -117,10 +122,11 @@ public class DominusJUnit4TestBase {
 
         out.printf(ANSI_CYAN + "*************************[%s] %s setUp*************************\n", this.getClass().getSimpleName(), name.getMethodName());
 
-        properties = PropertiesLoaderUtils.loadProperties(resourceLoader.getResource("classpath:spring-container/props/cdh.properties"));
-        PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:spring-container/props/jdbc.properties"));
-        assertTrue("[Global Properties] is empty",properties.size() > 0);
-        out.println("[Global Properties]:" + properties.size());
+//        properties = PropertiesLoaderUtils.loadProperties(resourceLoader.getResource("classpath:spring-container/props/cdh.properties"));
+//        PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:spring-container/props/jdbc.properties"));
+//        assertTrue("[Global Properties] is empty",properties.size() > 0);
+//        out.println("[Global Properties]:" + properties.size());
+        printf(ANSI_RED, "[Spring Active Profile] %s", properties.getActiveProfiles()[0]);
 
         //EE: hdfs client
         if (isHdfsClientEnabled()) {
