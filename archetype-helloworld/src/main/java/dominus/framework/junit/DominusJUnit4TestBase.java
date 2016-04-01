@@ -2,7 +2,6 @@ package dominus.framework.junit;
 
 
 import dominus.framework.junit.annotation.HdfsClient;
-import dominus.framework.junit.annotation.MySqlDataSource;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.junit.After;
@@ -13,16 +12,14 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.io.*;
 import java.util.Properties;
@@ -42,9 +39,11 @@ import static org.junit.Assert.assertTrue;
 @ActiveProfiles("travis-ci")
 public class DominusJUnit4TestBase {
 
+    @Resource(name="globalProps")
+    protected Properties properties;
 
     @Autowired
-    protected Environment properties;
+    Environment environment;
 
     @Rule //The TestName Rule makes the current test name available inside test methods
     public TestName name = new TestName();
@@ -98,10 +97,6 @@ public class DominusJUnit4TestBase {
         return this.getClass().getAnnotation(HdfsClient.class) != null;
     }
 
-    private boolean isMySqlDataSourceEnabled() {
-        return this.getClass().getAnnotation(MySqlDataSource.class) != null;
-    }
-
     protected File createSampleFile(int size) throws IOException {
         File file = File.createTempFile("DominusBaseTestCase", ".txt");
         file.deleteOnExit();
@@ -121,12 +116,10 @@ public class DominusJUnit4TestBase {
     public void setUp() throws Exception {
 
         out.printf(ANSI_CYAN + "*************************[%s] %s setUp*************************\n", this.getClass().getSimpleName(), name.getMethodName());
+        printf(ANSI_RED, "[Spring Active Profile] %s\n", environment.getActiveProfiles()[0]);
+        assertTrue("[Global Properties] is empty", properties.size() > 0);
+        out.println("[Global Properties]:" + properties.size());
 
-//        properties = PropertiesLoaderUtils.loadProperties(resourceLoader.getResource("classpath:spring-container/props/cdh.properties"));
-//        PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:spring-container/props/jdbc.properties"));
-//        assertTrue("[Global Properties] is empty",properties.size() > 0);
-//        out.println("[Global Properties]:" + properties.size());
-        printf(ANSI_RED, "[Spring Active Profile] %s\n", properties.getActiveProfiles()[0]);
 
         //EE: hdfs client
         if (isHdfsClientEnabled()) {
@@ -140,14 +133,6 @@ public class DominusJUnit4TestBase {
                 e.printStackTrace();
             }
             assertNotNull(hdfsClient);
-        }
-
-        if (isMySqlDataSourceEnabled()) {
-            ApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"jdbc_context.xml"});
-            sourceMysqlDS = (DataSource) context.getBean("mysql_dataSource");
-            stageMysqlDS = (DataSource) context.getBean("mysql_dataSource_local_iops");
-            out.println("[Source Connection] mysql_dataSource is initialized..");
-            out.println("[Stage Connection] mysql_dataSource_local_iops is initialized..");
         }
 
         assertNotNull(properties);
