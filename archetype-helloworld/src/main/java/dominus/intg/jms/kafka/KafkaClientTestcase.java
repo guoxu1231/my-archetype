@@ -35,9 +35,10 @@ public class KafkaClientTestcase extends KafkaZBaseTestCase {
 
     @Test
     @Repeat(1)
-    public void testRoundRobinPartitioner() {
+    public void testRoundRobinPartitioner() throws InterruptedException {
         long events = Long.valueOf(properties.getProperty("kafka.test.topic.msgCount"));
         KafkaFastProducer.main(testTopicName, String.valueOf(events), brokerList);
+        Thread.sleep(5000);
         //total partition offset should be equal with events count.
         assertEquals(events, sumPartitionOffset(brokerList, testTopicName));
     }
