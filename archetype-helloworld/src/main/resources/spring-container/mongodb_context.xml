@@ -10,6 +10,7 @@
           http://www.springframework.org/schema/beans
           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+    <!-- mongodb java client -->
     <mongo:mongo host="localhost" port="27017">
         <mongo:options connections-per-host="8"
                        threads-allowed-to-block-for-connection-multiplier="4"
@@ -28,10 +29,14 @@
     <mongo:db-factory id="mongoDbFactory"
                       host="localhost"
                       port="27017"
-                      dbname="iops_schema"/>
+                      dbname="test_schema"/>
 
     <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
         <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+    </bean>
+
+    <bean id="mongoAdmin" class="org.springframework.data.mongodb.core.MongoAdmin">
+        <constructor-arg name="mongo" ref="mongo"/>
     </bean>
 
 </beans>
