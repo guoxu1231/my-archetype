@@ -41,6 +41,7 @@ public class MongoIntgTest extends DominusJUnit4TestBase {
 
     @Override
     protected void doTearDown() throws Exception {
+        out.println(admin.getDatabaseStats(TEST_SCHEMA));
         admin.dropDatabase(TEST_SCHEMA);
         out.println(TEST_SCHEMA + " is deleted!");
     }
