@@ -6,7 +6,7 @@ os:
   - linux
 
 install:
-  - ./ci_script/install.sh
+  - ./travis/install.sh
 
 script:
   - mvn clean -pl archetype-helloworld test
