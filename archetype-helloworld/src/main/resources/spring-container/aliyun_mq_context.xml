@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="producerProp" class="java.util.Properties">
+        <constructor-arg>
+            <props>
+                <prop key="ConsumerId">${aliyun.mq.producerId}</prop>
+                <prop key="AccessKey">${aliyun.accessKey}</prop>
+                <prop key="SecretKey">${aliyun.secretKey}</prop>
+                <!--<prop key="ONSAddr">${aliyun.ONSAddr}</prop>-->
+            </props>
+        </constructor-arg>
+    </bean>
+    <bean id="producer" class="com.aliyun.openservices.ons.api.bean.ProducerBean" init-method="start"
+          destroy-method="shutdown">
+        <property name="properties" ref="producerProp"/>
+    </bean>
+
+    <bean id="consumerProp" class="java.util.Properties">
+        <constructor-arg>
+            <props>
+                <prop key="ConsumerId">${aliyun.mq.consumerId}</prop>
+                <prop key="AccessKey">${aliyun.accessKey}</prop>
+                <prop key="SecretKey">${aliyun.secretKey}</prop>
+                <prop key="ConsumeThreadNums">2</prop>
+            </props>
+        </constructor-arg>
+    </bean>
+    <bean id="msgListener" class="dominus.intg.jms.mq.endpoint.DemoMessageListener"></bean>
+    <bean id="consumer" class="com.aliyun.openservices.ons.api.bean.ConsumerBean" init-method="start"
+          destroy-method="shutdown">
+        <property name="properties" ref="consumerProp"/>
+        <property name="subscriptionTable">
+            <map>
+                <entry value-ref="msgListener">
+                    <key>
+                        <bean class="com.aliyun.openservices.ons.api.bean.Subscription">
+                            <property name="topic" value="${aliyun.mq.testTopic}"/>
+                            <property name="expression" value="*"/>
+                        </bean>
+                    </key>
+                </entry>
+                <!--更多的订阅添加entry节点即可-->
+            </map>
+        </property>
+    </bean>
+</beans>
