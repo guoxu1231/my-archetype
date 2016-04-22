@@ -8,7 +8,9 @@ import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.FormatType;
+//EE: public cloud & finance cloud package
 import com.aliyuncs.ons4financehz.model.v20160405.*;
+//import com.aliyuncs.ons.model.v20160405.*;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import org.junit.Test;
@@ -39,6 +41,7 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
     @Test
     public void testOnsRegionListRequest() throws ClientException {
         OnsRegionListRequest request = new OnsRegionListRequest();
+        request.setOnsRegionId(ONS_REGION_ID);
         request.setAcceptFormat(FormatType.JSON);
         request.setPreventCache(System.currentTimeMillis());
 
@@ -127,26 +130,47 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
     }
 
     public static final String TEST_10K_QUEUE = "D-GUOXU-TEST-10k";
+    public static final String TEST_ONE_MSG_QUEUE = "D-GUOXU-TEST-ONE";
     public static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
 
     @Test
-    public void testCreate10ThousandQueue() throws ClientException, IllegalAccessException {
+    public void testCreate10ThousandQueue() throws ClientException, IllegalAccessException, InterruptedException {
 
         this.createTestTopic(TEST_10K_QUEUE);
-        Producer producer = this.createProducer("PID-D-GUOXU-TEST-10k");
         this.createProducerPublish(TEST_10K_QUEUE, "PID-D-GUOXU-TEST-10k");
+        Producer producer = this.createProducer("PID-D-GUOXU-TEST-10k");
 
         for (int i = 0; i < 10000; i++) {
             Message msg = new Message(TEST_10K_QUEUE, "DefaultTag", ALPHABET.getBytes());
             msg.setKey(String.format("ORDERID_%d", i));
             SendResult sendResult = producer.send(msg);
             assert sendResult != null;
-            println(ANSI_RED, "send to 10ThousandQueue success: " + sendResult);
+            out.printf("%s send to 10ThousandQueue success: %s \n", msg.getKey(), sendResult);
         }
         OnsTopicStatusResponse.Data data = this.getTopicStatus(TEST_10K_QUEUE);
         assertEquals(10000L, data.getTotalCount().longValue());
 
         this.deleteProducerPublish(TEST_10K_QUEUE, "PID-D-GUOXU-TEST-10k");
+    }
+
+    @Test
+    public void testCreateOneMsgQueue() throws ClientException, IllegalAccessException, InterruptedException {
+
+        this.createTestTopic(TEST_ONE_MSG_QUEUE);
+        this.createProducerPublish(TEST_ONE_MSG_QUEUE, "PID-D-GUOXU-TEST-ONE");
+        Producer producer = this.createProducer("PID-D-GUOXU-TEST-ONE");
+
+        for (int i = 0; i < 1; i++) {
+            Message msg = new Message(TEST_ONE_MSG_QUEUE, "DefaultTag", ALPHABET.getBytes());
+            msg.setKey(String.format("ORDERID_%d", i));
+            SendResult sendResult = producer.send(msg);
+            assert sendResult != null;
+            out.printf("%s send to SingleQueue success: %s \n", msg.getKey(), sendResult);
+        }
+        OnsTopicStatusResponse.Data data = this.getTopicStatus(TEST_ONE_MSG_QUEUE);
+        assertEquals(1L, data.getTotalCount().longValue());
+
+        this.deleteProducerPublish(TEST_ONE_MSG_QUEUE, "PID-D-GUOXU-TEST-ONE");
     }
 
 }

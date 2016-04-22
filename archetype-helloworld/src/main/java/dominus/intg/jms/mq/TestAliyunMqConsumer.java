@@ -1,57 +1,60 @@
 package dominus.intg.jms.mq;
 
 
-import com.aliyun.openservices.ons.api.*;
-import com.aliyun.openservices.ons.api.exception.ONSClientException;
-import dominus.framework.junit.DominusJUnit4TestBase;
-import org.apache.commons.lang.reflect.FieldUtils;
+import com.aliyun.openservices.ons.api.Consumer;
+import com.aliyuncs.exceptions.ClientException;
+import dominus.intg.jms.mq.endpoint.DemoMessageListener;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
-/**
- * From Aliyun User manual
- */
-@ContextConfiguration(locations = {"classpath:spring-container/aliyun_mq_consumer_context.xml"})
-public class TestAliyunMqConsumer extends DominusJUnit4TestBase {
+import static org.junit.Assert.assertEquals;
 
+public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
 
-    @Autowired
     Consumer consumer;
+    String currentTopic;
 
-    String testTopic;
 
     @Override
     protected void doSetUp() throws Exception {
-        testTopic = properties.getProperty("aliyun.mq.testTopic");
-        out.printf("[Aliyun MQ] Test Topic:%s\n", testTopic);
-        out.printf("[Producer] %s\n", FieldUtils.readDeclaredField(consumer, "consumer", true));
+        super.doSetUp();
+
     }
 
     @Override
     protected void doTearDown() throws Exception {
         super.doTearDown();
-
+        if (consumer != null) consumer.shutdown();
+        //TODO delete exception in public cloud
+        deleteConsumerSubscription(currentTopic, testConsumerId);
     }
 
     @Test
-    public void testNull() throws InterruptedException {
+    public void test10KConsumer() throws InterruptedException, ClientException {
+        currentTopic = TestAliyunMqAdmin.TEST_10K_QUEUE;
 
-        Thread.sleep(5 * Minute);
+        this.createConsumerSubscription(currentTopic, testConsumerId);
+        //sleep to wait for topic and publish info updated to name server.
+        consumer = this.createDefaultConsumer(currentTopic, testConsumerId);
+        consumer.start();
+        while (true) {
+            if (DemoMessageListener.count.longValue() == 10000)
+                break;
+            else
+                Thread.sleep(10 * Second);
+        }
+        assertEquals(10000, DemoMessageListener.count.longValue());
     }
 
+    //MaxReconsumeTimes = "maxReconsumeTimes"
+    @Test
+    public void testResumeMessage() throws ClientException, InterruptedException {
+        currentTopic = TestAliyunMqAdmin.TEST_ONE_MSG_QUEUE;
 
-    public static class DemoMessageListener implements MessageListener {
-        public Action consume(Message message, ConsumeContext context) {
-            System.out.println("Receive: " + message.getMsgID());
-            try {
-                //do something..
-                return Action.CommitMessage;
-            } catch (Exception e) {
-                //消费失败
-                return Action.ReconsumeLater;
-            }
-        }
+        this.createConsumerSubscription(currentTopic, testConsumerId);
+        //sleep to wait for topic and publish info updated to name server.
+        consumer = this.createDefaultConsumer(currentTopic, testConsumerId);
+        consumer.start();
+        Thread.sleep(5 * Minute);
     }
 
 

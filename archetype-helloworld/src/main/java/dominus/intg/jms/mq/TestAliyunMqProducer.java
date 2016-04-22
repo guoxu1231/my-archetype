@@ -1,13 +1,14 @@
 package dominus.intg.jms.mq;
 
 
-import com.aliyun.openservices.ons.api.*;
+import com.aliyun.openservices.ons.api.Message;
+import com.aliyun.openservices.ons.api.Producer;
+import com.aliyun.openservices.ons.api.SendResult;
 import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.ons.model.v20160405.OnsTopicStatusResponse;
+//EE: public cloud & finance cloud package
+import com.aliyuncs.ons4financehz.model.v20160405.OnsTopicStatusResponse;
+//import com.aliyuncs.ons.model.v20160405.*;
 import org.junit.Test;
-
-
-import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,11 +25,8 @@ public class TestAliyunMqProducer extends TestAliyunMqZBaseTestCase {
         super.doSetUp();
 
         this.createTestTopic(testTopicId);
-        Thread.sleep(3 * Second);
         this.createProducerPublish(testTopicId, testProducerId);
-        Thread.sleep(30 * Second);
-        //sleep to wait for topic and publish info updated to name server.
-        producer = this.createProducer();
+        producer = this.createProducer(testProducerId);
     }
 
     @Override
@@ -36,12 +34,15 @@ public class TestAliyunMqProducer extends TestAliyunMqZBaseTestCase {
         super.doTearDown();
         this.deleteTestTopic(testTopicId);
         this.deleteProducerPublish(testTopicId, testProducerId);
-        producer.shutdown();
+        if (producer != null) producer.shutdown();
     }
 
 
     /**
-     * send simple message
+     * Send simple message
+     * EE: Guarantied message durability, no lost message.
+     * EE: Producer TPS TODO
+     * EE: 10 or 100 million level message produce TODO
      */
     @Test
     public void testSimpleMessage() throws InterruptedException, ClientException {
@@ -67,26 +68,26 @@ public class TestAliyunMqProducer extends TestAliyunMqZBaseTestCase {
 
     }
 
+
     @Test
-    public void testConnectivity() {
-        Properties properties = new Properties();
-        properties.put(PropertyKeyConst.ProducerId, "PID-D-GUOXU-TEST-20160420-1461146687862");
-        properties.put(PropertyKeyConst.AccessKey, accessKey);
-        properties.put(PropertyKeyConst.SecretKey, secretKey);
-        //properties.put(PropertyKeyConst.ONSAddr, ONS_ADDRESS);
-
-        Producer producer = ONSFactory.createProducer(properties);
-        producer.start();
-        out.printf("ONS Producer is started!%s\n", producer.getClass());
-
-        for (int i = 0; i < 10; i++) {
-            Message msg = new Message("D-GUOXU-TEST-20160420-1461146687861", "TagA", "Hello ONS".getBytes());
-            // unique business key,can be used to re-send message in case not found in ONS console
-            msg.setKey("ORDERID_100");
-            SendResult sendResult = producer.send(msg);
-            assert sendResult != null;
-            println(ANSI_RED, "send success: " + sendResult);
-        }
+    public void testOrderMessage() {
+        //send 1 billion ordered message, verify it in consumer
 
     }
+
+    @Test
+    public void testMessageRetry() {
+        //send 1 billion ordered message, verify it in consumer
+
+    }
+
+    /**
+     * EE: Sync TPS VS ASync TPS
+     */
+    @Test
+    public void testAsyncMessage() {
+        //send 1 billion ordered message, verify it in consumer
+
+    }
+
 }

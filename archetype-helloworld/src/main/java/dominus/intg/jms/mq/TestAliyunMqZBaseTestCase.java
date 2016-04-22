@@ -6,11 +6,14 @@ import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.FormatType;
+//EE: public cloud & finance cloud package
 import com.aliyuncs.ons4financehz.model.v20160405.*;
+//import com.aliyuncs.ons.model.v20160405.*;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import dominus.framework.junit.DominusJUnit4TestBase;
 import dominus.intg.jms.mq.endpoint.DemoMessageListener;
+import dominus.intg.jms.mq.endpoint.ResumeMessageListener;
 import org.junit.Test;
 
 import java.util.Date;
@@ -22,12 +25,12 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
     String ONS_REGION_ID;
     String accessKey;
     String secretKey;
+    String productName;
+    String domain;
+    String endpoint;
     String ONS_ADDRESS;
     IAcsClient iAcsClient;
     //EE:financial private cloud setting
-    final String DOMAIN = "ons4financehz.aliyuncs.com";
-    final String PRODUCT_NAME = "ons4financehz";
-    final String END_POINT_NAME = "cn-hangzhou";
 
     String testTopicId;
     String testProducerId;
@@ -41,11 +44,14 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
     protected void doSetUp() throws Exception {
         accessKey = properties.getProperty("aliyun.accessKey");
         secretKey = properties.getProperty("aliyun.secretKey");
+        productName = properties.getProperty("aliyun.mq.product");
+        domain = properties.getProperty("aliyun.mq.domain");
+        endpoint = properties.getProperty("aliyun.mq.endpoint");
         ACS_REGION_ID = properties.getProperty("aliyun.acs.region");
         ONS_REGION_ID = properties.getProperty("aliyun.mq.region");
         ONS_ADDRESS = properties.getProperty("aliyun.mq.address");
         //create Acs iAcsClient
-        DefaultProfile.addEndpoint(END_POINT_NAME, ACS_REGION_ID, PRODUCT_NAME, DOMAIN);
+        DefaultProfile.addEndpoint(endpoint, ACS_REGION_ID, productName, domain);
         IClientProfile profile = DefaultProfile.getProfile(ACS_REGION_ID, accessKey, secretKey);
         iAcsClient = new DefaultAcsClient(profile);
 
@@ -54,7 +60,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         testProducerId = String.format("PID-D-GUOXU-TEST-%1$tY%1$tm%1$td-%1$TQ", createDate);
         testConsumerId = String.format("CID-D-GUOXU-TEST-%1$tY%1$tm%1$td-%1$TQ", createDate);
 
-        out.printf("[ONS_REGION_ID] %s\n", ONS_REGION_ID);
+        out.printf("[ONS_REGION_ID] %s [PRODUCT] %s\n", ONS_REGION_ID, productName);
     }
 
     @Override
@@ -71,7 +77,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
 
     }
 
-    protected boolean createTestTopic(String testTopicName) throws ClientException {
+    protected boolean createTestTopic(String testTopicName) throws ClientException, InterruptedException {
         OnsTopicCreateRequest request = new OnsTopicCreateRequest();
 //        request.setAcceptFormat(FormatType.JSON);
         request.setTopic(testTopicName);
@@ -84,6 +90,15 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
 
         OnsTopicCreateResponse response = iAcsClient.getAcsResponse(request);
         System.out.printf("[AliyunMq TestTopic] %s is created!\nRequestId=%s, HelpUrl=%s\n", testTopicName, response.getRequestId(), response.getHelpUrl());
+
+        //EE: wait for initialization
+        if (isPublicTest()) {
+            out.println("sleep 30 seconds to wait for initialization");
+            Thread.sleep(30 * Second);
+        } else {
+            out.println("sleep 3 seconds to wait for initialization");
+            Thread.sleep(3 * Second);
+        }
         return true;
     }
 
@@ -116,7 +131,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         return data;
     }
 
-    protected boolean createProducerPublish(String testTopicId, String testPublishId) throws ClientException {
+    protected boolean createProducerPublish(String testTopicId, String testPublishId) throws ClientException, InterruptedException {
 
         OnsPublishCreateRequest request = new OnsPublishCreateRequest();
         request.setOnsRegionId(ONS_REGION_ID);
@@ -128,11 +143,19 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         OnsPublishCreateResponse response = iAcsClient.getAcsResponse(request);
         System.out.printf("[AliyunMq TestProducer] %s is created for %s!\nRequestId=%s, HelpUrl=%s\n",
                 testPublishId, testTopicId, response.getRequestId(), response.getHelpUrl());
+        //EE: wait for initialization
+        if (isPublicTest()) {
+            out.println("sleep 30 seconds to wait for initialization");
+            Thread.sleep(30 * Second);
+        } else {
+            out.println("sleep 3 seconds to wait for initialization");
+            Thread.sleep(3 * Second);
+        }
 
         return true;
     }
 
-    protected boolean createConsumerSubscription(String testTopicId, String testConsumerId) throws ClientException {
+    protected boolean createConsumerSubscription(String testTopicId, String testConsumerId) throws ClientException, InterruptedException {
 
         OnsSubscriptionCreateRequest request = new OnsSubscriptionCreateRequest();
         request.setOnsRegionId(ONS_REGION_ID);
@@ -143,6 +166,14 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
 
         OnsSubscriptionCreateResponse response = iAcsClient.getAcsResponse(request);
         System.out.printf("[AliyunMq TestConsumer] %s is created for %s!\n", testConsumerId, testTopicId);
+        //EE: wait for initialization
+        if (isPublicTest()) {
+            out.println("sleep 15 seconds to wait for initialization");
+            Thread.sleep(15 * Second);
+        } else {
+            out.println("sleep 3 seconds to wait for initialization");
+            Thread.sleep(3 * Second);
+        }
 
         return true;
     }
@@ -152,7 +183,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         OnsSubscriptionDeleteRequest request = new OnsSubscriptionDeleteRequest();
         request.setOnsRegionId(ONS_REGION_ID);
         request.setPreventCache(System.currentTimeMillis());
-        request.setAcceptFormat(FormatType.JSON);
+//        request.setAcceptFormat(FormatType.JSON);
         request.setTopic(testTopicId);
         request.setConsumerId(testConsumerId);
 
@@ -164,7 +195,10 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         } catch (ClientException e) {
             System.out.printf("[AliyunMq TestConsumer] %s fail to be deleted %s!\n",
                     testConsumerId, testTopicId);
+            out.println(e.getErrCode());
+            out.println(e.getErrMsg());
             e.printStackTrace();
+            return false;
         }
         return true;
     }
@@ -210,14 +244,27 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         return producer;
     }
 
-    protected Consumer createDefaultConsumer() {
+
+    protected Consumer createDefaultConsumer(String testTopicId, String testConsumerId) {
+        return createDefaultConsumer(testTopicId, testConsumerId, 16);
+    }
+
+    protected Consumer createDefaultConsumer(String testTopicId, String testConsumerId, int maxReconsumeTimes) {
         Properties properties = new Properties();
         properties.put(PropertyKeyConst.ConsumerId, testConsumerId);
         properties.put(PropertyKeyConst.AccessKey, accessKey);
         properties.put(PropertyKeyConst.SecretKey, secretKey);
+        properties.put(PropertyKeyConst.ConsumeThreadNums, 1);
+        properties.put(PropertyKeyConst.MaxReconsumeTimes, maxReconsumeTimes);
+        if (isPublicTest()) {
+            //TODO
+        } else {
+            properties.put(PropertyKeyConst.ONSAddr, ONS_ADDRESS);
+        }
+
         Consumer consumer = ONSFactory.createConsumer(properties);
-        consumer.subscribe(testTopicId, "*", new DemoMessageListener());
-        consumer.start();
+        consumer.subscribe(testTopicId, "*", new ResumeMessageListener());
+//        consumer.start();
         return consumer;
     }
 
