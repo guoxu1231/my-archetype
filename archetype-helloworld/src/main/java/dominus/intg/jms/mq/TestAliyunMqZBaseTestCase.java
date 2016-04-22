@@ -1,17 +1,16 @@
 package dominus.intg.jms.mq;
 
 
-import com.aliyun.openservices.ons.api.ONSFactory;
-import com.aliyun.openservices.ons.api.Producer;
-import com.aliyun.openservices.ons.api.PropertyKeyConst;
+import com.aliyun.openservices.ons.api.*;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.FormatType;
-import com.aliyuncs.ons.model.v20160405.*;
+import com.aliyuncs.ons4financehz.model.v20160405.*;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import dominus.framework.junit.DominusJUnit4TestBase;
+import dominus.intg.jms.mq.endpoint.DemoMessageListener;
 import org.junit.Test;
 
 import java.util.Date;
@@ -25,9 +24,14 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
     String secretKey;
     String ONS_ADDRESS;
     IAcsClient iAcsClient;
+    //EE:financial private cloud setting
+    final String DOMAIN = "ons4financehz.aliyuncs.com";
+    final String PRODUCT_NAME = "ons4financehz";
+    final String END_POINT_NAME = "cn-hangzhou";
 
     String testTopicId;
     String testProducerId;
+    String testConsumerId;
 
     protected boolean isPublicTest() {
         return ONS_REGION_ID.contains("publictest");
@@ -41,11 +45,15 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         ONS_REGION_ID = properties.getProperty("aliyun.mq.region");
         ONS_ADDRESS = properties.getProperty("aliyun.mq.address");
         //create Acs iAcsClient
+        DefaultProfile.addEndpoint(END_POINT_NAME, ACS_REGION_ID, PRODUCT_NAME, DOMAIN);
         IClientProfile profile = DefaultProfile.getProfile(ACS_REGION_ID, accessKey, secretKey);
         iAcsClient = new DefaultAcsClient(profile);
 
-        testTopicId = String.format("D-GUOXU-TEST-%1$tY%1$tm%1$td-%1$TQ", new Date());
-        testProducerId = String.format("PID-D-GUOXU-TEST-%1$tY%1$tm%1$td-%1$TQ", new Date());
+        Date createDate = new Date();
+        testTopicId = String.format("D-GUOXU-TEST-%1$tY%1$tm%1$td-%1$TQ", createDate);
+        testProducerId = String.format("PID-D-GUOXU-TEST-%1$tY%1$tm%1$td-%1$TQ", createDate);
+        testConsumerId = String.format("CID-D-GUOXU-TEST-%1$tY%1$tm%1$td-%1$TQ", createDate);
+
         out.printf("[ONS_REGION_ID] %s\n", ONS_REGION_ID);
     }
 
@@ -124,6 +132,43 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         return true;
     }
 
+    protected boolean createConsumerSubscription(String testTopicId, String testConsumerId) throws ClientException {
+
+        OnsSubscriptionCreateRequest request = new OnsSubscriptionCreateRequest();
+        request.setOnsRegionId(ONS_REGION_ID);
+        request.setPreventCache(System.currentTimeMillis());
+        request.setAcceptFormat(FormatType.JSON);
+        request.setTopic(testTopicId);
+        request.setConsumerId(testConsumerId);
+
+        OnsSubscriptionCreateResponse response = iAcsClient.getAcsResponse(request);
+        System.out.printf("[AliyunMq TestConsumer] %s is created for %s!\n", testConsumerId, testTopicId);
+
+        return true;
+    }
+
+    protected boolean deleteConsumerSubscription(String testTopicId, String testConsumerId) {
+
+        OnsSubscriptionDeleteRequest request = new OnsSubscriptionDeleteRequest();
+        request.setOnsRegionId(ONS_REGION_ID);
+        request.setPreventCache(System.currentTimeMillis());
+        request.setAcceptFormat(FormatType.JSON);
+        request.setTopic(testTopicId);
+        request.setConsumerId(testConsumerId);
+
+        OnsSubscriptionDeleteResponse response = null;
+        try {
+            response = iAcsClient.getAcsResponse(request);
+            System.out.printf("[AliyunMq TestConsumer] %s is created for %s!\nRequestId=%s, HelpUrl=%s\n",
+                    testConsumerId, testTopicId, response.getRequestId(), response.getHelpUrl());
+        } catch (ClientException e) {
+            System.out.printf("[AliyunMq TestConsumer] %s fail to be deleted %s!\n",
+                    testConsumerId, testTopicId);
+            e.printStackTrace();
+        }
+        return true;
+    }
+
     protected boolean deleteProducerPublish(String testTopicId, String testProducerId) {
 
         OnsPublishDeleteRequest request = new OnsPublishDeleteRequest();
@@ -147,7 +192,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         return true;
     }
 
-    protected Producer createProducer() throws IllegalAccessException {
+    protected Producer createProducer(String testProducerId) throws IllegalAccessException {
         Properties properties = new Properties();
         properties.put(PropertyKeyConst.ProducerId, testProducerId);
         properties.put(PropertyKeyConst.AccessKey, accessKey);
@@ -165,6 +210,16 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         return producer;
     }
 
+    protected Consumer createDefaultConsumer() {
+        Properties properties = new Properties();
+        properties.put(PropertyKeyConst.ConsumerId, testConsumerId);
+        properties.put(PropertyKeyConst.AccessKey, accessKey);
+        properties.put(PropertyKeyConst.SecretKey, secretKey);
+        Consumer consumer = ONSFactory.createConsumer(properties);
+        consumer.subscribe(testTopicId, "*", new DemoMessageListener());
+        consumer.start();
+        return consumer;
+    }
 
     protected void printAllTopics() {
 
