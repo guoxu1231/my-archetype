@@ -1,9 +1,9 @@
 package dominus.intg.jms.kafka;
 
 
-import dominus.intg.jms.kafka.consumer.KafkaConsumerConnector;
-import dominus.intg.jms.kafka.producer.KafkaFastProducer;
-import dominus.intg.jms.kafka.producer.KafkaReliableProducer;
+import dominus.intg.jms.kafka.sdk.consumer.KafkaConsumerConnector;
+import dominus.intg.jms.kafka.sdk.producer.KafkaFastProducer;
+import dominus.intg.jms.kafka.sdk.producer.KafkaReliableProducer;
 import kafka.api.FetchRequest;
 import kafka.api.FetchRequestBuilder;
 import kafka.api.PartitionOffsetRequestInfo;

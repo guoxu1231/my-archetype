@@ -1,7 +1,7 @@
 package dominus.intg.jms.kafka;
 
 import dominus.framework.junit.DominusJUnit4TestBase;
-import dominus.intg.jms.kafka.producer.KafkaFastProducer;
+import dominus.intg.jms.kafka.sdk.producer.KafkaFastProducer;
 import kafka.admin.AdminUtils;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;

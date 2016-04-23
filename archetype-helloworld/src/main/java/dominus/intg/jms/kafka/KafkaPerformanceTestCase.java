@@ -1,8 +1,7 @@
 package dominus.intg.jms.kafka;
 
 
-import dominus.intg.jms.kafka.producer.KafkaFastProducer;
-import dominus.intg.jms.kafka.producer.KafkaReliableProducer;
+import dominus.intg.jms.kafka.sdk.producer.KafkaFastProducer;
 import org.junit.Test;
 import org.springframework.test.annotation.Repeat;
 
