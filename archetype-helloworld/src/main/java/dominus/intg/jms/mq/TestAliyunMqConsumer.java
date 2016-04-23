@@ -48,7 +48,7 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
                 break;
             else {
                 printf(ANSI_RED, "Consumed Message: %d\n", DemoMessageListener.count.longValue());
-                Thread.sleep(10 * Second);
+                java.lang.Thread.sleep(10 * Second);
             }
         }
         assertEquals(10000, DemoMessageListener.count.longValue());

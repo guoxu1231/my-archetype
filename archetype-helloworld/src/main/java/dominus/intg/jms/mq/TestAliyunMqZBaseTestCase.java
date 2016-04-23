@@ -71,9 +71,9 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
     public void testNull() throws InterruptedException, ClientException {
 
         this.createTestTopic(testTopicId);
-        Thread.sleep(3000);
+        java.lang.Thread.sleep(3000);
         this.createProducerPublish(testTopicId, testProducerId);
-        Thread.sleep(3000);
+        java.lang.Thread.sleep(3000);
 
     }
 
@@ -94,10 +94,10 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         //EE: wait for initialization
         if (isPublicTest()) {
             out.println("sleep 30 seconds to wait for initialization");
-            Thread.sleep(30 * Second);
+            java.lang.Thread.sleep(30 * Second);
         } else {
             out.println("sleep 3 seconds to wait for initialization");
-            Thread.sleep(3 * Second);
+            java.lang.Thread.sleep(3 * Second);
         }
         return true;
     }
@@ -146,10 +146,10 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         //EE: wait for initialization
         if (isPublicTest()) {
             out.println("sleep 30 seconds to wait for initialization");
-            Thread.sleep(30 * Second);
+            java.lang.Thread.sleep(30 * Second);
         } else {
             out.println("sleep 3 seconds to wait for initialization");
-            Thread.sleep(3 * Second);
+            java.lang.Thread.sleep(3 * Second);
         }
 
         return true;
@@ -169,10 +169,10 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         //EE: wait for initialization
         if (isPublicTest()) {
             out.println("sleep 15 seconds to wait for initialization");
-            Thread.sleep(15 * Second);
+            java.lang.Thread.sleep(15 * Second);
         } else {
             out.println("sleep 3 seconds to wait for initialization");
-            Thread.sleep(3 * Second);
+            java.lang.Thread.sleep(3 * Second);
         }
 
         return true;
