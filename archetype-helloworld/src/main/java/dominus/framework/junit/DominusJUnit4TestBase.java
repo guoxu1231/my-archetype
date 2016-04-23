@@ -88,6 +88,7 @@ public class DominusJUnit4TestBase {
     protected static final long GB = 1073741824L;
 
     protected static final long Minute = 60000;
+    protected static final long Second = 1000;
 
     public DominusJUnit4TestBase() {
         super();
