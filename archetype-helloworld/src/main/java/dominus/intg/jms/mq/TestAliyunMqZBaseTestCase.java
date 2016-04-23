@@ -245,16 +245,12 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
     }
 
 
-    protected Consumer createDefaultConsumer(String testTopicId, String testConsumerId) {
-        return createDefaultConsumer(testTopicId, testConsumerId, 16);
-    }
-
-    protected Consumer createDefaultConsumer(String testTopicId, String testConsumerId, int maxReconsumeTimes) {
+    protected Consumer createDefaultConsumer(String testTopicId, String testConsumerId, int consumeThreadNums, int maxReconsumeTimes, MessageListener listener) {
         Properties properties = new Properties();
         properties.put(PropertyKeyConst.ConsumerId, testConsumerId);
         properties.put(PropertyKeyConst.AccessKey, accessKey);
         properties.put(PropertyKeyConst.SecretKey, secretKey);
-        properties.put(PropertyKeyConst.ConsumeThreadNums, 1);
+        properties.put(PropertyKeyConst.ConsumeThreadNums, consumeThreadNums);
         properties.put(PropertyKeyConst.MaxReconsumeTimes, maxReconsumeTimes);
         if (isPublicTest()) {
             //TODO
@@ -263,8 +259,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         }
 
         Consumer consumer = ONSFactory.createConsumer(properties);
-        consumer.subscribe(testTopicId, "*", new ResumeMessageListener());
-//        consumer.start();
+        consumer.subscribe(testTopicId, "*", listener);
         return consumer;
     }
 

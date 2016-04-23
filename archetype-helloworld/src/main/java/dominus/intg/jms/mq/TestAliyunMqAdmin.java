@@ -7,6 +7,7 @@ import com.aliyun.openservices.ons.api.SendResult;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.FormatType;
 //EE: public cloud & finance cloud package
 import com.aliyuncs.ons4financehz.model.v20160405.*;
@@ -18,11 +19,76 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * 注意：因为POP网关是面对公网环境提供服务的，因此使用Open-API的前提是，客户端需要能够访问公网服务。否则会提示服务无法连接
  */
 public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
+
+    String currentTopic;
+
+    @Override
+    protected void doSetUp() throws Exception {
+        super.doSetUp();
+        this.currentTopic = testTopicId;
+    }
+
+
+    @Test
+    public void testOnsTopicStatusRequest() throws ClientException {
+
+        currentTopic = TEST_10K_QUEUE;
+
+        //template code begin
+        OnsTopicStatusRequest request = new OnsTopicStatusRequest();
+        request.setAcceptFormat(FormatType.JSON);
+        request.setOnsRegionId(ONS_REGION_ID);
+        request.setPreventCache(System.currentTimeMillis());
+        request.setTopic(currentTopic);
+        OnsTopicStatusResponse response = iAcsClient.getAcsResponse(request);
+        OnsTopicStatusResponse.Data data = response.getData();
+        assertNotNull(data);
+        //template code end
+        System.out.printf("[%s] totalCount %d lastTimeStamp %d\n", currentTopic, data.getTotalCount(), data.getLastTimeStamp());
+    }
+
+
+    @Test
+    public void testOnsTopicGetRequest() throws ClientException {
+
+        currentTopic = TEST_10K_QUEUE;
+
+        OnsTopicGetRequest request = new OnsTopicGetRequest();
+        request.setAcceptFormat(FormatType.JSON);
+        request.setTopic(currentTopic);
+        request.setOnsRegionId(ONS_REGION_ID);
+        request.setPreventCache(System.currentTimeMillis());
+
+        OnsTopicGetResponse response = iAcsClient.getAcsResponse(request);
+        List<OnsTopicGetResponse.PublishInfoDo> publishInfoDoList = response.getData();
+        for (OnsTopicGetResponse.PublishInfoDo publishInfoDo : publishInfoDoList) {
+            System.out.println(publishInfoDo.getId() + "  " +
+                    publishInfoDo.getChannelId() + "  " +
+                    publishInfoDo.getChannelName() + "  " +
+                    publishInfoDo.getOnsRegionId() + "  " +
+                    publishInfoDo.getRegionName() + "  " +
+                    publishInfoDo.getTopic() + "  " +
+                    publishInfoDo.getOwner() + "  " +
+                    publishInfoDo.getRelation() + "  " +
+                    publishInfoDo.getRelationName() + "  " +
+                    publishInfoDo.getStatus() + "  " +
+                    publishInfoDo.getStatusName() + "  " +
+                    publishInfoDo.getAppkey() + "  " +
+                    publishInfoDo.getCreateTime() + "  " +
+                    publishInfoDo.getUpdateTime() + "  " +
+                    publishInfoDo.getRemark());
+        }
+        System.out.println(response.getRequestId());
+
+
+    }
+
 
     /**
      * 1  cn-qingdao-publictest  公网测试  null    1411623866000  1411623866000
