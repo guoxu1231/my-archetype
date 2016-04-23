@@ -8,13 +8,11 @@ import com.aliyun.openservices.ons.api.MessageListener;
 import java.util.concurrent.atomic.AtomicLong;
 
 
-public class DemoMessageListener implements MessageListener {
-
-    public static AtomicLong count = new AtomicLong(0L);
+public class ResumeMessageListener implements MessageListener {
 
     public Action consume(Message message, ConsumeContext context) {
-        System.out.printf("DemoMessageListener Receive: %s [%s]\n", message.getKey(), message.getMsgID());
-        count.incrementAndGet();
-        return Action.CommitMessage;
+        System.out.printf("DemoMessageListener Receive: %s [%s] [ReconsumeTimes] %d\n", message.getKey(), message.getMsgID(), message.getReconsumeTimes());
+
+        return Action.ReconsumeLater;
     }
 }
