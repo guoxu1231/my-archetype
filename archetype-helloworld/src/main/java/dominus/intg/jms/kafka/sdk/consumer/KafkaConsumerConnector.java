@@ -1,4 +1,4 @@
-package dominus.intg.jms.kafka.consumer;
+package dominus.intg.jms.kafka.sdk.consumer;
 
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
@@ -45,7 +45,7 @@ public class KafkaConsumerConnector {
          at kafka.consumer.ConsumerIterator.makeNext(ConsumerIterator.scala:33)
          at kafka.utils.IteratorTemplate.maybeComputeNext(IteratorTemplate.scala:66)
          at kafka.utils.IteratorTemplate.hasNext(IteratorTemplate.scala:58)
-         at dominus.intg.jms.kafka.consumer.KafkaConsumerConnector$MessageHandler.run(KafkaConsumerConnector.java:79)
+         at dominus.intg.jms.kafka.sdk.consumer.KafkaConsumerConnector$MessageHandler.run(KafkaConsumerConnector.java:79)
          */
         props.put("consumer.timeout.ms", "30000");
         ConsumerConfig consumerConfig = new ConsumerConfig(props);
