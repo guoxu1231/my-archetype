@@ -8,14 +8,25 @@ import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertTrue;
 
@@ -37,13 +48,16 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     ZkClient zkClient;
 
     //test topic
-    String TEST_TOPIC_PREFIX = "page_visits_";
+    public static final String TEST_TOPIC_PREFIX = "page_visits_";
     String testTopicName;
 
     String groupId;
 
     @Resource(name = "kafkaProducerProps")
     Properties kafkaProducerProps;
+
+    @Resource(name = "kafkaConsumerProps")
+    Properties kafkaConsumerProps;
 
 
     @Override
@@ -52,6 +66,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         bootstrapServers = properties.getProperty("bootstrap.servers");
         replicationFactor = Integer.valueOf(properties.getProperty("kafka.replication.factor"));
         out.println("[kafka Producer Properties]" + kafkaProducerProps.size());
+        out.println("[kafka Consumer Properties]" + kafkaConsumerProps.size());
         testTopicName = TEST_TOPIC_PREFIX + new Date().getTime();
         groupId = "dominus.consumer.test." + new Date().getTime();
 
@@ -73,8 +88,8 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     protected boolean createTestTopic(String testTopic) {
         int numPartitions = Integer.valueOf(properties.getProperty("kafka.test.topic.partition"));
         AdminUtils.createTopic(zkUtils, testTopic, numPartitions, replicationFactor, new Properties());
-        out.printf("Kafka Topic[%s] is created!\n", testTopicName);
-        assertTrue("Kafka Topic[%s] does not exist!", AdminUtils.topicExists(zkUtils, testTopicName));
+        out.printf("Kafka Topic[%s] is created!\n", testTopic);
+        assertTrue("Kafka Topic[%s] does not exist!", AdminUtils.topicExists(zkUtils, testTopic));
         return true;
     }
 
@@ -117,5 +132,36 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
 //        kafkaProducerProps.list(out);
         Producer<String, String> producer = new KafkaProducer<>(kafkaProducerProps);
         return producer;
+    }
+
+    protected void produceTestMessage(Producer producer, String topicName, long count) throws InterruptedException, ExecutionException, TimeoutException {
+        Random rnd = new Random();
+        StopWatch watch = new StopWatch("[Producer] message count:" + count);
+        watch.start();
+        for (long nEvents = 0; nEvents < count; nEvents++) {
+            long runtime = new Date().getTime();
+            String ip = "192.168.2." + rnd.nextInt(255);
+            String info = runtime + ",www.example.com," + ip;
+            ProducerRecord<String, String> message = new ProducerRecord<String, String>(topicName, ip, info);
+
+            RecordMetadata medadata = ((RecordMetadata) producer.send(message).get(10, TimeUnit.SECONDS));
+            out.printf("[Acknowledged Message]:%s, %s, %s\n", medadata.topic(), medadata.partition(), medadata.offset());
+        }
+        watch.stop();
+        System.out.println(watch);
+    }
+
+    protected Consumer createDefaultConsumer(String subscribeTopic, Properties overrideProps) {
+        kafkaConsumerProps.put("bootstrap.servers", bootstrapServers);
+        kafkaConsumerProps.put("group.id", groupId);
+        kafkaConsumerProps.put("enable.auto.commit", "false");
+        kafkaConsumerProps.put("auto.commit.interval.ms", "1000");
+        kafkaConsumerProps.put("session.timeout.ms", "30000");
+        kafkaConsumerProps.put("auto.offset.reset", "earliest");
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumerProps);
+//        consumer.seekToBeginning(new TopicPartition(KafkaAdminTestCase.TEST_TOPIC_100K, 0));
+        consumer.subscribe(Arrays.asList(subscribeTopic));
+
+        return consumer;
     }
 }

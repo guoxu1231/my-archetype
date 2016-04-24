@@ -1,8 +1,5 @@
 package dominus.intg.jms.kafka09;
 
-import dominus.intg.jms.kafka09.sdk.consumer.KafkaConsumerConnector;
-import dominus.intg.jms.kafka09.sdk.producer.KafkaFastProducer;
-import dominus.intg.jms.kafka09.sdk.producer.KafkaReliableProducer;
 import kafka.api.FetchRequest;
 import kafka.api.FetchRequestBuilder;
 import kafka.api.PartitionOffsetRequestInfo;
@@ -14,7 +11,6 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.junit.Test;
-import org.springframework.test.annotation.Repeat;
 import org.springframework.util.StopWatch;
 
 import java.io.UnsupportedEncodingException;
@@ -53,64 +49,20 @@ public class KafkaProducerTestcase extends KafkaZBaseTestCase {
     }
 
 
-    @Test
-    @Repeat(1)
-    public void testRoundRobinPartitioner() throws InterruptedException {
-        long events = Long.valueOf(properties.getProperty("kafka.test.topic.msgCount"));
-        KafkaFastProducer.main(testTopicName, String.valueOf(events), brokerList);
-        Thread.sleep(5000);
-        //total partition offset should be equal with events count.
-//        assertEquals(events, sumPartitionOffset(brokerList, testTopicName));
-    }
-
-    /**
-     * Test producer.type = async/sync
-     *
-     * @throws InterruptedException
-     */
-    @Test
-    @Repeat(2)
-    public void testKafkaProducer() throws InterruptedException {
-
-        final long events = Long.valueOf(properties.getProperty("kafka.test.topic.msgCount"));
-
-        KafkaConsumerConnector.main(testTopicName, groupId, properties.getProperty("zkQuorum"),
-                properties.getProperty("kafka.test.topic.partition"));
-        //junit.framework.AssertionFailedError:Expected :500 Actual :244
-        Thread.sleep(5000);
-        new Thread() {
-            @Override
-            public void run() {
-                KafkaFastProducer.main(testTopicName, String.valueOf(events), brokerList);
-            }
-        }.start();
-        new Thread() {
-            @Override
-            public void run() {
-                KafkaReliableProducer.main(testTopicName, String.valueOf(events), brokerList);
-            }
-        }.start();
-
-        KafkaConsumerConnector.shutdownThread.join();
-        assertEquals("client produced != server offset", events * 2, sumPartitionOffset(brokerList, testTopicName));
-        assertEquals("produced != consumed", events * 2, KafkaConsumerConnector.count.intValue());
-        KafkaConsumerConnector.count.set(0);
-    }
-
     /**
      * https://cwiki.apache.org/confluence/display/KAFKA/0.8.0+SimpleConsumer+Example
      * EE: Consumer message from leader broker, You must keep track of the offsets in your application to know where you left off consuming.
      * (SimpleConsumer does not require zookeeper to work)
      */
     @Test
-    public void testSimpleConsumer() throws UnsupportedEncodingException {
+    public void testSimpleConsumer() throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
 
         int kafkaPort = Integer.valueOf(properties.getProperty("kafka.seed.broker.port"));
         int partitionCount = Integer.valueOf(properties.getProperty("kafka.test.topic.partition"));
         final int testMsgCount = 5;
 
         //generate test data
-        KafkaReliableProducer.main(testTopicName, String.valueOf(partitionCount * testMsgCount), brokerList);
+        produceTestMessage(producer, testTopicName, partitionCount * testMsgCount);
         assertEquals(partitionCount * testMsgCount, sumPartitionOffset(brokerList, testTopicName));
 
         SimpleConsumer consumer = new SimpleConsumer(properties.getProperty("kafka.seed.broker"), kafkaPort, zkConnectionTimeout, 64 * KB, "leaderLookup");
@@ -191,5 +143,7 @@ public class KafkaProducerTestcase extends KafkaZBaseTestCase {
         System.out.println(watch);
         assertEquals(count, sumPartitionOffset(brokerList, testTopicName));
     }
+
+
 
 }
