@@ -18,7 +18,6 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
     @Override
     protected void doSetUp() throws Exception {
         super.doSetUp();
-
     }
 
     @Override
@@ -41,7 +40,7 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
 
         this.createConsumerSubscription(currentTopic, testConsumerId);
         //sleep to wait for topic and publish info updated to name server.
-        consumer = this.createDefaultConsumer(currentTopic, testConsumerId, 2, 16, new DemoMessageListener());
+        consumer = this.createDefaultConsumer(currentTopic, testConsumerId, 1, 16, new DemoMessageListener(0 * Second));
         consumer.start();
         while (true) {
             if (DemoMessageListener.count.longValue() == 10000)

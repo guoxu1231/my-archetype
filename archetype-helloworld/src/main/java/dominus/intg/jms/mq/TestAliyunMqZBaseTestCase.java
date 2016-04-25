@@ -19,6 +19,8 @@ import org.junit.Test;
 import java.util.Date;
 import java.util.Properties;
 
+import static org.junit.Assert.assertEquals;
+
 public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
 
     String ACS_REGION_ID;
@@ -183,7 +185,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         OnsSubscriptionDeleteRequest request = new OnsSubscriptionDeleteRequest();
         request.setOnsRegionId(ONS_REGION_ID);
         request.setPreventCache(System.currentTimeMillis());
-//        request.setAcceptFormat(FormatType.JSON);
+        request.setAcceptFormat(FormatType.JSON);
         request.setTopic(testTopicId);
         request.setConsumerId(testConsumerId);
 
@@ -265,6 +267,20 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
 
     protected void printAllTopics() {
 
+    }
+
+    public static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+    protected void produceTestMessage(Producer producer, String testTopic, Long count) throws ClientException {
+        for (int i = 0; i < count; i++) {
+            Message msg = new Message(testTopic, "DefaultTag", ALPHABET.getBytes());
+            msg.setKey(String.format("ORDERID_%d", i));
+            SendResult sendResult = producer.send(msg);
+            assert sendResult != null;
+            out.printf("%s send to %s success: %s \n", msg.getKey(), testTopic, sendResult);
+        }
+        OnsTopicStatusResponse.Data data = this.getTopicStatus(testTopic);
+        assertEquals(count, data.getTotalCount());
     }
 
 }

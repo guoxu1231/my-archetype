@@ -163,25 +163,31 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
 
     @Test
     public void testOnsTopicDeleteRequest() throws ClientException {
+
+        String deleteTopic = "D-GUOXU-TEST-100K";
+
         IClientProfile profile = DefaultProfile.getProfile(ACS_REGION_ID, accessKey, secretKey);
         IAcsClient client = new DefaultAcsClient(profile);
 
         OnsTopicDeleteRequest request = new OnsTopicDeleteRequest();
         request.setPreventCache(System.currentTimeMillis());
         request.setOnsRegionId(ONS_REGION_ID);
-        request.setTopic("D-GUOXU-TEST-160418");
+        request.setTopic(deleteTopic);
 
         OnsTopicDeleteResponse response = client.getAcsResponse(request);
-        System.out.println(response.getRequestId());
+        System.out.printf("%s is deleted! %s\n", deleteTopic, response.getRequestId());
     }
 
     @Test
     public void testOnsTrendTopicInputTpsRequest() throws ClientException {
+
+        String currentTopic = TEST_10K_QUEUE;
+
         OnsTrendTopicInputTpsRequest request = new OnsTrendTopicInputTpsRequest();
         request.setOnsRegionId(ONS_REGION_ID);
         request.setPreventCache(System.currentTimeMillis());
         request.setAcceptFormat(FormatType.JSON);
-        request.setTopic("D-GUOXU-TEST-20160421-1461231992812");
+        request.setTopic(currentTopic);
         request.setBeginTime(System.currentTimeMillis() - 120 * Minute);
         request.setEndTime(System.currentTimeMillis());
         request.setPeriod(1L);
@@ -195,48 +201,27 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
         }
     }
 
-    public static final String TEST_10K_QUEUE = "D-GUOXU-TEST-10k";
+    public static final String TEST_10K_QUEUE = "D-GUOXU-TEST-10K";
+    public static final String TEST_100K_QUEUE = "D-GUOXU-TEST-100K";
     public static final String TEST_ONE_MSG_QUEUE = "D-GUOXU-TEST-ONE";
-    public static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
 
     @Test
-    public void testCreate10ThousandQueue() throws ClientException, IllegalAccessException, InterruptedException {
-
-        this.createTestTopic(TEST_10K_QUEUE);
-        this.createProducerPublish(TEST_10K_QUEUE, "PID-D-GUOXU-TEST-10k");
-        Producer producer = this.createProducer("PID-D-GUOXU-TEST-10k");
-
-        for (int i = 0; i < 10000; i++) {
-            Message msg = new Message(TEST_10K_QUEUE, "DefaultTag", ALPHABET.getBytes());
-            msg.setKey(String.format("ORDERID_%d", i));
-            SendResult sendResult = producer.send(msg);
-            assert sendResult != null;
-            out.printf("%s send to 10ThousandQueue success: %s \n", msg.getKey(), sendResult);
-        }
-        OnsTopicStatusResponse.Data data = this.getTopicStatus(TEST_10K_QUEUE);
-        assertEquals(10000L, data.getTotalCount().longValue());
-
+    public void create100KQueue() throws ClientException, IllegalAccessException, InterruptedException {
+        String publishId = "PID-" + TEST_100K_QUEUE;
+        this.createTestTopic(TEST_100K_QUEUE);
+        this.createProducerPublish(TEST_100K_QUEUE, publishId);
+        Producer producer = this.createProducer(publishId);
+        produceTestMessage(producer, TEST_100K_QUEUE, 100000L);
         this.deleteProducerPublish(TEST_10K_QUEUE, "PID-D-GUOXU-TEST-10k");
     }
 
     @Test
     public void testCreateOneMsgQueue() throws ClientException, IllegalAccessException, InterruptedException {
-
+        String publishId = "PID-" + TEST_ONE_MSG_QUEUE;
         this.createTestTopic(TEST_ONE_MSG_QUEUE);
-        this.createProducerPublish(TEST_ONE_MSG_QUEUE, "PID-D-GUOXU-TEST-ONE");
-        Producer producer = this.createProducer("PID-D-GUOXU-TEST-ONE");
-
-        for (int i = 0; i < 1; i++) {
-            Message msg = new Message(TEST_ONE_MSG_QUEUE, "DefaultTag", ALPHABET.getBytes());
-            msg.setKey(String.format("ORDERID_%d", i));
-            SendResult sendResult = producer.send(msg);
-            assert sendResult != null;
-            out.printf("%s send to SingleQueue success: %s \n", msg.getKey(), sendResult);
-        }
-        OnsTopicStatusResponse.Data data = this.getTopicStatus(TEST_ONE_MSG_QUEUE);
-        assertEquals(1L, data.getTotalCount().longValue());
-
-        this.deleteProducerPublish(TEST_ONE_MSG_QUEUE, "PID-D-GUOXU-TEST-ONE");
+        this.createProducerPublish(TEST_100K_QUEUE, publishId);
+        Producer producer = this.createProducer(publishId);
+        produceTestMessage(producer, TEST_ONE_MSG_QUEUE, 1L);
+        this.deleteProducerPublish(TEST_ONE_MSG_QUEUE, publishId);
     }
-
 }

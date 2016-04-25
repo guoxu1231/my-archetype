@@ -47,17 +47,7 @@ public class TestAliyunMqProducer extends TestAliyunMqZBaseTestCase {
     @Test
     public void testSimpleMessage() throws InterruptedException, ClientException {
         Long msgCount = Long.valueOf(properties.getProperty("aliyun.mq.testTopic.count"));
-        for (int i = 0; i < msgCount; i++) {
-            Message msg = new Message(testTopicId, "TagA", "Hello ONS".getBytes());
-            // unique business key,can be used to re-send message in case not found in ONS console
-            msg.setKey("ORDERID_100");
-            //EE: naming server update delay, cause [MQClientFactoryScheduledThread] WARN  RocketmqClient - get Topic [TBW102] RouteInfoFromNameServer is not exist value
-            SendResult sendResult = producer.send(msg);
-            assert sendResult != null;
-            println(ANSI_RED, "send success: " + sendResult);
-        }
-        OnsTopicStatusResponse.Data data = this.getTopicStatus(testTopicId);
-        assertEquals(msgCount, data.getTotalCount());
+        produceTestMessage(producer, testTopicId, msgCount);
     }
 
     /**
