@@ -85,11 +85,15 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         zkUtils.close();
     }
 
-    protected boolean createTestTopic(String testTopic) {
+    protected boolean createTestTopic(String testTopic) throws InterruptedException {
         int numPartitions = Integer.valueOf(properties.getProperty("kafka.test.topic.partition"));
         AdminUtils.createTopic(zkUtils, testTopic, numPartitions, replicationFactor, new Properties());
         out.printf("Kafka Topic[%s] is created!\n", testTopic);
         assertTrue("Kafka Topic[%s] does not exist!", AdminUtils.topicExists(zkUtils, testTopic));
+        if (!isLocalEnvironment()) {
+            out.println("Sleep 5 Seconds for Topic Initialization...");
+            Thread.sleep(5 * Second);
+        }
         return true;
     }
 
@@ -124,7 +128,9 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
      */
     protected Producer createDefaultProducer(Properties overrideProps) {
         kafkaProducerProps.put("bootstrap.servers", bootstrapServers);
-        kafkaProducerProps.put("acks", "all");
+        //EE: important parameter
+        kafkaProducerProps.put("acks", "1");
+        //
         kafkaProducerProps.put("retries", "2");
         kafkaProducerProps.put("batch.size", "0");
         if (overrideProps != null)

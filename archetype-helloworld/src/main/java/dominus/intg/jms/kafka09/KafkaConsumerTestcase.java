@@ -37,7 +37,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
                 count++;
             }
             consumer.commitSync();
-            if (count == 10000) break;
+            if (count == 100000) break;
         }
         assertEquals(100000, count);
     }
