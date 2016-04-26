@@ -49,6 +49,8 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
 
     //test topic
     public static final String TEST_TOPIC_PREFIX = "page_visits_";
+    public static final String TEST_TOPIC_100K = TEST_TOPIC_PREFIX + "100K";
+    public static final String TEST_TOPIC_10K = TEST_TOPIC_PREFIX + "10K";
     String testTopicName;
 
     String groupId;
@@ -130,9 +132,10 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         kafkaProducerProps.put("bootstrap.servers", bootstrapServers);
         //EE: important parameter
         kafkaProducerProps.put("acks", "1");
+        kafkaProducerProps.put("batch.size", "0");
         //
         kafkaProducerProps.put("retries", "2");
-        kafkaProducerProps.put("batch.size", "0");
+
         if (overrideProps != null)
             kafkaProducerProps.putAll(overrideProps);
 //        kafkaProducerProps.list(out);
