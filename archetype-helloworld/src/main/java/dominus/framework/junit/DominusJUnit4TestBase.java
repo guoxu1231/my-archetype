@@ -98,6 +98,10 @@ public class DominusJUnit4TestBase {
         return this.getClass().getAnnotation(HdfsClient.class) != null;
     }
 
+    protected boolean isLocalEnvironment() {
+        return environment.getActiveProfiles()[0].contains("local");
+    }
+
     protected File createSampleFile(int size) throws IOException {
         File file = File.createTempFile("DominusBaseTestCase", ".txt");
         file.deleteOnExit();
