@@ -2,6 +2,7 @@ package dominus.intg.jms.kafka09;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
+import dominus.intg.jms.kafka09.ext.RebalanceEchoListener;
 import kafka.admin.AdminUtils;
 import kafka.tools.GetOffsetShell;
 import kafka.utils.ZKStringSerializer$;
@@ -14,7 +15,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.common.TopicPartition;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
@@ -131,10 +131,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     protected Producer createDefaultProducer(Properties overrideProps) {
         kafkaProducerProps.put("bootstrap.servers", bootstrapServers);
         //EE: important parameter
-        kafkaProducerProps.put("acks", "1");
-        kafkaProducerProps.put("batch.size", "0");
-        //
-        kafkaProducerProps.put("retries", "2");
+
 
         if (overrideProps != null)
             kafkaProducerProps.putAll(overrideProps);
@@ -163,13 +160,11 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     protected Consumer createDefaultConsumer(String subscribeTopic, Properties overrideProps) {
         kafkaConsumerProps.put("bootstrap.servers", bootstrapServers);
         kafkaConsumerProps.put("group.id", groupId);
-        kafkaConsumerProps.put("enable.auto.commit", "false");
-        kafkaConsumerProps.put("auto.commit.interval.ms", "1000");
-        kafkaConsumerProps.put("session.timeout.ms", "30000");
-        kafkaConsumerProps.put("auto.offset.reset", "earliest");
+        if (overrideProps != null)
+            kafkaProducerProps.putAll(overrideProps);
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumerProps);
 //        consumer.seekToBeginning(new TopicPartition(KafkaAdminTestCase.TEST_TOPIC_100K, 0));
-        consumer.subscribe(Arrays.asList(subscribeTopic));
+        consumer.subscribe(Arrays.asList(subscribeTopic), new RebalanceEchoListener());
 
         return consumer;
     }
