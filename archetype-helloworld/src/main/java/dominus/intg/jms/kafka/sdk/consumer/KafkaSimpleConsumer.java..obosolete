@@ -1,0 +1,11 @@
+package dominus.intg.jms.kafka.sdk.consumer;
+
+
+/**
+ * from 0.8.0 SimpleConsumer Example
+ * EE: Does not require zookeeper to work.
+ */
+public class KafkaSimpleConsumer {
+
+
+}
