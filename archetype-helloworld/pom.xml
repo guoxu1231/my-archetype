@@ -160,11 +160,9 @@
                 <dependency>
                     <groupId>org.springframework.kafka</groupId>
                     <artifactId>spring-kafka</artifactId>
-                    <version>2.0.0.BUILD</version>
+                    <version>1.0.0.BUILD-SNAPSHOT</version>
                     <scope>system</scope>
-                    <systemPath>
-                        ${basedir}/lib/spring-integration-kafka/spring-integration-kafka-2.0.0.BUILD-SNAPSHOT.jar
-                    </systemPath>
+                    <systemPath>${basedir}/lib/spring-kafka/spring-kafka-1.0.0.BUILD-SNAPSHOT.jar</systemPath>
                 </dependency>
 
                 <!--memcached client -->
@@ -329,11 +327,11 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <systemPath>${basedir}/lib/aliyun/aliyun-java-sdk-ons4financehz-1.1.1-SNAPSHOT.jar</systemPath>
                 </dependency>
                 <!--<dependency>-->
-                <!--<groupId>com.aliyun</groupId>-->
-                <!--<artifactId>aliyun-java-sdk-ons</artifactId>-->
-                <!--<version>1.1.1-SNAPSHOT</version>-->
-                <!--<scope>system</scope>-->
-                <!--<systemPath>${basedir}/lib/aliyun/aliyun-java-sdk-ons-1.1.1-SNAPSHOT.jar</systemPath>-->
+                    <!--<groupId>com.aliyun</groupId>-->
+                    <!--<artifactId>aliyun-java-sdk-ons</artifactId>-->
+                    <!--<version>1.1.1-SNAPSHOT</version>-->
+                    <!--<scope>system</scope>-->
+                    <!--<systemPath>${basedir}/lib/aliyun/aliyun-java-sdk-ons-1.1.1-SNAPSHOT.jar</systemPath>-->
                 <!--</dependency>-->
                 <dependency>
                     <groupId>com.aliyun</groupId>
