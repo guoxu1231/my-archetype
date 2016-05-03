@@ -382,7 +382,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.jms.kafka09.KafkaProducerTestcase</include>
                         <include>dominus.intg.jms.kafka09.KafkaConsumerTestcase</include>
                         <include>dominus.intg.jms.kafka09.KafkaAdminTestCase</include>
-                        <include>dominus.intg.jms.kafka09.SpringKafkaProducerTestCase</include>
+                        <include>dominus.intg.jms.kafka09.SpringKafkaTestCase</include>
                         <!-- Mongodb -->
                         <include>dominus.intg.datastore.mongodb.MongoIntgTest</include>
                         <!-- ORM integration -->
