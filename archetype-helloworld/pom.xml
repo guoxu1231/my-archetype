@@ -349,6 +349,8 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <excludes>
                         <exclude>dominus/intg/jms/kafka/KafkaZBaseTestCase.java</exclude>
                         <exclude>dominus/intg/jms/kafka/KafkaServerTestCase.java</exclude>

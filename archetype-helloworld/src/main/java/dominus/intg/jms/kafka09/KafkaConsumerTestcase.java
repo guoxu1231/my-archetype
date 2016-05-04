@@ -10,18 +10,18 @@ import kafka.message.MessageAndOffset;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.common.TopicPartition;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
 
@@ -136,4 +136,33 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         assertEquals(MESSAGE_COUNT, count);
     }
 
+    @Test
+    public void testCommitByRecord() {
+        int pollingTime = 0;
+        int[] offsetLog = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        while (true) {
+            ConsumerRecords<String, String> records = consumer.poll(100);
+            pollingTime++;
+            out.printf("[%d th], polling size:%d\n", pollingTime, records.count());
+
+            //EE:only consume first record of partitions
+            for (TopicPartition partition : records.partitions()) {
+                List<ConsumerRecord<String, String>> partitionRecords = records.records(partition);
+                out.println(partition + "-" + partitionRecords.size());
+                for (ConsumerRecord<String, String> record : partitionRecords) {
+                    out.printf("processed record - %s\n", record);
+                    consumer.commitSync(Collections.singletonMap(partition, new OffsetAndMetadata(record.offset() + 1)));
+                    //EE: consumer side seek
+                    consumer.seek(partition, record.offset() + 1);
+                    break;
+                }
+            }
+            for (TopicPartition par : records.partitions())
+                offsetLog[par.partition()] = offsetLog[par.partition()] + 1;
+
+            if (IntStream.of(offsetLog).sum() == MESSAGE_COUNT)
+                break;
+        }
+        assertEquals(MESSAGE_COUNT, IntStream.of(offsetLog).sum());
+    }
 }
