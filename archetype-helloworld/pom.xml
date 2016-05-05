@@ -294,12 +294,12 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <version>1.7</version>
                 </dependency>
 
-                <!-- alibaba dubbo rpc framework -->
-                <dependency>
-                    <groupId>com.alibaba</groupId>
-                    <artifactId>dubbo</artifactId>
-                    <version>2.5.4-SNAPSHOT</version>
-                </dependency>
+                <!--EE: alibaba dubbo rpc framework -->
+                <!--<dependency>-->
+                    <!--<groupId>com.alibaba</groupId>-->
+                    <!--<artifactId>dubbo</artifactId>-->
+                    <!--<version>2.5.4-SNAPSHOT</version>-->
+                <!--</dependency>-->
 
                 <!-- persistent framework -->
                 <dependency>
@@ -319,20 +319,20 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <version>1.2.1</version>
                 </dependency>
                 <!-- EE:ons open api management-->
-                <dependency>
-                    <groupId>com.aliyun</groupId>
-                    <artifactId>aliyun-java-sdk-ons4financehz</artifactId>
-                    <version>1.1.1-SNAPSHOT</version>
-                    <scope>system</scope>
-                    <systemPath>${basedir}/lib/aliyun/aliyun-java-sdk-ons4financehz-1.1.1-SNAPSHOT.jar</systemPath>
-                </dependency>
                 <!--<dependency>-->
                     <!--<groupId>com.aliyun</groupId>-->
-                    <!--<artifactId>aliyun-java-sdk-ons</artifactId>-->
+                    <!--<artifactId>aliyun-java-sdk-ons4financehz</artifactId>-->
                     <!--<version>1.1.1-SNAPSHOT</version>-->
                     <!--<scope>system</scope>-->
-                    <!--<systemPath>${basedir}/lib/aliyun/aliyun-java-sdk-ons-1.1.1-SNAPSHOT.jar</systemPath>-->
+                    <!--<systemPath>${basedir}/lib/aliyun/aliyun-java-sdk-ons4financehz-1.1.1-SNAPSHOT.jar</systemPath>-->
                 <!--</dependency>-->
+                <dependency>
+                    <groupId>com.aliyun</groupId>
+                    <artifactId>aliyun-java-sdk-ons</artifactId>
+                    <version>1.1.1-SNAPSHOT</version>
+                    <scope>system</scope>
+                    <systemPath>${basedir}/lib/aliyun/aliyun-java-sdk-ons-1.1.1-SNAPSHOT.jar</systemPath>
+                </dependency>
                 <dependency>
                     <groupId>com.aliyun</groupId>
                     <artifactId>aliyun-java-sdk-core</artifactId>
@@ -378,7 +378,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.scripting.GroovyIntgTest</include>
                         <include>dominus.intg.ws.jaxb.XmlBindingTest</include>
                         <!-- RPC -->
-                        <include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>
+                        <!--<include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>-->
                         <!-- Kafka & ZK -->
                         <include>dominus.intg.jms.kafka09.KafkaEmbeddedServerTestCase</include>
                         <include>dominus.intg.jms.kafka09.KafkaProducerTestcase</include>

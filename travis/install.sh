@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-#Install dubbo dependencies / cached
-git clone https://github.com/alibaba/dubbo.git dubbo
-cd dubbo
-mvn clean install -Dmaven.test.skip -o
+#EE:[disabled] Install dubbo dependencies / cached
+#git clone https://github.com/alibaba/dubbo.git dubbo
+#cd dubbo
+#mvn clean install -Dmaven.test.skip -o
 
 #install test_db
 git clone https://github.com/datacharmer/test_db.git test_db
