@@ -10,8 +10,8 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.FormatType;
 //EE: public cloud & finance cloud package
-import com.aliyuncs.ons4financehz.model.v20160405.*;
-//import com.aliyuncs.ons.model.v20160405.*;
+//import com.aliyuncs.ons4financehz.model.v20160405.*;
+import com.aliyuncs.ons.model.v20160405.*;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import org.junit.Test;
@@ -164,7 +164,7 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
     @Test
     public void testOnsTopicDeleteRequest() throws ClientException {
 
-        String deleteTopic = "D-GUOXU-TEST-100K";
+        String deleteTopic = TEST_100K_QUEUE;
 
         IClientProfile profile = DefaultProfile.getProfile(ACS_REGION_ID, accessKey, secretKey);
         IAcsClient client = new DefaultAcsClient(profile);

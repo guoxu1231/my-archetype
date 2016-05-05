@@ -7,8 +7,8 @@ import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.FormatType;
 //EE: public cloud & finance cloud package
-import com.aliyuncs.ons4financehz.model.v20160405.*;
-//import com.aliyuncs.ons.model.v20160405.*;
+//import com.aliyuncs.ons4financehz.model.v20160405.*;
+import com.aliyuncs.ons.model.v20160405.*;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import dominus.framework.junit.DominusJUnit4TestBase;
@@ -237,6 +237,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         if (isPublicTest()) {
             properties.put(PropertyKeyConst.SendMsgTimeoutMillis, 15 * Second);
         } else {
+            properties.put(PropertyKeyConst.SendMsgTimeoutMillis, 15 * Second);
             properties.put(PropertyKeyConst.ONSAddr, ONS_ADDRESS);
         }
 

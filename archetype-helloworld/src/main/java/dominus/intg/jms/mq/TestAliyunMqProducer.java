@@ -6,8 +6,8 @@ import com.aliyun.openservices.ons.api.Producer;
 import com.aliyun.openservices.ons.api.SendResult;
 import com.aliyuncs.exceptions.ClientException;
 //EE: public cloud & finance cloud package
-import com.aliyuncs.ons4financehz.model.v20160405.OnsTopicStatusResponse;
-//import com.aliyuncs.ons.model.v20160405.*;
+//import com.aliyuncs.ons4financehz.model.v20160405.OnsTopicStatusResponse;
+import com.aliyuncs.ons.model.v20160405.*;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
