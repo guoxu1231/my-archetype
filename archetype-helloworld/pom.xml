@@ -389,6 +389,8 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.datastore.mongodb.MongoIntgTest</include>
                         <!-- ORM integration -->
                         <include>dominus.intg.datastore.persistent.mybatis.TestMyBatisDao</include>
+                        <!-- java language -->
+                        <include>dominus.language.threads.TestSynchronizer</include>
                     </includes>
                 </configuration>
             </plugin>
