@@ -28,8 +28,8 @@ import static org.junit.Assert.*;
 public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
 
     Producer producer;
-    Consumer consumer;
-    final long MESSAGE_COUNT = 1000L;
+    Consumer<String, String> consumer;
+    final int MESSAGE_COUNT = 1000;
 
     @Override
     protected void doSetUp() throws Exception {
@@ -40,7 +40,6 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         //prepare message
         produceTestMessage(producer, testTopicName, MESSAGE_COUNT);
         assertEquals(MESSAGE_COUNT, sumPartitionOffset(brokerList, testTopicName));
-        consumer = this.createDefaultConsumer(testTopicName, null);
     }
 
     @Override
@@ -122,8 +121,10 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
 
     @Test
     public void testSimpleConsumer() {
-        long count = 0;
 
+        consumer = this.createDefaultConsumer(testTopicName, null, true);
+
+        long count = 0;
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(100);
             for (ConsumerRecord<String, String> record : records) {
@@ -138,10 +139,13 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
 
     @Test
     public void testCommitByRecord() {
+
+        consumer = this.createDefaultConsumer(testTopicName, null, true);
+
         int pollingTime = 0;
         int[] offsetLog = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         while (true) {
-            ConsumerRecords<String, String> records = consumer.poll(100);
+            ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
             pollingTime++;
             out.printf("[%d th], polling size:%d\n", pollingTime, records.count());
 
@@ -164,5 +168,49 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
                 break;
         }
         assertEquals(MESSAGE_COUNT, IntStream.of(offsetLog).sum());
+    }
+
+    @Test
+    public void testMessageOrderInPartition() {
+        consumer = this.createDefaultConsumer(testTopicName, null, false);
+        //EE:only assign partition 0 to consumer
+        consumer.assign(Collections.singletonList(new TopicPartition(testTopicName, 0)));
+
+        int expectedOffset = 0;
+        while (true) {
+            ConsumerRecords records = consumer.poll(pollTimeout);
+            Iterator<ConsumerRecord> iterator = records.iterator();
+            while (iterator.hasNext()) {
+                final ConsumerRecord record = iterator.next();
+                out.println(record);
+                //EE: offset from 0 to largest
+                assertEquals(expectedOffset++, record.offset());
+                if (expectedOffset == testMessageMap.get(0).size())
+                    return;
+            }
+        }
+    }
+
+    /**
+     * If assign to multiple partition, can not guarantee the partition seek works!
+     * Because each polling may fetch records from other partitions.
+     */
+    @Test
+    public void testRandomSeekInPartition() {
+        consumer = this.createDefaultConsumer(testTopicName, null, false);
+        //EE:only assign partition 0 to consumer
+        consumer.assign(Collections.singletonList(new TopicPartition(testTopicName, 0)));
+
+        for (int i = 0; i < 100; i++) {
+            KafkaTestMessage expectedMsg = testMessageMap.get(0).get(random.nextInt(testMessageMap.get(0).size()));
+            consumer.seek(new TopicPartition(testTopicName, 0), expectedMsg.medadata.offset());
+            //EE:random seek to partition first record
+            ConsumerRecord record = consumer.poll(pollTimeout).iterator().next();
+
+            out.printf("Expected Message:(%s,%s), %s\n", expectedMsg.medadata.partition(), expectedMsg.medadata.offset(), expectedMsg.message);
+            out.printf("Actual   Message:(%s,%s), %s\n", record.partition(), record.offset(), record);
+            assertEquals(expectedMsg.message.key(), record.key());
+            assertEquals(expectedMsg.message.value(), record.value());
+        }
     }
 }

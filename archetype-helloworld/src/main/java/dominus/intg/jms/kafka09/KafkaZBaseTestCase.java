@@ -2,7 +2,6 @@ package dominus.intg.jms.kafka09;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
-import dominus.intg.jms.kafka09.ext.RebalanceEchoListener;
 import kafka.admin.AdminUtils;
 import kafka.tools.GetOffsetShell;
 import kafka.utils.ZKStringSerializer$;
@@ -10,20 +9,19 @@ import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
 import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -40,12 +38,14 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     String brokerList;
     int replicationFactor;
     String bootstrapServers;
+    int numPartitions;
 
     //ZK
     static int zkSessionTimeout = 6000;
     static int zkConnectionTimeout = 10000;
     ZkUtils zkUtils;
     ZkClient zkClient;
+    static volatile long pollTimeout = 1000;
 
     //test topic
     public static final String TEST_TOPIC_PREFIX = "page_visits_";
@@ -61,12 +61,16 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     @Resource(name = "kafkaConsumerProps")
     Properties kafkaConsumerProps;
 
+    //partition id, messages
+    Map<Integer, ArrayList<KafkaTestMessage>> testMessageMap;
+
 
     @Override
     protected void doSetUp() throws Exception {
         brokerList = properties.getProperty("bootstrap.servers");
         bootstrapServers = properties.getProperty("bootstrap.servers");
         replicationFactor = Integer.valueOf(properties.getProperty("kafka.replication.factor"));
+        numPartitions = Integer.valueOf(properties.getProperty("kafka.test.topic.partition"));
         out.println("[kafka Producer Properties]" + kafkaProducerProps.size());
         out.println("[kafka Consumer Properties]" + kafkaConsumerProps.size());
         testTopicName = TEST_TOPIC_PREFIX + new Date().getTime();
@@ -88,7 +92,17 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     }
 
     protected boolean createTestTopic(String testTopic) throws InterruptedException {
-        int numPartitions = Integer.valueOf(properties.getProperty("kafka.test.topic.partition"));
+        AdminUtils.createTopic(zkUtils, testTopic, numPartitions, replicationFactor, new Properties());
+        out.printf("Kafka Topic[%s] is created!\n", testTopic);
+        assertTrue("Kafka Topic[%s] does not exist!", AdminUtils.topicExists(zkUtils, testTopic));
+        if (!isLocalEnvironment()) {
+            out.println("Sleep 5 Seconds for Topic Initialization...");
+            Thread.sleep(5 * Second);
+        }
+        return true;
+    }
+
+    protected boolean createTestTopic(String testTopic, int numPartitions) throws InterruptedException {
         AdminUtils.createTopic(zkUtils, testTopic, numPartitions, replicationFactor, new Properties());
         out.printf("Kafka Topic[%s] is created!\n", testTopic);
         assertTrue("Kafka Topic[%s] does not exist!", AdminUtils.topicExists(zkUtils, testTopic));
@@ -141,6 +155,11 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     }
 
     protected void produceTestMessage(Producer producer, String topicName, long count) throws InterruptedException, ExecutionException, TimeoutException {
+
+        testMessageMap = new HashMap<Integer, ArrayList<KafkaTestMessage>>();
+        for (int i = 0; i < numPartitions; i++)
+            testMessageMap.put(i, new ArrayList<KafkaTestMessage>((int) count));
+
         Random rnd = new Random();
         StopWatch watch = new StopWatch("[Producer] message count:" + count);
         watch.start();
@@ -152,20 +171,44 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
 
             RecordMetadata medadata = ((RecordMetadata) producer.send(message).get(10, TimeUnit.SECONDS));
             out.printf("[Acknowledged Message]:%s, %s, %s\n", medadata.topic(), medadata.partition(), medadata.offset());
+            testMessageMap.get(medadata.partition()).add(new KafkaTestMessage(medadata, message));
         }
         watch.stop();
         System.out.println(watch);
     }
 
-    protected Consumer createDefaultConsumer(String subscribeTopic, Properties overrideProps) {
+    protected Consumer createDefaultConsumer(String subscribeTopic, Properties overrideProps, boolean autoAssign) {
         kafkaConsumerProps.put("bootstrap.servers", bootstrapServers);
         kafkaConsumerProps.put("group.id", groupId);
         if (overrideProps != null)
             kafkaProducerProps.putAll(overrideProps);
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumerProps);
 //        consumer.seekToBeginning(new TopicPartition(KafkaAdminTestCase.TEST_TOPIC_100K, 0));
-        consumer.subscribe(Arrays.asList(subscribeTopic), new RebalanceEchoListener());
+        ConsumerRebalanceListener rebalanceListener = new ConsumerRebalanceListener() {
+            @Override
+            public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+                out.println("partitions revoked:" + partitions);
+            }
+
+            @Override
+            public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+                out.println("partitions assigned:" + partitions);
+            }
+        };
+        if (autoAssign)
+            consumer.subscribe(Arrays.asList(subscribeTopic), rebalanceListener);
 
         return consumer;
     }
+
+    static class KafkaTestMessage {
+        RecordMetadata medadata;
+        ProducerRecord message;
+
+        public KafkaTestMessage(RecordMetadata medadata, ProducerRecord message) {
+            this.medadata = medadata;
+            this.message = message;
+        }
+    }
+
 }

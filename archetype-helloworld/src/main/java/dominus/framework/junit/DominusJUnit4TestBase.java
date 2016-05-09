@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.io.*;
 import java.util.Properties;
+import java.util.Random;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -70,6 +71,8 @@ public class DominusJUnit4TestBase {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
+
+    protected Random random = new Random();
 
     public static void println(String color, Object x) {
         out.print(color);
