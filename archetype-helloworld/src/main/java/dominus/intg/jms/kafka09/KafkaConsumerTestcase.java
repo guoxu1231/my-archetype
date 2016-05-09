@@ -201,16 +201,20 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         //EE:only assign partition 0 to consumer
         consumer.assign(Collections.singletonList(new TopicPartition(testTopicName, 0)));
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             KafkaTestMessage expectedMsg = testMessageMap.get(0).get(random.nextInt(testMessageMap.get(0).size()));
             consumer.seek(new TopicPartition(testTopicName, 0), expectedMsg.medadata.offset());
             //EE:random seek to partition first record
-            ConsumerRecord record = consumer.poll(pollTimeout).iterator().next();
+            ConsumerRecords<?, ?> records = consumer.poll(pollTimeout);
+            out.printf("polling records count:%d\n", records.count());
+            ConsumerRecord record = records.isEmpty() ? null : records.iterator().next();
 
-            out.printf("Expected Message:(%s,%s), %s\n", expectedMsg.medadata.partition(), expectedMsg.medadata.offset(), expectedMsg.message);
-            out.printf("Actual   Message:(%s,%s), %s\n", record.partition(), record.offset(), record);
-            assertEquals(expectedMsg.message.key(), record.key());
-            assertEquals(expectedMsg.message.value(), record.value());
+            if (record != null) {
+                out.printf("Expected Message:(%s,%s), %s\n", expectedMsg.medadata.partition(), expectedMsg.medadata.offset(), expectedMsg.message);
+                out.printf("Actual   Message:(%s,%s), %s\n", record.partition(), record.offset(), record);
+                assertEquals(expectedMsg.message.key(), record.key());
+                assertEquals(expectedMsg.message.value(), record.value());
+            }
         }
     }
 }
