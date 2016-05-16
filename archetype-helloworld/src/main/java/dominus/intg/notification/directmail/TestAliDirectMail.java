@@ -2,16 +2,24 @@ package dominus.intg.notification.directmail;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.util.StopWatch;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.Date;
 import java.util.Properties;
 
 /**
  * 使用javamail通过smtp协议发信
  */
+@ContextConfiguration(locations = "classpath:spring-container/java_mail_context.xml")
 public class TestAliDirectMail extends DominusJUnit4TestBase {
     private static final String ALIDM_SMTP_HOST = "smtpdm.aliyun.com";
     private static final int ALIDM_SMTP_PORT = 25;
@@ -19,6 +27,10 @@ public class TestAliDirectMail extends DominusJUnit4TestBase {
     String mailUser;
     String mailPassword;
     String mailTo;
+    String mailTemplate;
+
+    @Autowired
+    JavaMailSender mailSender;
 
     @Override
     protected void doSetUp() throws Exception {
@@ -26,6 +38,9 @@ public class TestAliDirectMail extends DominusJUnit4TestBase {
         mailUser = properties.getProperty("mail.user");
         mailPassword = properties.getProperty("mail.password");
         mailTo = properties.getProperty("mail.to");
+        mailTemplate = IOUtils.toString(resourceLoader.
+                getResource("classpath:template/html-mail-template.html").getInputStream(), "UTF-8");
+        out.println(mailTemplate.substring(200));
     }
 
     @Test
@@ -36,7 +51,7 @@ public class TestAliDirectMail extends DominusJUnit4TestBase {
         // 表示SMTP发送邮件，需要进行身份验证
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.host", ALIDM_SMTP_HOST);
-        props.put("mail.smtp.port", ALIDM_SMTP_PORT);
+//        props.put("mail.smtp.port", ALIDM_SMTP_PORT);
         // 如果使用ssl，则去掉使用25端口的配置，进行如下配置,
         props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.socketFactory.port", "465");
@@ -77,6 +92,52 @@ public class TestAliDirectMail extends DominusJUnit4TestBase {
         // 发送邮件
         Transport.send(message);
     }
+
+
+    /**
+     * html email, link to image url rather than as inline.
+     *
+     * @throws MessagingException
+     */
+    @Test
+    public void testSpringHtmlMailSend() throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        //EE: Allows for defining a character encoding for the entire message, automatically applied by all methods of this helper class.
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+        helper.setText(mailTemplate, true);
+        helper.setFrom(mailUser);
+        helper.setTo(mailTo);
+        helper.setSentDate(new Date());
+        helper.setSubject("测试邮件");
+        //EE: javax.mail.Transport is expensive, performance bottleneck, object pool
+        mailSender.send(mimeMessage);
+    }
+
+    /**
+     * 180 / running time (millis) = 82348, 457ms per mail
+     * @throws MessagingException
+     */
+    @Test
+    public void testSendPerformance() throws MessagingException {
+        StopWatch watch = new StopWatch("JavaMail Send Porformance Test");
+        watch.start();
+        for (int i = 0; i < 2000; i++) {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            //EE: Allows for defining a character encoding for the entire message, automatically applied by all methods of this helper class.
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setText(mailTemplate, true);
+            helper.setFrom(mailUser);
+            helper.setTo(mailTo);
+            helper.setSentDate(new Date());
+            helper.setSubject("测试邮件");
+            //EE: javax.mail.Transport is expensive, performance bottleneck, object pool
+            mailSender.send(mimeMessage);
+            out.printf("send %dth mail to %s successful.\n",i,mailTo);
+        }
+        watch.stop();
+        out.println(watch);
+    }
+
 
     @Override
     protected void doTearDown() throws Exception {
