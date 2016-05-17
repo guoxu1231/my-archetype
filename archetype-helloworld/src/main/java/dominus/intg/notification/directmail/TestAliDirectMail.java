@@ -3,8 +3,10 @@ package dominus.intg.notification.directmail;
 
 import dominus.framework.junit.DominusJUnit4TestBase;
 import org.apache.commons.io.IOUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.context.ContextConfiguration;
@@ -15,6 +17,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.Date;
 import java.util.Properties;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * 使用javamail通过smtp协议发信
@@ -103,25 +107,42 @@ public class TestAliDirectMail extends DominusJUnit4TestBase {
     public void testSpringHtmlMailSend() throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         //EE: Allows for defining a character encoding for the entire message, automatically applied by all methods of this helper class.
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
         helper.setText(mailTemplate, true);
         helper.setFrom(mailUser);
         helper.setTo(mailTo);
         helper.setSentDate(new Date());
         helper.setSubject("测试邮件");
+        assertEquals("UTF-8", helper.getEncoding());
         //EE: javax.mail.Transport is expensive, performance bottleneck, object pool
+        mailSender.send(mimeMessage);
+    }
+
+    @Test(expected = MailSendException.class)
+    public void testError436() throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        //EE: Allows for defining a character encoding for the entire message, automatically applied by all methods of this helper class.
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+        helper.setText(mailTemplate, true);
+        //EE: mail from should conform with authentication user.
+        //com.sun.mail.smtp.SMTPSendFailedException: 436 "MAIL FROM" doesn't conform with authentication
+        helper.setFrom(mailUser+".cn");
+        helper.setTo(mailTo);
+        helper.setSentDate(new Date());
+        helper.setSubject("测试邮件");
         mailSender.send(mimeMessage);
     }
 
     /**
      * 180 / running time (millis) = 82348, 457ms per mail
+     *
      * @throws MessagingException
      */
-    @Test
-    public void testSendPerformance() throws MessagingException {
+    @Ignore
+    public void testSendPerformance() throws MessagingException, InterruptedException {
         StopWatch watch = new StopWatch("JavaMail Send Porformance Test");
         watch.start();
-        for (int i = 0; i < 2000; i++) {
+        for (int i = 0; i < 1000; i++) {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             //EE: Allows for defining a character encoding for the entire message, automatically applied by all methods of this helper class.
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -132,7 +153,8 @@ public class TestAliDirectMail extends DominusJUnit4TestBase {
             helper.setSubject("测试邮件");
             //EE: javax.mail.Transport is expensive, performance bottleneck, object pool
             mailSender.send(mimeMessage);
-            out.printf("send %dth mail to %s successful.\n",i,mailTo);
+            out.printf("send %dth mail to %s successful.\n", i, mailTo);
+            Thread.sleep(random.nextInt(60000));
         }
         watch.stop();
         out.println(watch);
