@@ -46,7 +46,7 @@ public class TestAliyunMqProducer extends TestAliyunMqZBaseTestCase {
      */
     @Test
     public void testSimpleMessage() throws InterruptedException, ClientException {
-        Long msgCount = Long.valueOf(properties.getProperty("aliyun.mq.testTopic.count"));
+        Integer msgCount = Integer.valueOf(properties.getProperty("aliyun.mq.testTopic.count"));
         produceTestMessage(producer, testTopicId, msgCount);
     }
 

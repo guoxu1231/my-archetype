@@ -12,7 +12,9 @@ import com.aliyuncs.ons.model.v20160405.*;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import dominus.framework.junit.DominusJUnit4TestBase;
+import dominus.framework.junit.annotation.MessageQueueTest;
 import org.junit.Test;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.Date;
 import java.util.Properties;
@@ -36,8 +38,11 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
     String testProducerId;
     String testConsumerId;
 
-    final int SLEEP_PUBLIC = 5;
+    final int SLEEP_PUBLIC = 20;
     final int SLEEP_FINANCE = 3;
+    final int MAX_RECONSUME_TIMES = 16;
+
+    MessageQueueTest testAnnotation;
 
     protected boolean isPublicTest() {
         return ONS_REGION_ID.contains("publictest");
@@ -63,6 +68,8 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         testProducerId = String.format("PID-D-GUOXU-TEST-%1$tY%1$tm%1$td-%1$TQ", createDate);
         testConsumerId = String.format("CID-D-GUOXU-TEST-%1$tY%1$tm%1$td-%1$TQ", createDate);
 
+        //EE: get test method annotation
+        testAnnotation = AnnotationUtils.getAnnotation(this.getClass().getMethod(this.name.getMethodName()), MessageQueueTest.class);
         out.printf("[ONS_REGION_ID] %s [PRODUCT] %s\n", ONS_REGION_ID, productName);
     }
 
@@ -164,6 +171,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
     }
 
     private void sleep() {
+        //sleep to wait for topic and publish info updated to name server.
         try {
             if (isPublicTest()) {
                 out.printf("sleep %d seconds to wait for initialization\n", SLEEP_PUBLIC);
@@ -269,7 +277,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
 
     public static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-    protected void produceTestMessage(Producer producer, String testTopic, Long count) throws ClientException {
+    protected void produceTestMessage(Producer producer, String testTopic, int count) throws ClientException {
         for (int i = 0; i < count; i++) {
             Message msg = new Message(testTopic, "DefaultTag", ALPHABET.getBytes());
             msg.setKey(String.format("ORDERID_%d", i));
@@ -278,7 +286,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
             out.printf("%s send to %s success: %s \n", msg.getKey(), testTopic, sendResult);
         }
         OnsTopicStatusResponse.Data data = this.getTopicStatus(testTopic);
-        assertEquals(count, data.getTotalCount());
+        assertEquals(count, data.getTotalCount().intValue());
     }
 
 }
