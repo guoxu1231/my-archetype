@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.IntStream;
 
 import static org.junit.Assert.*;
 
@@ -164,10 +163,10 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
             for (TopicPartition par : records.partitions())
                 offsetLog[par.partition()] = offsetLog[par.partition()] + 1;
 
-            if (IntStream.of(offsetLog).sum() == MESSAGE_COUNT)
+            if (sum(offsetLog) == MESSAGE_COUNT)
                 break;
         }
-        assertEquals(MESSAGE_COUNT, IntStream.of(offsetLog).sum());
+        assertEquals(MESSAGE_COUNT, sum(offsetLog));
     }
 
     @Test
