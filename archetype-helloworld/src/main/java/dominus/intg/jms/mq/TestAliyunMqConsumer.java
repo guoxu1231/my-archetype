@@ -1,32 +1,69 @@
 package dominus.intg.jms.mq;
 
 
-import com.aliyun.openservices.ons.api.Consumer;
+import com.aliyun.openservices.ons.api.*;
 import com.aliyuncs.exceptions.ClientException;
+import dominus.framework.junit.annotation.MessageQueueTest;
 import dominus.intg.jms.mq.endpoint.DemoMessageListener;
-import dominus.intg.jms.mq.endpoint.ResumeMessageListener;
 import org.junit.Test;
+import org.springframework.util.StringUtils;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 
 public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
 
     Consumer consumer;
-    String currentTopic;
-
+    Producer producer;
 
     @Override
     protected void doSetUp() throws Exception {
         super.doSetUp();
+        if (testAnnotation != null && testAnnotation.produceTestMessage()) {
+            this.createTestTopic(testTopicId);
+            this.createProducerPublish(testTopicId, testProducerId);
+            producer = this.createProducer(testProducerId);
+            produceTestMessage(producer, testTopicId, testAnnotation.count());
+        }
+        if (testAnnotation != null && StringUtils.hasText(testAnnotation.queueName()))
+            testTopicId = testAnnotation.queueName();
+        this.createConsumerSubscription(testTopicId, testConsumerId);
     }
 
     @Override
     protected void doTearDown() throws Exception {
         super.doTearDown();
+        if (producer != null) producer.shutdown();
         if (consumer != null) consumer.shutdown();
         //TODO delete exception in public cloud
-        deleteConsumerSubscription(currentTopic, testConsumerId);
+        deleteConsumerSubscription(testTopicId, testConsumerId);
+        if (testAnnotation != null && testAnnotation.produceTestMessage()) {
+            this.deleteTestTopic(testTopicId);
+            this.deleteProducerPublish(testTopicId, testProducerId);
+        }
+
     }
+
+    @MessageQueueTest(produceTestMessage = true, count = 100)
+    @Test
+    public void testSimpleConsumer() throws ClientException, InterruptedException, IllegalAccessException {
+        final CountDownLatch latch = new CountDownLatch(testAnnotation.count());
+
+        consumer = this.createDefaultConsumer(testTopicId, testConsumerId, 2, MAX_RECONSUME_TIMES);
+        consumer.subscribe(testTopicId, "*", new MessageListener() {
+            @Override
+            public Action consume(Message message, ConsumeContext context) {
+                latch.countDown();
+                out.printf("consumed message, [key]=%s,[value]=%s\n", message.getKey(), new String(message.getBody()));
+                return Action.CommitMessage;
+            }
+        });
+        consumer.start();
+        assertEquals(true, latch.await(5, TimeUnit.MINUTES));
+    }
+
 
     /**
      * EE: 16 partitions in public cloud
@@ -34,35 +71,43 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
      * DemoMessageListener Receive: ORDERID_19 [0A91883700001F9000000B8F310C2ABF]
      * EE: ONS broker failed, only get 5000 messages.
      */
+    @MessageQueueTest(produceTestMessage = false, queueName = "D-GUOXU-TEST-1K-0520", count = 1000)
     @Test
-    public void test10KConsumer() throws InterruptedException, ClientException {
-        currentTopic = TestAliyunMqAdmin.TEST_10K_QUEUE;
+    public void testConsumeMessage() throws InterruptedException, ClientException {
+        final CountDownLatch latch = new CountDownLatch(testAnnotation.count());
 
-        this.createConsumerSubscription(currentTopic, testConsumerId);
-        //sleep to wait for topic and publish info updated to name server.
-        consumer = this.createDefaultConsumer(currentTopic, testConsumerId, 1, 16, new DemoMessageListener(0 * Second));
-        consumer.start();
-        while (true) {
-            if (DemoMessageListener.count.longValue() == 10000)
-                break;
-            else {
-                printf(ANSI_RED, "Consumed Message: %d\n", DemoMessageListener.count.longValue());
-                java.lang.Thread.sleep(10 * Second);
+        consumer = this.createDefaultConsumer(testTopicId, testConsumerId, 1, MAX_RECONSUME_TIMES);
+        consumer.subscribe(testTopicId, "*", new MessageListener() {
+            @Override
+            public Action consume(Message message, ConsumeContext context) {
+                latch.countDown();
+                out.printf("consumed message, [key]=%s,[value]=%s\n", message.getKey(), new String(message.getBody()));
+                return Action.CommitMessage;
             }
-        }
-        assertEquals(10000, DemoMessageListener.count.longValue());
+        });
+        consumer.start();
+        assertEquals(true, latch.await(5, TimeUnit.MINUTES));
     }
 
-    //MaxReconsumeTimes = "maxReconsumeTimes"
+    @MessageQueueTest(queueName = "D-GUOXU-TEST-ONE-0520")
     @Test
-    public void testResumeMessage() throws ClientException, InterruptedException {
-        currentTopic = TestAliyunMqAdmin.TEST_ONE_MSG_QUEUE;
+    public void testResumeLater() throws ClientException, InterruptedException {
+        //re-consume later for 3 times
+        final CountDownLatch latch = new CountDownLatch(3);
 
-        this.createConsumerSubscription(currentTopic, testConsumerId);
         //sleep to wait for topic and publish info updated to name server.
-        consumer = this.createDefaultConsumer(currentTopic, testConsumerId, 1, 3, new ResumeMessageListener());
+        consumer = this.createDefaultConsumer(testTopicId, testConsumerId, 1, MAX_RECONSUME_TIMES);
+        consumer.subscribe(testTopicId, "*", new MessageListener() {
+            @Override
+            public Action consume(Message message, ConsumeContext context) {
+                printf(ANSI_RED, "ReconsumeLater, [ReconsumeTime]:%d, [key]=%s,[value]=%s\n",
+                        message.getReconsumeTimes(),message.getKey(), new String(message.getBody()));
+                latch.countDown();
+                return Action.ReconsumeLater;
+            }
+        });
         consumer.start();
-        Thread.sleep(5 * Minute);
+        assertEquals(true, latch.await(5, TimeUnit.MINUTES));
     }
 
 

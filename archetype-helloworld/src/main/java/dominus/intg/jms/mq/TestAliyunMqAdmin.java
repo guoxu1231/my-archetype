@@ -14,6 +14,8 @@ import com.aliyuncs.http.FormatType;
 import com.aliyuncs.ons.model.v20160405.*;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
+import dominus.framework.junit.annotation.MessageQueueTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -26,19 +28,16 @@ import static org.junit.Assert.assertNotNull;
  */
 public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
 
-    String currentTopic;
-
     @Override
     protected void doSetUp() throws Exception {
         super.doSetUp();
-        this.currentTopic = testTopicId;
     }
 
-
+    @MessageQueueTest(queueName = "D-GUOXU-TEST-1K-0520")
     @Test
     public void testOnsTopicStatusRequest() throws ClientException {
 
-        currentTopic = TEST_10K_QUEUE;
+        String currentTopic = testAnnotation.queueName();
 
         //template code begin
         OnsTopicStatusRequest request = new OnsTopicStatusRequest();
@@ -54,10 +53,11 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
     }
 
 
+    @MessageQueueTest(queueName = "D-GUOXU-TEST-1K-0520")
     @Test
     public void testOnsTopicGetRequest() throws ClientException {
 
-        currentTopic = TEST_10K_QUEUE;
+        String currentTopic = testAnnotation.queueName();
 
         OnsTopicGetRequest request = new OnsTopicGetRequest();
         request.setAcceptFormat(FormatType.JSON);
@@ -88,7 +88,6 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
 
 
     }
-
 
     /**
      * 1  cn-qingdao-publictest  公网测试  null    1411623866000  1411623866000
@@ -138,50 +137,11 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
         }
     }
 
-    @Test
-    public void testOnsTopicCreateRequest() throws ClientException {
-        IClientProfile profile = DefaultProfile.getProfile(ACS_REGION_ID, accessKey, secretKey);
-        IAcsClient client = new DefaultAcsClient(profile);
-
-        OnsTopicCreateRequest request = new OnsTopicCreateRequest();
-        request.setAcceptFormat(FormatType.JSON);
-        request.setTopic("D-GUOXU-TEST-160418");
-        request.setQps(1000l);
-        request.setRemark("DEV");
-        request.setStatus(0);
-        /**
-         *ONSRegionId是指你需要API访问ONS哪个区域的资源。
-         *该值必须要根据OnsRegionList方法获取的列表来选择和配置，因为OnsRegionId是变动的，不能够写固定值
-         */
-        request.setOnsRegionId(ONS_REGION_ID);
-        request.setCluster("DEV-Test");
-        request.setPreventCache(System.currentTimeMillis());
-
-        OnsTopicCreateResponse response = client.getAcsResponse(request);
-        System.out.println(response.getRequestId());
-    }
-
-    @Test
-    public void testOnsTopicDeleteRequest() throws ClientException {
-
-        String deleteTopic = TEST_100K_QUEUE;
-
-        IClientProfile profile = DefaultProfile.getProfile(ACS_REGION_ID, accessKey, secretKey);
-        IAcsClient client = new DefaultAcsClient(profile);
-
-        OnsTopicDeleteRequest request = new OnsTopicDeleteRequest();
-        request.setPreventCache(System.currentTimeMillis());
-        request.setOnsRegionId(ONS_REGION_ID);
-        request.setTopic(deleteTopic);
-
-        OnsTopicDeleteResponse response = client.getAcsResponse(request);
-        System.out.printf("%s is deleted! %s\n", deleteTopic, response.getRequestId());
-    }
-
+    @MessageQueueTest(queueName = "D-GUOXU-TEST-10K", count = 1000)
     @Test
     public void testOnsTrendTopicInputTpsRequest() throws ClientException {
 
-        String currentTopic = TEST_10K_QUEUE;
+        String currentTopic = testAnnotation.queueName();
 
         OnsTrendTopicInputTpsRequest request = new OnsTrendTopicInputTpsRequest();
         request.setOnsRegionId(ONS_REGION_ID);
@@ -201,27 +161,23 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
         }
     }
 
-    public static final String TEST_10K_QUEUE = "D-GUOXU-TEST-10K";
-    public static final String TEST_100K_QUEUE = "D-GUOXU-TEST-100K";
-    public static final String TEST_ONE_MSG_QUEUE = "D-GUOXU-TEST-ONE";
-
+    @MessageQueueTest(queueName = "D-GUOXU-TEST-ONE-0520", count = 1)
     @Test
-    public void create100KQueue() throws ClientException, IllegalAccessException, InterruptedException {
-        String publishId = "PID-" + TEST_100K_QUEUE;
-        this.createTestTopic(TEST_100K_QUEUE);
-        this.createProducerPublish(TEST_100K_QUEUE, publishId);
+    public void createTestQueue() throws ClientException, IllegalAccessException, InterruptedException {
+        String queueName = testAnnotation.queueName();
+        int count = testAnnotation.count();
+        String publishId = "PID-" + queueName;
+
+        this.createTestTopic(queueName);
+        this.createProducerPublish(queueName, publishId);
         Producer producer = this.createProducer(publishId);
-        produceTestMessage(producer, TEST_100K_QUEUE, 100000L);
-        this.deleteProducerPublish(TEST_10K_QUEUE, "PID-D-GUOXU-TEST-10k");
+        produceTestMessage(producer, queueName, count);
+        this.deleteProducerPublish(queueName, publishId);
     }
 
+    @MessageQueueTest(queueName = "D-GUOXU-TEST-1K-0520", count = 1000)
     @Test
-    public void testCreateOneMsgQueue() throws ClientException, IllegalAccessException, InterruptedException {
-        String publishId = "PID-" + TEST_ONE_MSG_QUEUE;
-        this.createTestTopic(TEST_ONE_MSG_QUEUE);
-        this.createProducerPublish(TEST_100K_QUEUE, publishId);
-        Producer producer = this.createProducer(publishId);
-        produceTestMessage(producer, TEST_ONE_MSG_QUEUE, 1L);
-        this.deleteProducerPublish(TEST_ONE_MSG_QUEUE, publishId);
+    public void deleteTestQueue() {
+        this.deleteTestTopic(testAnnotation.queueName());
     }
 }
