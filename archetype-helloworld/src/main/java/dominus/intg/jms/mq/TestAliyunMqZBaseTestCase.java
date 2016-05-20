@@ -12,8 +12,6 @@ import com.aliyuncs.ons.model.v20160405.*;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import dominus.framework.junit.DominusJUnit4TestBase;
-import dominus.intg.jms.mq.endpoint.DemoMessageListener;
-import dominus.intg.jms.mq.endpoint.ResumeMessageListener;
 import org.junit.Test;
 
 import java.util.Date;
@@ -37,6 +35,9 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
     String testTopicId;
     String testProducerId;
     String testConsumerId;
+
+    final int SLEEP_PUBLIC = 5;
+    final int SLEEP_FINANCE = 3;
 
     protected boolean isPublicTest() {
         return ONS_REGION_ID.contains("publictest");
@@ -93,14 +94,8 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         OnsTopicCreateResponse response = iAcsClient.getAcsResponse(request);
         System.out.printf("[AliyunMq TestTopic] %s is created!\nRequestId=%s, HelpUrl=%s\n", testTopicName, response.getRequestId(), response.getHelpUrl());
 
-        //EE: wait for initialization
-        if (isPublicTest()) {
-            out.println("sleep 30 seconds to wait for initialization");
-            java.lang.Thread.sleep(30 * Second);
-        } else {
-            out.println("sleep 3 seconds to wait for initialization");
-            java.lang.Thread.sleep(3 * Second);
-        }
+        //EE: sleep for initialization
+        sleep();
         return true;
     }
 
@@ -146,13 +141,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         System.out.printf("[AliyunMq TestProducer] %s is created for %s!\nRequestId=%s, HelpUrl=%s\n",
                 testPublishId, testTopicId, response.getRequestId(), response.getHelpUrl());
         //EE: wait for initialization
-        if (isPublicTest()) {
-            out.println("sleep 30 seconds to wait for initialization");
-            java.lang.Thread.sleep(30 * Second);
-        } else {
-            out.println("sleep 3 seconds to wait for initialization");
-            java.lang.Thread.sleep(3 * Second);
-        }
+        sleep();
 
         return true;
     }
@@ -168,16 +157,24 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
 
         OnsSubscriptionCreateResponse response = iAcsClient.getAcsResponse(request);
         System.out.printf("[AliyunMq TestConsumer] %s is created for %s!\n", testConsumerId, testTopicId);
-        //EE: wait for initialization
-        if (isPublicTest()) {
-            out.println("sleep 15 seconds to wait for initialization");
-            java.lang.Thread.sleep(15 * Second);
-        } else {
-            out.println("sleep 3 seconds to wait for initialization");
-            java.lang.Thread.sleep(3 * Second);
-        }
+        //EE: sleep for initialization
+        sleep();
 
         return true;
+    }
+
+    private void sleep() {
+        try {
+            if (isPublicTest()) {
+                out.printf("sleep %d seconds to wait for initialization\n", SLEEP_PUBLIC);
+                Thread.sleep(SLEEP_PUBLIC * Second);
+            } else {
+                out.printf("sleep %d seconds to wait for initialization\n", SLEEP_FINANCE);
+                java.lang.Thread.sleep(SLEEP_FINANCE * Second);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     protected boolean deleteConsumerSubscription(String testTopicId, String testConsumerId) {
@@ -248,7 +245,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
     }
 
 
-    protected Consumer createDefaultConsumer(String testTopicId, String testConsumerId, int consumeThreadNums, int maxReconsumeTimes, MessageListener listener) {
+    protected Consumer createDefaultConsumer(String testTopicId, String testConsumerId, int consumeThreadNums, int maxReconsumeTimes) {
         Properties properties = new Properties();
         properties.put(PropertyKeyConst.ConsumerId, testConsumerId);
         properties.put(PropertyKeyConst.AccessKey, accessKey);
@@ -262,7 +259,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         }
 
         Consumer consumer = ONSFactory.createConsumer(properties);
-        consumer.subscribe(testTopicId, "*", listener);
+//        consumer.subscribe(testTopicId, "*", listener);
         return consumer;
     }
 
