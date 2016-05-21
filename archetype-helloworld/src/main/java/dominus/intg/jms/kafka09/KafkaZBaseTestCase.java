@@ -2,6 +2,7 @@ package dominus.intg.jms.kafka09;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
+import dominus.framework.junit.annotation.MessageQueueTest;
 import kafka.admin.AdminUtils;
 import kafka.tools.GetOffsetShell;
 import kafka.utils.ZKStringSerializer$;
@@ -16,6 +17,7 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.TopicPartition;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
@@ -64,6 +66,8 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     //partition id, messages
     Map<Integer, ArrayList<KafkaTestMessage>> testMessageMap;
 
+    MessageQueueTest messageQueueAnnotation;
+
 
     @Override
     protected void doSetUp() throws Exception {
@@ -84,6 +88,9 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
                 ZKStringSerializer$.MODULE$);
         ZkConnection zkConnection = new ZkConnection(properties.getProperty("zkQuorum"));
         zkUtils = new ZkUtils(zkClient, zkConnection, false);
+
+        //EE: get test method annotation
+        messageQueueAnnotation = AnnotationUtils.getAnnotation(this.getClass().getMethod(this.name.getMethodName()), MessageQueueTest.class);
     }
 
     @Override

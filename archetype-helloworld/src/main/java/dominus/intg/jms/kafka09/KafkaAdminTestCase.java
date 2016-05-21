@@ -1,6 +1,7 @@
 package dominus.intg.jms.kafka09;
 
 
+import dominus.framework.junit.annotation.MessageQueueTest;
 import kafka.admin.AdminUtils;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;
@@ -116,18 +117,22 @@ public class KafkaAdminTestCase extends KafkaZBaseTestCase {
     }
 
 
-
     /**
      * DO NOT DELETE 100K TEST TOPIC
      */
-    @Ignore
-    public void testCreate10kTopic() throws InterruptedException, ExecutionException, TimeoutException {
-        this.createTestTopic(TEST_TOPIC_100K);
+    @MessageQueueTest(queueName = "page_visits_10k", count = 10000)
+    @Test
+    public void testCreateTestTopic() throws InterruptedException, ExecutionException, TimeoutException {
+
+        int count = messageQueueAnnotation.count();
+        String testTopic = messageQueueAnnotation.queueName();
+
+        this.createTestTopic(testTopic);
         Producer producer = this.createDefaultProducer(null);
-        produceTestMessage(producer, TEST_TOPIC_100K, 100000L);
+        produceTestMessage(producer, testTopic, count);
         producer.close();
         Thread.sleep(5 * Second);
-        assertEquals(100000L, sumPartitionOffset(brokerList, TEST_TOPIC_100K));
+        assertEquals(count, sumPartitionOffset(brokerList, TEST_TOPIC_100K));
     }
 
 
