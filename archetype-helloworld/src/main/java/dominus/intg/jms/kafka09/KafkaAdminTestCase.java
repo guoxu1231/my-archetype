@@ -132,7 +132,7 @@ public class KafkaAdminTestCase extends KafkaZBaseTestCase {
         produceTestMessage(producer, testTopic, count);
         producer.close();
         Thread.sleep(5 * Second);
-        assertEquals(count, sumPartitionOffset(brokerList, TEST_TOPIC_100K));
+        assertEquals(count, sumPartitionOffset(brokerList, testTopic));
     }
 
 
