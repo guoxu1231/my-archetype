@@ -86,7 +86,7 @@ public class SpringKafkaTestCase extends KafkaZBaseTestCase {
         consumer.setMessageListener(new MessageListener<String, String>() {
             @Override
             public void onMessage(ConsumerRecord<String, String> message) {
-                out.println("received: " + message);
+                logger.info("received: " + message);
                 latch.countDown();
             }
         });

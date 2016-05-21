@@ -177,7 +177,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
             ProducerRecord<String, String> message = new ProducerRecord<String, String>(topicName, ip, info);
 
             RecordMetadata medadata = ((RecordMetadata) producer.send(message).get(10, TimeUnit.SECONDS));
-            out.printf("[Acknowledged Message]:%s, %s, %s\n", medadata.topic(), medadata.partition(), medadata.offset());
+            logger.info("[acknowledged message]:{}, {}, {}", medadata.topic(), medadata.partition(), medadata.offset());
             testMessageMap.get(medadata.partition()).add(new KafkaTestMessage(medadata, message));
         }
         watch.stop();
