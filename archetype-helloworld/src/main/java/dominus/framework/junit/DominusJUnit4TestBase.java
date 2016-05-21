@@ -197,4 +197,12 @@ public class DominusJUnit4TestBase {
         println(ANSI_RED, error);
         return output;
     }
+
+    public int sum(int[] intArray) {
+        int sum = 0;
+        for (int i : intArray) {
+            sum += i;
+        }
+        return sum;
+    }
 }
