@@ -296,9 +296,9 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
 
                 <!--EE: alibaba dubbo rpc framework -->
                 <!--<dependency>-->
-                    <!--<groupId>com.alibaba</groupId>-->
-                    <!--<artifactId>dubbo</artifactId>-->
-                    <!--<version>2.5.4-SNAPSHOT</version>-->
+                <!--<groupId>com.alibaba</groupId>-->
+                <!--<artifactId>dubbo</artifactId>-->
+                <!--<version>2.5.4-SNAPSHOT</version>-->
                 <!--</dependency>-->
 
                 <!-- persistent framework -->
@@ -320,11 +320,11 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                 </dependency>
                 <!-- EE:ons open api management-->
                 <!--<dependency>-->
-                    <!--<groupId>com.aliyun</groupId>-->
-                    <!--<artifactId>aliyun-java-sdk-ons4financehz</artifactId>-->
-                    <!--<version>1.1.1-SNAPSHOT</version>-->
-                    <!--<scope>system</scope>-->
-                    <!--<systemPath>${basedir}/lib/aliyun/aliyun-java-sdk-ons4financehz-1.1.1-SNAPSHOT.jar</systemPath>-->
+                <!--<groupId>com.aliyun</groupId>-->
+                <!--<artifactId>aliyun-java-sdk-ons4financehz</artifactId>-->
+                <!--<version>1.1.1-SNAPSHOT</version>-->
+                <!--<scope>system</scope>-->
+                <!--<systemPath>${basedir}/lib/aliyun/aliyun-java-sdk-ons4financehz-1.1.1-SNAPSHOT.jar</systemPath>-->
                 <!--</dependency>-->
                 <dependency>
                     <groupId>com.aliyun</groupId>
@@ -338,7 +338,23 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <artifactId>aliyun-java-sdk-core</artifactId>
                     <version>2.4.2</version>
                 </dependency>
-
+                <!-- EE: aliyun direct mail-->
+                <!--<dependency>-->
+                    <!--<groupId>com.aliyun</groupId>-->
+                    <!--<artifactId>aliyun-java-sdk-dm</artifactId>-->
+                    <!--<version>2.0.0-rc2</version>-->
+                <!--</dependency>-->
+                <dependency>
+                    <groupId>javax.mail</groupId>
+                    <artifactId>mail</artifactId>
+                    <version>1.4.7</version>
+                </dependency>
+                <!--EE: Java Mail & Scheduling Util -->
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context-support</artifactId>
+                    <version>${spring.version}</version>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>
@@ -349,8 +365,8 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <excludes>
                         <exclude>dominus/intg/jms/kafka/KafkaZBaseTestCase.java</exclude>
                         <exclude>dominus/intg/jms/kafka/KafkaServerTestCase.java</exclude>
@@ -421,5 +437,8 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
             </plugin>
         </plugins>
     </build>
+    <repositories>
+
+    </repositories>
 
 </project>
