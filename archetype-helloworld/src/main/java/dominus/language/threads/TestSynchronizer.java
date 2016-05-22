@@ -20,6 +20,7 @@ public class TestSynchronizer extends DominusJUnit4TestBase {
                 while (true) {
                     latch.countDown();
                     logger.info("countDown..{}..........CountDownLatch", latch.getCount());
+                    if (latch.getCount() == 0) break;
                 }
             }
         }).start();
