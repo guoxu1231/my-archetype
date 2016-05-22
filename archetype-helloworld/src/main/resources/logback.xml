@@ -23,13 +23,13 @@
         <appender-ref ref="STDOUT_SHORT"/>
     </root>
 
-    <logger name="dominus" level="ALL"/>
+    <logger name="dominus" level="WARN"/>
     <!--<logger name="org.springframework.jms" level="ALL" />-->
     <!--<logger name="org.apache.activemq" level="ALL" />-->
-    <logger name="net.spy.memcached" level="ALL"/>
+    <logger name="net.spy.memcached" level="INFO"/>
     <logger name="org.apache.zookeeper" level="WARN"/>
     <logger name="org.springframework.jdbc" level="INFO"/>
     <logger name="org.apache.hadoop" level="INFO"/>
     <logger name="org.springframework.jdbc.core.JdbcTemplate" level="DEBUG"/>
-    <logger name="dominus.intg.jms.kafka" level="INFO"/>
+    <logger name="dominus.intg.jms.kafka" level="WARN"/>
 </configuration>

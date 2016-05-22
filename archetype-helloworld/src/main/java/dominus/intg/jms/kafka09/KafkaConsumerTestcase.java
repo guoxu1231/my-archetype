@@ -189,7 +189,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
             Iterator<ConsumerRecord> iterator = records.iterator();
             while (iterator.hasNext()) {
                 final ConsumerRecord record = iterator.next();
-                out.println(record);
+                logger.info(record.toString());
                 //EE: offset from 0 to largest
                 assertEquals(expectedOffset++, record.offset());
                 if (expectedOffset == testMessageMap.get(0).size())
