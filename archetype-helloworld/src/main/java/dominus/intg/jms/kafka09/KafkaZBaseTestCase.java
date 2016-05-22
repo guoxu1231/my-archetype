@@ -66,7 +66,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     //partition id, messages
     Map<Integer, ArrayList<KafkaTestMessage>> testMessageMap;
 
-    MessageQueueTest messageQueueAnnotation;
+    protected MessageQueueTest messageQueueAnnotation;
 
 
     @Override
