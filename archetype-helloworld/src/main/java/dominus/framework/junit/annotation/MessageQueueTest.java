@@ -13,4 +13,6 @@ public @interface MessageQueueTest {
     int count() default 0;
 
     String queueName() default "";
+
+    String consumerGroupId() default "";
 }

@@ -23,6 +23,7 @@ import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -78,7 +79,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         out.println("[kafka Producer Properties]" + kafkaProducerProps.size());
         out.println("[kafka Consumer Properties]" + kafkaConsumerProps.size());
         testTopicName = TEST_TOPIC_PREFIX + new Date().getTime();
-        groupId = "dominus.consumer.test." + new Date().getTime();
+        SimpleDateFormat format = new SimpleDateFormat("MMdd.HHmmss");
 
         // Create a ZooKeeper client
         // Note: You must initialize the ZkClient with ZKStringSerializer.  If you don't, then
@@ -94,6 +95,13 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage() == false) {
             testTopicName = messageQueueAnnotation.queueName();
         }
+        if (messageQueueAnnotation != null && StringUtils.hasText(messageQueueAnnotation.consumerGroupId())) {
+            groupId = messageQueueAnnotation.consumerGroupId();
+        } else {
+            groupId = "dominus.consumer.test." + format.format(new Date());
+        }
+        out.println("[kafka test topic name] = " + testTopicName);
+        out.println("[kafka consumer group id] = " + groupId);
     }
 
     @Override
