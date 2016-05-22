@@ -1,6 +1,7 @@
 package dominus.intg.jms.kafka09;
 
 
+import dominus.framework.junit.annotation.MessageQueueTest;
 import kafka.api.FetchRequestBuilder;
 import kafka.api.PartitionOffsetRequestInfo;
 import kafka.common.TopicAndPartition;
@@ -28,24 +29,29 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
 
     Producer producer;
     Consumer<String, String> consumer;
+    @Deprecated
     final int MESSAGE_COUNT = 1000;
 
     @Override
     protected void doSetUp() throws Exception {
         super.doSetUp();
-        int partitionCount = Integer.valueOf(properties.getProperty("kafka.test.topic.partition"));
-        this.createTestTopic(testTopicName);
-        producer = this.createDefaultProducer(null);
-        //prepare message
-        produceTestMessage(producer, testTopicName, MESSAGE_COUNT);
-        assertEquals(MESSAGE_COUNT, sumPartitionOffset(brokerList, testTopicName));
+
+        if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
+            this.createTestTopic(testTopicName);
+            producer = this.createDefaultProducer(null);
+            //prepare message
+            produceTestMessage(producer, testTopicName, messageQueueAnnotation.count());
+            assertEquals(messageQueueAnnotation.count(), sumPartitionOffset(brokerList, testTopicName));
+        }
     }
 
     @Override
     protected void doTearDown() throws Exception {
-        producer.close();
-        this.deleteTestTopic(testTopicName);
-        consumer.close();
+        if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
+            producer.close();
+            this.deleteTestTopic(testTopicName);
+        }
+        if (consumer != null) consumer.close();
         super.doTearDown();
     }
 
@@ -118,6 +124,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     }
 
 
+    @MessageQueueTest(produceTestMessage = true, count = 1000)
     @Test
     public void testSimpleConsumer() {
 
@@ -127,15 +134,16 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(100);
             for (ConsumerRecord<String, String> record : records) {
-                out.println(record);
+                logger.info("consumed message {}", record.key());
                 count++;
             }
             consumer.commitSync();
-            if (count == MESSAGE_COUNT) break;
+            if (count == messageQueueAnnotation.count()) break;
         }
-        assertEquals(MESSAGE_COUNT, count);
+        assertEquals(messageQueueAnnotation.count(), count);
     }
 
+    @MessageQueueTest(produceTestMessage = true, count = 1000)
     @Test
     public void testCommitByRecord() {
 
@@ -153,7 +161,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
                 List<ConsumerRecord<String, String>> partitionRecords = records.records(partition);
                 out.println(partition + "-" + partitionRecords.size());
                 for (ConsumerRecord<String, String> record : partitionRecords) {
-                    out.printf("processed record - %s\n", record);
+                    logger.info("processed record - {}", record);
                     consumer.commitSync(Collections.singletonMap(partition, new OffsetAndMetadata(record.offset() + 1)));
                     //EE: consumer side seek
                     consumer.seek(partition, record.offset() + 1);
@@ -163,12 +171,13 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
             for (TopicPartition par : records.partitions())
                 offsetLog[par.partition()] = offsetLog[par.partition()] + 1;
 
-            if (sum(offsetLog) == MESSAGE_COUNT)
+            if (sum(offsetLog) == messageQueueAnnotation.count())
                 break;
         }
-        assertEquals(MESSAGE_COUNT, sum(offsetLog));
+        assertEquals(messageQueueAnnotation.count(), sum(offsetLog));
     }
 
+    @MessageQueueTest(produceTestMessage = true, count = 1000)
     @Test
     public void testMessageOrderInPartition() {
         consumer = this.createDefaultConsumer(testTopicName, null, false);
@@ -194,6 +203,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
      * If assign to multiple partition, can not guarantee the partition seek works!
      * Because each polling may fetch records from other partitions.
      */
+    @MessageQueueTest(produceTestMessage = true, count = 1000)
     @Test
     public void testRandomSeekInPartition() {
         consumer = this.createDefaultConsumer(testTopicName, null, false);
