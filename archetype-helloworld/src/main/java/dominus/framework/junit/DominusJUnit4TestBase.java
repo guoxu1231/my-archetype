@@ -49,7 +49,7 @@ public class DominusJUnit4TestBase {
     @Rule //The TestName Rule makes the current test name available inside test methods
     public TestName name = new TestName();
 
-    final Logger logger = LoggerFactory.getLogger(DominusJUnit4TestBase.class);
+    protected final Logger logger = LoggerFactory.getLogger(DominusJUnit4TestBase.class);
 
     protected static ResourceLoader resourceLoader = new DefaultResourceLoader();
     protected static PrintStream out = System.out;
