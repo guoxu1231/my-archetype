@@ -91,6 +91,9 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
 
         //EE: get test method annotation
         messageQueueAnnotation = AnnotationUtils.getAnnotation(this.getClass().getMethod(this.name.getMethodName()), MessageQueueTest.class);
+        if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage() == false) {
+            testTopicName = messageQueueAnnotation.queueName();
+        }
     }
 
     @Override
