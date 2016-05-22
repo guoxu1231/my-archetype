@@ -8,10 +8,7 @@ import kafka.common.TopicAndPartition;
 import kafka.javaapi.*;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.message.MessageAndOffset;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.TopicPartition;
 import org.junit.Ignore;
@@ -36,6 +33,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     protected void doSetUp() throws Exception {
         super.doSetUp();
 
+        //produce test message according to the test annotation
         if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
             this.createTestTopic(testTopicName);
             producer = this.createDefaultProducer(null);
@@ -124,7 +122,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     }
 
 
-    @MessageQueueTest(produceTestMessage = true, count = 1000)
+    @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k", consumerGroupId = "shawguo.0522")
     @Test
     public void testSimpleConsumer() {
 
@@ -133,6 +131,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         long count = 0;
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(100);
+            out.printf("kafka consumer received %s records\n", records.count());
             for (ConsumerRecord<String, String> record : records) {
                 logger.info("consumed message {}", record.key());
                 count++;
@@ -226,4 +225,48 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
             }
         }
     }
+
+    @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k", consumerGroupId = "shawguo.0522.5")
+    @Test
+    public void testConsumerRestart() throws InterruptedException {
+        int totalCommitted = 0;
+        while (true) {
+            consumer = this.createDefaultConsumer(testTopicName, null, true);
+
+            Set<TopicPartition> assignment = consumer.assignment();
+            for (TopicPartition par : assignment) {
+                out.println(par);
+                out.println("consumer position = " + consumer.position(par));
+            }
+            long committedCount = 0;
+            while (true) {
+                ConsumerRecords<String, String> records = consumer.poll(100);
+                out.printf("kafka consumer received %s records\n", records.count());
+                for (ConsumerRecord<String, String> record : records) {
+                    logger.info("consumed message [key]={} [partition]={} [offset]={}",
+                            record.key(), record.partition(), record.offset());
+//                    Thread.sleep(100);
+                }
+                try {
+                    consumer.commitSync();
+                    out.println("consumer commit success!");
+                    committedCount += records.count();
+                    totalCommitted += records.count();
+                    if (committedCount >= 2000 || totalCommitted == messageQueueAnnotation.count()) { //EE: close consumer per 2000 message
+                        consumer.close();
+                        consumer = null;
+                        break;
+                    }
+                } catch (CommitFailedException e) {
+                    println(ANSI_RED, e.getLocalizedMessage());
+                    continue;
+                }
+            }
+            Thread.sleep(35 * Second);
+            out.println("will restart kafka consumer");
+            if (totalCommitted == messageQueueAnnotation.count()) break;
+        }
+        assertEquals(messageQueueAnnotation.count(), totalCommitted);
+    }
+
 }

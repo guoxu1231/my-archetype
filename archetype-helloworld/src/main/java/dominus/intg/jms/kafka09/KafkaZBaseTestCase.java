@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -55,6 +56,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     public static final String TEST_TOPIC_100K = TEST_TOPIC_PREFIX + "100K";
     public static final String TEST_TOPIC_10K = TEST_TOPIC_PREFIX + "10K";
     String testTopicName;
+    final String SEEDED_TOPIC = "page_visits_10k";
 
     String groupId;
 
@@ -102,6 +104,19 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         }
         out.println("[kafka test topic name] = " + testTopicName);
         out.println("[kafka consumer group id] = " + groupId);
+
+        //EE: create seeded topic.
+        if (!AdminUtils.topicExists(zkUtils, SEEDED_TOPIC)) {
+            out.println("create seeded topic with 10000 messages");
+            this.createTestTopic(SEEDED_TOPIC);
+            Producer producer = this.createDefaultProducer(null);
+            //prepare message
+            produceTestMessage(producer, SEEDED_TOPIC, 10000);
+            assertEquals(10000, sumPartitionOffset(brokerList, SEEDED_TOPIC));
+            producer.close();
+            producer = null;
+        }
+
     }
 
     @Override
@@ -201,7 +216,6 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         if (overrideProps != null)
             kafkaProducerProps.putAll(overrideProps);
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumerProps);
-//        consumer.seekToBeginning(new TopicPartition(KafkaAdminTestCase.TEST_TOPIC_100K, 0));
         ConsumerRebalanceListener rebalanceListener = new ConsumerRebalanceListener() {
             @Override
             public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
