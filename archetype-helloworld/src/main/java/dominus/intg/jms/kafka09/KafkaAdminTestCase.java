@@ -121,7 +121,7 @@ public class KafkaAdminTestCase extends KafkaZBaseTestCase {
      * DO NOT DELETE 100K TEST TOPIC
      */
     @MessageQueueTest(queueName = "page_visits_10k", count = 10000)
-    @Test
+    @Ignore
     public void testCreateTestTopic() throws InterruptedException, ExecutionException, TimeoutException {
 
         int count = messageQueueAnnotation.count();

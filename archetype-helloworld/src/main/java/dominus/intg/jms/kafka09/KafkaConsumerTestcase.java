@@ -131,7 +131,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         long count = 0;
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(100);
-            out.printf("kafka consumer received %s records\n", records.count());
+            logger.info("kafka consumer received {} records", records.count());
             for (ConsumerRecord<String, String> record : records) {
                 logger.info("consumed message {}", record.key());
                 count++;
@@ -158,7 +158,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
             //EE:only consume first record of partitions
             for (TopicPartition partition : records.partitions()) {
                 List<ConsumerRecord<String, String>> partitionRecords = records.records(partition);
-                out.println(partition + "-" + partitionRecords.size());
+                logger.info(partition + "-" + partitionRecords.size());
                 for (ConsumerRecord<String, String> record : partitionRecords) {
                     logger.info("processed record - {}", record);
                     consumer.commitSync(Collections.singletonMap(partition, new OffsetAndMetadata(record.offset() + 1)));
@@ -241,7 +241,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
             long committedCount = 0;
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(100);
-                out.printf("kafka consumer received %s records\n", records.count());
+                logger.info("kafka consumer received {} records", records.count());
                 for (ConsumerRecord<String, String> record : records) {
                     logger.info("consumed message [key]={} [partition]={} [offset]={}",
                             record.key(), record.partition(), record.offset());
@@ -249,7 +249,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
                 }
                 try {
                     consumer.commitSync();
-                    out.println("consumer commit success!");
+                    logger.info("consumer commit success!");
                     committedCount += records.count();
                     totalCommitted += records.count();
                     if (committedCount >= 2000 || totalCommitted == messageQueueAnnotation.count()) { //EE: close consumer per 2000 message
@@ -263,7 +263,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
                 }
             }
             Thread.sleep(35 * Second);
-            out.println("will restart kafka consumer");
+            out.println("sleep 35 seconds and will restart kafka consumer...");
             if (totalCommitted == messageQueueAnnotation.count()) break;
         }
         assertEquals(messageQueueAnnotation.count(), totalCommitted);

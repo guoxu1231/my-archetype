@@ -1,6 +1,7 @@
 package dominus.language.threads;
 
 
+import dominus.framework.junit.DominusJUnit4TestBase;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -8,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestSynchronizer {
+public class TestSynchronizer extends DominusJUnit4TestBase {
 
     @Test
     public void testCountDownLatch() throws InterruptedException {
@@ -18,7 +19,7 @@ public class TestSynchronizer {
             public void run() {
                 while (true) {
                     latch.countDown();
-                    System.out.printf("countDown..%d..........CountDownLatch\n", latch.getCount());
+                    logger.info("countDown..{}..........CountDownLatch", latch.getCount());
                 }
             }
         }).start();

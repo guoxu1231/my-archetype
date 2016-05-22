@@ -57,7 +57,7 @@ public class KafkaProducerTestcase extends KafkaZBaseTestCase {
             ProducerRecord<String, String> message = new ProducerRecord<String, String>(testTopicName, ip, info);
 
             RecordMetadata medadata = ((RecordMetadata) producer.send(message).get(10, TimeUnit.SECONDS));
-            out.printf("[Acknowledged Message]:%s, %s, %s\n", medadata.topic(), medadata.partition(), medadata.offset());
+            logger.info("[acknowledged message]:%s, %s, %s\n", medadata.topic(), medadata.partition(), medadata.offset());
         }
         watch.stop();
         System.out.println(watch);
