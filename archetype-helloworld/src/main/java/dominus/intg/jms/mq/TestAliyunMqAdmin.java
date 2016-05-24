@@ -1,27 +1,19 @@
 package dominus.intg.jms.mq;
 
 
-import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.Producer;
-import com.aliyun.openservices.ons.api.SendResult;
-import com.aliyuncs.DefaultAcsClient;
-import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.FormatType;
-//EE: public cloud & finance cloud package
-//import com.aliyuncs.ons4financehz.model.v20160405.*;
-import com.aliyuncs.ons.model.v20160405.*;
-import com.aliyuncs.profile.DefaultProfile;
-import com.aliyuncs.profile.IClientProfile;
+import com.aliyuncs.ons.model.v20160503.*;
 import dominus.framework.junit.annotation.MessageQueueTest;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+//EE: public cloud & finance cloud package
+//import com.aliyuncs.ons4financehz.model.v20160405.*;
 
 /**
  * 注意：因为POP网关是面对公网环境提供服务的，因此使用Open-API的前提是，客户端需要能够访问公网服务。否则会提示服务无法连接
@@ -37,7 +29,7 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
     @Test
     public void testOnsTopicStatusRequest() throws ClientException {
 
-        String currentTopic = testAnnotation.queueName();
+        String currentTopic = messageQueueAnnotation.queueName();
 
         //template code begin
         OnsTopicStatusRequest request = new OnsTopicStatusRequest();
@@ -52,12 +44,29 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
         System.out.printf("[%s] totalCount %d lastTimeStamp %d\n", currentTopic, data.getTotalCount(), data.getLastTimeStamp());
     }
 
+    @MessageQueueTest(queueName = "D-GUOXU-TEST-1K-0524", consumerGroupId = "CID-D-GUOXU-TEST-1K-05241")
+    @Test
+    public void testResetConsumerOffset() throws ClientException {
+        OnsConsumerResetOffsetRequest request = new OnsConsumerResetOffsetRequest();
+        request.setOnsRegionId(ONS_REGION_ID);
+        request.setPreventCache(System.currentTimeMillis());
+        request.setAcceptFormat(FormatType.JSON);
+        request.setConsumerId(testConsumerId);
+        request.setTopic(messageQueueAnnotation.queueName());
+        request.setType(1);
+        request.setResetTimestamp(System.currentTimeMillis() - 50 * Minute);
 
-    @MessageQueueTest(queueName = "D-GUOXU-TEST-1K-0520")
+        OnsConsumerResetOffsetResponse response = iAcsClient.getAcsResponse(request);
+        System.out.println(response.getRequestId());
+
+    }
+
+
+    @MessageQueueTest(queueName = "D-GUOXU-TEST-100K")
     @Test
     public void testOnsTopicGetRequest() throws ClientException {
 
-        String currentTopic = testAnnotation.queueName();
+        String currentTopic = messageQueueAnnotation.queueName();
 
         OnsTopicGetRequest request = new OnsTopicGetRequest();
         request.setAcceptFormat(FormatType.JSON);
@@ -137,18 +146,18 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
         }
     }
 
-    @MessageQueueTest(queueName = "D-GUOXU-TEST-10K", count = 1000)
+    @MessageQueueTest(queueName = "D-GUOXU-TEST-1K-0524", count = 1000)
     @Test
     public void testOnsTrendTopicInputTpsRequest() throws ClientException {
 
-        String currentTopic = testAnnotation.queueName();
+        String currentTopic = messageQueueAnnotation.queueName();
 
         OnsTrendTopicInputTpsRequest request = new OnsTrendTopicInputTpsRequest();
         request.setOnsRegionId(ONS_REGION_ID);
         request.setPreventCache(System.currentTimeMillis());
         request.setAcceptFormat(FormatType.JSON);
         request.setTopic(currentTopic);
-        request.setBeginTime(System.currentTimeMillis() - 120 * Minute);
+        request.setBeginTime(System.currentTimeMillis() - 20 * Minute);
         request.setEndTime(System.currentTimeMillis());
         request.setPeriod(1L);
         request.setType(1);
@@ -161,11 +170,11 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
         }
     }
 
-    @MessageQueueTest(queueName = "D-GUOXU-TEST-ONE-0520", count = 1)
+    @MessageQueueTest(queueName = "D-GUOXU-TEST-1K-0524", count = 1000)
     @Test
     public void createTestQueue() throws ClientException, IllegalAccessException, InterruptedException {
-        String queueName = testAnnotation.queueName();
-        int count = testAnnotation.count();
+        String queueName = messageQueueAnnotation.queueName();
+        int count = messageQueueAnnotation.count();
         String publishId = "PID-" + queueName;
 
         this.createTestTopic(queueName);
@@ -178,6 +187,6 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
     @MessageQueueTest(queueName = "D-GUOXU-TEST-1K-0520", count = 1000)
     @Test
     public void deleteTestQueue() {
-        this.deleteTestTopic(testAnnotation.queueName());
+        this.deleteTestTopic(messageQueueAnnotation.queueName());
     }
 }

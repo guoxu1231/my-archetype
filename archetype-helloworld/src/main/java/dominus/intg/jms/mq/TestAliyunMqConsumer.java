@@ -4,7 +4,6 @@ package dominus.intg.jms.mq;
 import com.aliyun.openservices.ons.api.*;
 import com.aliyuncs.exceptions.ClientException;
 import dominus.framework.junit.annotation.MessageQueueTest;
-import dominus.intg.jms.mq.endpoint.DemoMessageListener;
 import org.junit.Test;
 import org.springframework.util.StringUtils;
 
@@ -21,15 +20,17 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
     @Override
     protected void doSetUp() throws Exception {
         super.doSetUp();
-        if (testAnnotation != null && testAnnotation.produceTestMessage()) {
+        if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
             this.createTestTopic(testTopicId);
             this.createProducerPublish(testTopicId, testProducerId);
             producer = this.createProducer(testProducerId);
-            produceTestMessage(producer, testTopicId, testAnnotation.count());
+            produceTestMessage(producer, testTopicId, messageQueueAnnotation.count());
         }
-        if (testAnnotation != null && StringUtils.hasText(testAnnotation.queueName()))
-            testTopicId = testAnnotation.queueName();
-        this.createConsumerSubscription(testTopicId, testConsumerId);
+        if (messageQueueAnnotation != null && StringUtils.hasText(messageQueueAnnotation.queueName()))
+            testTopicId = messageQueueAnnotation.queueName();
+
+//        this.createConsumerSubscription(testTopicId, testConsumerId);
+
     }
 
     @Override
@@ -39,8 +40,10 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
         if (consumer != null) consumer.shutdown();
         //TODO delete exception in public cloud
         deleteConsumerSubscription(testTopicId, testConsumerId);
-        if (testAnnotation != null && testAnnotation.produceTestMessage()) {
+        if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
             this.deleteTestTopic(testTopicId);
+        }
+        if (messageQueueAnnotation != null && !StringUtils.hasText(messageQueueAnnotation.consumerGroupId())) {
             this.deleteProducerPublish(testTopicId, testProducerId);
         }
 
@@ -49,7 +52,7 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
     @MessageQueueTest(produceTestMessage = true, count = 100)
     @Test
     public void testSimpleConsumer() throws ClientException, InterruptedException, IllegalAccessException {
-        final CountDownLatch latch = new CountDownLatch(testAnnotation.count());
+        final CountDownLatch latch = new CountDownLatch(messageQueueAnnotation.count());
 
         consumer = this.createDefaultConsumer(testTopicId, testConsumerId, 2, MAX_RECONSUME_TIMES);
         consumer.subscribe(testTopicId, "*", new MessageListener() {
@@ -71,10 +74,10 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
      * DemoMessageListener Receive: ORDERID_19 [0A91883700001F9000000B8F310C2ABF]
      * EE: ONS broker failed, only get 5000 messages.
      */
-    @MessageQueueTest(produceTestMessage = false, queueName = "D-GUOXU-TEST-1K-0520", count = 1000)
+    @MessageQueueTest(produceTestMessage = false, consumerGroupId = "CID-D-GUOXU-TEST-1K-05241", queueName = "D-GUOXU-TEST-1K-0524", count = 1000)
     @Test
     public void testConsumeMessage() throws InterruptedException, ClientException {
-        final CountDownLatch latch = new CountDownLatch(testAnnotation.count());
+        final CountDownLatch latch = new CountDownLatch(messageQueueAnnotation.count());
 
         consumer = this.createDefaultConsumer(testTopicId, testConsumerId, 1, MAX_RECONSUME_TIMES);
         consumer.subscribe(testTopicId, "*", new MessageListener() {
@@ -101,7 +104,7 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
             @Override
             public Action consume(Message message, ConsumeContext context) {
                 printf(ANSI_RED, "ReconsumeLater, [ReconsumeTime]:%d, [key]=%s,[value]=%s\n",
-                        message.getReconsumeTimes(),message.getKey(), new String(message.getBody()));
+                        message.getReconsumeTimes(), message.getKey(), new String(message.getBody()));
                 latch.countDown();
                 return Action.ReconsumeLater;
             }

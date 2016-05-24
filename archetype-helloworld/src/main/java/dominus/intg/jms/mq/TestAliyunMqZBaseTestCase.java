@@ -8,13 +8,14 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.FormatType;
 //EE: public cloud & finance cloud package
 //import com.aliyuncs.ons4financehz.model.v20160405.*;
-import com.aliyuncs.ons.model.v20160405.*;
+import com.aliyuncs.ons.model.v20160503.*;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import dominus.framework.junit.DominusJUnit4TestBase;
 import dominus.framework.junit.annotation.MessageQueueTest;
 import org.junit.Test;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.Properties;
@@ -42,7 +43,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
     final int SLEEP_FINANCE = 3;
     final int MAX_RECONSUME_TIMES = 16;
 
-    MessageQueueTest testAnnotation;
+    MessageQueueTest messageQueueAnnotation;
 
     protected boolean isPublicTest() {
         return ONS_REGION_ID.contains("publictest");
@@ -69,7 +70,16 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         testConsumerId = String.format("CID-D-GUOXU-TEST-%1$tY%1$tm%1$td-%1$TQ", createDate);
 
         //EE: get test method annotation
-        testAnnotation = AnnotationUtils.getAnnotation(this.getClass().getMethod(this.name.getMethodName()), MessageQueueTest.class);
+        messageQueueAnnotation = AnnotationUtils.getAnnotation(this.getClass().getMethod(this.name.getMethodName()), MessageQueueTest.class);
+        messageQueueAnnotation = AnnotationUtils.getAnnotation(this.getClass().getMethod(this.name.getMethodName()), MessageQueueTest.class);
+        if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage() == false) {
+            testTopicId = messageQueueAnnotation.queueName();
+        }
+        if (messageQueueAnnotation != null && StringUtils.hasText(messageQueueAnnotation.consumerGroupId())) {
+            testConsumerId = messageQueueAnnotation.consumerGroupId();
+        }
+        out.println("[Aliyun MQ test topic name] = " + testTopicId);
+        out.println("[Aliyun MQ consumer group id] = " + testConsumerId);
         out.printf("[ONS_REGION_ID] %s [PRODUCT] %s\n", ONS_REGION_ID, productName);
     }
 
