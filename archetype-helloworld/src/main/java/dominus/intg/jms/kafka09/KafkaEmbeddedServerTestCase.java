@@ -1,7 +1,7 @@
 package dominus.intg.jms.kafka09;
 
-import dominus.framework.junit.DominusJUnit4TestBase;
 import kafka.admin.AdminUtils;
+import kafka.admin.RackAwareMode;
 import kafka.server.KafkaConfig;
 import kafka.server.KafkaServer;
 import kafka.utils.SystemTime$;
@@ -76,7 +76,7 @@ public class KafkaEmbeddedServerTestCase extends KafkaZBaseTestCase {
         ZkConnection zkConnection = new ZkConnection(properties.getProperty("zkQuorum"));
         _zkUtils = new ZkUtils(_zkClient, zkConnection, false);
         //EE:replication factor: 3 larger than available brokers: 1
-        AdminUtils.createTopic(_zkUtils, TEST_TOPIC_NAME, 1, 1, new Properties());
+        AdminUtils.createTopic(_zkUtils, TEST_TOPIC_NAME, 1, 1, new Properties(), RackAwareMode.Disabled$.MODULE$);
         out.printf("Kafka Topic[%s] is created!\n", TEST_TOPIC_NAME);
         assertTrue("Kafka Topic[%s] does not exist!", AdminUtils.topicExists(_zkUtils, TEST_TOPIC_NAME));
 

@@ -4,6 +4,7 @@ package dominus.intg.jms.kafka09;
 import dominus.framework.junit.DominusJUnit4TestBase;
 import dominus.framework.junit.annotation.MessageQueueTest;
 import kafka.admin.AdminUtils;
+import kafka.admin.RackAwareMode;
 import kafka.tools.GetOffsetShell;
 import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
@@ -125,7 +126,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     }
 
     protected boolean createTestTopic(String testTopic) throws InterruptedException {
-        AdminUtils.createTopic(zkUtils, testTopic, numPartitions, replicationFactor, new Properties());
+        AdminUtils.createTopic(zkUtils, testTopic, numPartitions, replicationFactor, new Properties(), RackAwareMode.Disabled$.MODULE$);
         out.printf("Kafka Topic[%s] is created!\n", testTopic);
         assertTrue("Kafka Topic[%s] does not exist!", AdminUtils.topicExists(zkUtils, testTopic));
         if (!isLocalEnvironment()) {
@@ -136,7 +137,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     }
 
     protected boolean createTestTopic(String testTopic, int numPartitions) throws InterruptedException {
-        AdminUtils.createTopic(zkUtils, testTopic, numPartitions, replicationFactor, new Properties());
+        AdminUtils.createTopic(zkUtils, testTopic, numPartitions, replicationFactor, new Properties(), RackAwareMode.Disabled$.MODULE$);
         out.printf("Kafka Topic[%s] is created!\n", testTopic);
         assertTrue("Kafka Topic[%s] does not exist!", AdminUtils.topicExists(zkUtils, testTopic));
         if (!isLocalEnvironment()) {
