@@ -231,14 +231,16 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     @Test
     public void testPollingRecords() {
         consumer = this.createDefaultConsumer(testTopicName, null, true);
-
+        final int POLLING_RECORDS = Integer.valueOf(kafkaConsumerProps.getProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG)).intValue();
         long count = 0;
+
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
             if (records.count() != 0) {
                 logger.info("kafka consumer received {} records", records.count());
-                assertEquals(Integer.valueOf(kafkaConsumerProps.getProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG)).intValue(), records.count());
+                assertTrue(records.count() == POLLING_RECORDS || records.count() < 10);
                 consumer.commitSync();
+                count += records.count();
             }
             if (count == messageQueueAnnotation.count()) break;
         }
