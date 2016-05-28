@@ -46,7 +46,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     @Override
     protected void doTearDown() throws Exception {
         if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
-            producer.close();
+            if (producer != null) producer.close();
             this.deleteTestTopic(testTopicName);
         }
         if (consumer != null) consumer.close();
@@ -225,6 +225,24 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
                 assertEquals(expectedMsg.message.value(), record.value());
             }
         }
+    }
+
+    @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k")
+    @Test
+    public void testPollingRecords() {
+        consumer = this.createDefaultConsumer(testTopicName, null, true);
+
+        long count = 0;
+        while (true) {
+            ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
+            if (records.count() != 0) {
+                logger.info("kafka consumer received {} records", records.count());
+                assertEquals(Integer.valueOf(kafkaConsumerProps.getProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG)).intValue(), records.count());
+                consumer.commitSync();
+            }
+            if (count == messageQueueAnnotation.count()) break;
+        }
+        assertEquals(messageQueueAnnotation.count(), count);
     }
 
     @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k", consumerGroupId = "shawguo.0522.5")

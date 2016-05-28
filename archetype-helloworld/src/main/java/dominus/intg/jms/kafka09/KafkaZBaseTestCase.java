@@ -59,10 +59,10 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     String groupId;
 
     @Resource(name = "kafkaProducerProps")
-    Properties kafkaProducerProps;
+    protected Properties kafkaProducerProps;
 
     @Resource(name = "kafkaConsumerProps")
-    Properties kafkaConsumerProps;
+    protected Properties kafkaConsumerProps;
 
     //partition id, messages
     Map<Integer, ArrayList<KafkaTestMessage>> testMessageMap;
