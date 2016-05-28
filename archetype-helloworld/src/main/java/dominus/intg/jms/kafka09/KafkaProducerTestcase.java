@@ -35,7 +35,7 @@ public class KafkaProducerTestcase extends KafkaZBaseTestCase {
 
     @Override
     protected void doTearDown() throws Exception {
-        producer.close();
+        if (producer != null) producer.close();
         this.deleteTestTopic(testTopicName);
         super.doTearDown();
     }
@@ -63,7 +63,6 @@ public class KafkaProducerTestcase extends KafkaZBaseTestCase {
         System.out.println(watch);
         assertEquals(count, sumPartitionOffset(brokerList, testTopicName));
     }
-
 
 
 }

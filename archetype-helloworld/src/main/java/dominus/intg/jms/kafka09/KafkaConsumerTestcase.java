@@ -122,7 +122,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     }
 
 
-    @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k", consumerGroupId = "shawguo.0522")
+    @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k")
     @Test
     public void testSimpleConsumer() {
 
@@ -133,7 +133,8 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
             ConsumerRecords<String, String> records = consumer.poll(100);
             logger.info("kafka consumer received {} records", records.count());
             for (ConsumerRecord<String, String> record : records) {
-                logger.info("consumed message {}", record.key());
+                logger.info("consumed message [key]={} [partition]={} [offset]={}",
+                        record.key(), record.partition(), record.offset());
                 count++;
             }
             consumer.commitSync();

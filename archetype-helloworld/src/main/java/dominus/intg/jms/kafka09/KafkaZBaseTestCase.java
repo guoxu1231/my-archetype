@@ -13,10 +13,7 @@ import org.I0Itec.zkclient.ZkConnection;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.ContextConfiguration;
@@ -72,6 +69,8 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
 
     protected MessageQueueTest messageQueueAnnotation;
 
+    String securityMechanism;
+
 
     @Override
     protected void doSetUp() throws Exception {
@@ -79,6 +78,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         bootstrapServers = properties.getProperty("bootstrap.servers");
         replicationFactor = Integer.valueOf(properties.getProperty("kafka.replication.factor"));
         numPartitions = Integer.valueOf(properties.getProperty("kafka.test.topic.partition"));
+        securityMechanism = properties.getProperty("kafka.security");
         out.println("[kafka Producer Properties]" + kafkaProducerProps.size());
         out.println("[kafka Consumer Properties]" + kafkaConsumerProps.size());
         testTopicName = TEST_TOPIC_PREFIX + new Date().getTime();
@@ -105,6 +105,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         }
         out.println("[kafka test topic name] = " + testTopicName);
         out.println("[kafka consumer group id] = " + groupId);
+        out.println("[Kafka SecurityMechanism] = " + securityMechanism);
 
         //EE: create seeded topic.
         if (!AdminUtils.topicExists(zkUtils, SEEDED_TOPIC)) {
@@ -178,6 +179,10 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
      */
     protected Producer createDefaultProducer(Properties overrideProps) {
         kafkaProducerProps.put("bootstrap.servers", bootstrapServers);
+        if (securityMechanism != null) {
+            kafkaProducerProps.put("security.protocol", "SASL_PLAINTEXT");
+            kafkaProducerProps.put("sasl.mechanism", "PLAIN");
+        }
         //EE: important parameter
 
 
@@ -214,6 +219,10 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     protected Consumer createDefaultConsumer(String subscribeTopic, Properties overrideProps, boolean autoAssign) {
         kafkaConsumerProps.put("bootstrap.servers", bootstrapServers);
         kafkaConsumerProps.put("group.id", groupId);
+        if (securityMechanism != null) {
+            kafkaConsumerProps.put("security.protocol", "SASL_PLAINTEXT");
+            kafkaConsumerProps.put("sasl.mechanism", "PLAIN");
+        }
         if (overrideProps != null)
             kafkaProducerProps.putAll(overrideProps);
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumerProps);
