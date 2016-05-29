@@ -15,6 +15,7 @@ public class TestRedis extends DominusJUnit4TestBase {
     protected void doSetUp() throws Exception {
         super.doSetUp();
         jedis = new Jedis(properties.getProperty("redis.connect"));
+        out.println(jedis.info());
     }
 
     @Override

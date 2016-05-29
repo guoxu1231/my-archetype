@@ -21,3 +21,4 @@ cache:
 services:
   - mysql
   - mongodb
+  - redis-server
