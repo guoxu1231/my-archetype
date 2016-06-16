@@ -179,7 +179,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
      */
     protected Producer createDefaultProducer(Properties overrideProps) {
         kafkaProducerProps.put("bootstrap.servers", bootstrapServers);
-        if (securityMechanism != null) {
+        if (System.getProperty("java.security.auth.login.config") != null) {
             kafkaProducerProps.put("security.protocol", "SASL_PLAINTEXT");
             kafkaProducerProps.put("sasl.mechanism", "PLAIN");
         }
@@ -219,7 +219,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     protected Consumer createDefaultConsumer(String subscribeTopic, Properties overrideProps, boolean autoAssign) {
         kafkaConsumerProps.put("bootstrap.servers", bootstrapServers);
         kafkaConsumerProps.put("group.id", groupId);
-        if (securityMechanism != null) {
+        if (System.getProperty("java.security.auth.login.config") != null) {
             kafkaConsumerProps.put("security.protocol", "SASL_PLAINTEXT");
             kafkaConsumerProps.put("sasl.mechanism", "PLAIN");
         }
