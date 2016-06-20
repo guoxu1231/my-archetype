@@ -7,8 +7,11 @@ import dominus.framework.junit.annotation.MessageQueueTest;
 import org.junit.Test;
 import org.springframework.util.StringUtils;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,8 +31,8 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
         }
         if (messageQueueAnnotation != null && StringUtils.hasText(messageQueueAnnotation.queueName()))
             testTopicId = messageQueueAnnotation.queueName();
-
-//        this.createConsumerSubscription(testTopicId, testConsumerId);
+        if (messageQueueAnnotation != null && !StringUtils.hasText(messageQueueAnnotation.consumerGroupId()))
+        this.createConsumerSubscription(testTopicId, testConsumerId);
 
     }
 
@@ -65,6 +68,37 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
         });
         consumer.start();
         assertEquals(true, latch.await(5, TimeUnit.MINUTES));
+    }
+
+
+    @MessageQueueTest(produceTestMessage = false, count = 20000, queueName = "D-GUOXU-TEST-20K-0620")
+    @Test
+    public void testConcurrentConsumer() throws ClientException, InterruptedException, IllegalAccessException {
+        final CountDownLatch latch = new CountDownLatch(messageQueueAnnotation.count());
+        final ConcurrentMap<Long, AtomicLong> map = new ConcurrentHashMap<>();
+        int concurrency = 1000;
+
+        consumer = this.createDefaultConsumer(testTopicId, testConsumerId, concurrency, MAX_RECONSUME_TIMES);
+        consumer.subscribe(testTopicId, "*", new MessageListener() {
+            @Override
+            public Action consume(Message message, ConsumeContext context) {
+                latch.countDown();
+                map.putIfAbsent(Thread.currentThread().getId(), new AtomicLong(0));
+                map.get(Thread.currentThread().getId()).incrementAndGet();
+                out.printf("%s -> consumed message, [key]=%s,[value]=%s\n",
+                        Thread.currentThread().getId(), message.getKey(), new String(message.getBody()));
+                return Action.CommitMessage;
+            }
+        });
+        consumer.start();
+        assertEquals(true, latch.await(5, TimeUnit.MINUTES));
+        assertEquals(concurrency, map.keySet().size());
+        int total = 0;
+        for (Long id : map.keySet()) {
+            out.println(map.get(id));
+            total += map.get(id).intValue();
+        }
+        assertEquals(messageQueueAnnotation.count(), total);
     }
 
 
