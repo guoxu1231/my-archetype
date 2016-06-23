@@ -2,32 +2,24 @@ package dominus.intg.jms.kafka09;
 
 
 import dominus.framework.junit.annotation.MessageQueueTest;
-import kafka.api.FetchRequestBuilder;
-import kafka.api.PartitionOffsetRequestInfo;
-import kafka.common.TopicAndPartition;
-import kafka.javaapi.*;
-import kafka.javaapi.consumer.SimpleConsumer;
-import kafka.message.MessageAndOffset;
+import kafka.common.MessageFormatter;
+import kafka.coordinator.GroupMetadataManager;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.TopicPartition;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
 
     Producer producer;
     Consumer<String, String> consumer;
-    @Deprecated
-    final int MESSAGE_COUNT = 1000;
 
     @Override
     protected void doSetUp() throws Exception {
@@ -53,84 +45,15 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         super.doTearDown();
     }
 
-
-    /**
-     * https://cwiki.apache.org/confluence/display/KAFKA/0.8.0+SimpleConsumer+Example
-     * EE: Consumer message from leader broker, You must keep track of the offsets in your application to know where you left off consuming.
-     * (SimpleConsumer does not require zookeeper to work)
-     */
-    @Ignore
-    public void test08SimpleConsumer() throws UnsupportedEncodingException, InterruptedException, ExecutionException, TimeoutException {
-
-        int kafkaPort = Integer.valueOf(properties.getProperty("kafka.seed.broker.port"));
-        int partitionCount = Integer.valueOf(properties.getProperty("kafka.test.topic.partition"));
-        final int testMsgCount = 5;
-
-        SimpleConsumer consumer = new SimpleConsumer(properties.getProperty("kafka.seed.broker"), kafkaPort, zkConnectionTimeout, 64 * KB, "leaderLookup");
-        List<String> topics = Collections.singletonList(testTopicName);
-        TopicMetadataRequest req = new TopicMetadataRequest(topics);
-        TopicMetadataResponse resp = consumer.send(req);
-        //EE: find TopicMetadata from seed kafka server
-        List<TopicMetadata> metaData = resp.topicsMetadata();
-        assertTrue(metaData.size() == 1);
-        List<PartitionMetadata> partitionList = metaData.get(0).partitionsMetadata();
-        assertTrue(partitionList.size() == partitionCount);
-        for (PartitionMetadata partition : partitionList) {
-            println(ANSI_RED, partition);
-            String leadBroker = partition.leader().host();
-            String clientName = "Client_" + testTopicName + "_" + partition.partitionId();
-            SimpleConsumer partitionConsumer = new SimpleConsumer(leadBroker, kafkaPort, zkConnectionTimeout, 64 * KB, clientName);
-            TopicAndPartition topicAndPartition = new TopicAndPartition(testTopicName, partition.partitionId());
-            Map<TopicAndPartition, PartitionOffsetRequestInfo> leastRequestInfo = new HashMap<TopicAndPartition, PartitionOffsetRequestInfo>();
-            leastRequestInfo.put(topicAndPartition, new PartitionOffsetRequestInfo(kafka.api.OffsetRequest.EarliestTime(), 1));
-            Map<TopicAndPartition, PartitionOffsetRequestInfo> latestRequestInfo = new HashMap<TopicAndPartition, PartitionOffsetRequestInfo>();
-            latestRequestInfo.put(topicAndPartition, new PartitionOffsetRequestInfo(kafka.api.OffsetRequest.LatestTime(), Integer.MAX_VALUE));
-            //EE: build OffsetRequest and send it to leadBroker
-            OffsetRequest leastOffsetRequest = new OffsetRequest(leastRequestInfo, kafka.api.OffsetRequest.CurrentVersion(), clientName);
-            OffsetRequest latestOffsetRequest = new OffsetRequest(latestRequestInfo, kafka.api.OffsetRequest.CurrentVersion(), clientName);
-            OffsetResponse leastResponse = partitionConsumer.getOffsetsBefore(leastOffsetRequest);
-            OffsetResponse latestResponse = partitionConsumer.getOffsetsBefore(latestOffsetRequest);
-            assertFalse("Error fetching data Offset Data the Broker. Reason: " + leastResponse.errorCode(testTopicName, partition.partitionId()), leastResponse.hasError());
-            assertFalse("Error fetching data Offset Data the Broker. Reason: " + latestResponse.errorCode(testTopicName, partition.partitionId()), latestResponse.hasError());
-            long leastOffset = leastResponse.offsets(testTopicName, partition.partitionId())[0];
-            long latestOffset = latestResponse.offsets(testTopicName, partition.partitionId())[0];
-//            assertEquals(MESSAGE_COUNT, latestOffset);
-            printf(ANSI_RED, "partition [%d] least offset is %d  latest offset is %d\n", partition.partitionId(), leastOffset, latestOffset);
-
-            kafka.api.FetchRequest fetchRequest = new FetchRequestBuilder()
-                    .clientId(clientName)
-                    .addFetch(testTopicName, partition.partitionId(), leastOffset, 100000) // Note: this fetchSize of 100000 might need to be increased if large batches are written to Kafka
-                    .build();
-            FetchResponse fetchResponse = partitionConsumer.fetch(fetchRequest);
-            //EE: TODO find new leader when met error
-            assertFalse("Error fetching data from the Broker:" + leadBroker + " Reason: " + fetchResponse.errorCode(testTopicName, partition.partitionId()), fetchResponse.hasError());
-
-            //EE: read message from least offset
-            long readOffset = leastOffset;
-            long numRead = 0;
-            for (MessageAndOffset messageAndOffset : fetchResponse.messageSet(testTopicName, partition.partitionId())) {
-                ByteBuffer payload = messageAndOffset.message().payload();
-                byte[] bytes = new byte[payload.limit()];
-                payload.get(bytes);
-                println(ANSI_YELLOW, String.valueOf(messageAndOffset.offset()) + ": " + new String(bytes, "UTF-8"));
-                numRead++;
-            }
-            assertEquals("fetch message count does not match test message count", MESSAGE_COUNT, numRead);
-            if (partitionConsumer != null) partitionConsumer.close();
-        }
-        if (consumer != null) consumer.close();
-    }
-
-
     @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k")
     @Test
-    public void testSimpleConsumer() {
+    public void testSimpleConsumer() throws InterruptedException {
 
         consumer = this.createDefaultConsumer(testTopicName, null, true);
 
         long count = 0;
         while (true) {
-            ConsumerRecords<String, String> records = consumer.poll(100);
+            ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
             logger.info("kafka consumer received {} records", records.count());
             for (ConsumerRecord<String, String> record : records) {
                 logger.info("consumed message [key]={} [partition]={} [offset]={}",
@@ -165,6 +88,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
                     consumer.commitSync(Collections.singletonMap(partition, new OffsetAndMetadata(record.offset() + 1)));
                     //EE: consumer side seek
                     consumer.seek(partition, record.offset() + 1);
+//                    assertEquals(record.offset() + 1,consumer.committed(partition).offset()); TODO
                     break;
                 }
             }
@@ -227,6 +151,9 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         }
     }
 
+    /**
+     * test max.poll.records in kafka consumer.
+     */
     @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k")
     @Test
     public void testPollingRecords() {
@@ -247,47 +174,68 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         assertEquals(messageQueueAnnotation.count(), count);
     }
 
-    @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k", consumerGroupId = "shawguo.0522.5")
+    /**
+     * test consumer the __consumer_offsets topic.
+     */
+    @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k")
     @Test
-    public void testConsumerRestart() throws InterruptedException {
-        int totalCommitted = 0;
-        while (true) {
-            consumer = this.createDefaultConsumer(testTopicName, null, true);
+    public void testConsumerOffsetTopic() throws InterruptedException {
 
-            Set<TopicPartition> assignment = consumer.assignment();
-            for (TopicPartition par : assignment) {
-                out.println(par);
-                out.println("consumer position = " + consumer.position(par));
-            }
-            long committedCount = 0;
-            while (true) {
-                ConsumerRecords<String, String> records = consumer.poll(100);
-                logger.info("kafka consumer received {} records", records.count());
-                for (ConsumerRecord<String, String> record : records) {
-                    logger.info("consumed message [key]={} [partition]={} [offset]={}",
-                            record.key(), record.partition(), record.offset());
-//                    Thread.sleep(100);
-                }
+        //EE: consumer thread
+        new Thread() {
+            @Override
+            public void run() {
                 try {
-                    consumer.commitSync();
-                    logger.info("consumer commit success!");
-                    committedCount += records.count();
-                    totalCommitted += records.count();
-                    if (committedCount >= 2000 || totalCommitted == messageQueueAnnotation.count()) { //EE: close consumer per 2000 message
-                        consumer.close();
-                        consumer = null;
-                        break;
+                    sleep(20 * Second);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Properties properties = new Properties();
+                properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "10");
+                Consumer consumer = createDefaultConsumer(testTopicName, properties, true);
+                while (true) {
+                    ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
+                    if (!records.isEmpty()) {
+                        assertEquals(10, records.count());
+                        consumer.commitSync();
                     }
-                } catch (CommitFailedException e) {
-                    println(ANSI_RED, e.getLocalizedMessage());
-                    continue;
                 }
             }
-            Thread.sleep(35 * Second);
-            out.println("sleep 35 seconds and will restart kafka consumer...");
-            if (totalCommitted == messageQueueAnnotation.count()) break;
-        }
-        assertEquals(messageQueueAnnotation.count(), totalCommitted);
+        }.start();
+
+
+        final CountDownLatch latch = new CountDownLatch(1000 * numPartitions);
+        //EE: __consumer_offsets thread
+        new Thread() {
+            @Override
+            public void run() {
+                MessageFormatter formatter = new GroupMetadataManager.OffsetsMessageFormatter();
+
+                Properties properties = new Properties();
+                properties.setProperty(ConsumerConfig.EXCLUDE_INTERNAL_TOPICS_CONFIG, "false");
+                properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+                properties.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer_offsets_group");
+                properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArrayDeserializer");
+                properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArrayDeserializer");
+                properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+                properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+                KafkaConsumer<Byte[], Byte[]> consumer = new KafkaConsumer<>(properties);
+                consumer.subscribe(Arrays.asList("__consumer_offsets"));
+                //should receive 1000 message commit request;
+                while (true) {
+                    ConsumerRecords<Byte[], Byte[]> records = consumer.poll(pollTimeout);
+                    for (ConsumerRecord record : records) {
+                        formatter.writeTo(record, out);
+                        latch.countDown();
+                        logger.info(String.valueOf(latch.getCount()));
+                    }
+                    if (latch.getCount() == 0)
+                        break;
+                }
+            }
+        }.start();
+
+        assertEquals(true, latch.await(120, TimeUnit.SECONDS));
     }
 
 }
