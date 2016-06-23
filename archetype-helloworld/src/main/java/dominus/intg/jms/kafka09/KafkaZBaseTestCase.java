@@ -224,7 +224,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
             kafkaConsumerProps.put("sasl.mechanism", "PLAIN");
         }
         if (overrideProps != null)
-            kafkaProducerProps.putAll(overrideProps);
+            kafkaConsumerProps.putAll(overrideProps);
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumerProps);
         ConsumerRebalanceListener rebalanceListener = new ConsumerRebalanceListener() {
             @Override
