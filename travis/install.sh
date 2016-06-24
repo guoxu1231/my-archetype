@@ -13,6 +13,14 @@ mysql -t < test_employees_md5.sql
 #create staging schema
 mysql -u root -e "create database IF NOT EXISTS iops_schema;"
 mysql -u root -e "show schemas"
+#enable master replication
+sudo /etc/init.d/mysql stop || true
+echo '[mysqld]'            | sudo tee /etc/mysql/conf.d/replication.cnf
+echo 'log-bin=mysql-bin'   | sudo tee -a /etc/mysql/conf.d/replication.cnf
+echo 'server-id=1'         | sudo tee -a /etc/mysql/conf.d/replication.cnf
+echo 'binlog-format = row' | sudo tee -a /etc/mysql/conf.d/replication.cnf
+sudo /etc/init.d/mysql start || true
+sudo tail -1000 /var/log/syslog
 cd ..
 
 #install kafka & standalone zookeeper
