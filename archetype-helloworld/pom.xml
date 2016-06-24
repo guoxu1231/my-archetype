@@ -427,6 +427,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <!-- JDBC begin-->
                         <include>dominus.intg.datastore.mysql.MySqlDDLTest</include>
                         <include>dominus.intg.datastore.mysql.MySqlMetaDataTest</include>
+                        <include>dominus.connector.MysqlBinlogConnectorTest</include>
                         <!-- Misc -->
                         <include>dominus.intg.scripting.GroovyIntgTest</include>
                         <include>dominus.intg.ws.jaxb.XmlBindingTest</include>

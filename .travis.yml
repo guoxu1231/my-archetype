@@ -5,6 +5,8 @@ jdk:
 os:
   - linux
 
+sudo: required
+
 install:
   - ./travis/install.sh
 
