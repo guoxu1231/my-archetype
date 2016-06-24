@@ -191,12 +191,12 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
                     e.printStackTrace();
                 }
                 Properties properties = new Properties();
-                properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "10");
+                properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "100");
                 Consumer consumer = createDefaultConsumer(testTopicName, properties, true);
                 while (true) {
                     ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
                     if (!records.isEmpty()) {
-                        assertEquals(10, records.count());
+                        assertEquals(100, records.count());
                         consumer.commitSync();
                     }
                 }
@@ -204,7 +204,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         }.start();
 
 
-        final CountDownLatch latch = new CountDownLatch(1000 * numPartitions);
+        final CountDownLatch latch = new CountDownLatch(100 * numPartitions);
         //EE: __consumer_offsets thread
         new Thread() {
             @Override
