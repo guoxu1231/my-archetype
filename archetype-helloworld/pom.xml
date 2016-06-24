@@ -395,6 +395,13 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <artifactId>quartz</artifactId>
                     <version>2.2.1</version>
                 </dependency>
+
+                <!--mysql binlog connector-->
+                <dependency>
+                    <groupId>com.github.shyiko</groupId>
+                    <artifactId>mysql-binlog-connector-java</artifactId>
+                    <version>0.3.1</version>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>
@@ -407,16 +414,6 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
-                    <excludes>
-                        <exclude>dominus/intg/jms/kafka/KafkaZBaseTestCase.java</exclude>
-                        <exclude>dominus/intg/jms/kafka/KafkaServerTestCase.java</exclude>
-                        <exclude>dominus/intg/jms/kafka/KafkaPerformanceTestCase.java</exclude>
-                        <exclude>dominus/intg/jms/kafka/KafkaClientTestcase.java</exclude>
-                        <exclude>dominus/intg/jms/kafka/KafkaAdminTestCase.java</exclude>
-                        <exclude>dominus/intg/jms/kafka/consumer/*.java</exclude>
-                        <exclude>dominus/intg/jms/kafka/producer/*.java</exclude>
-                        <exclude>dominus/intg/jms/kafka/ext/*.java</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
