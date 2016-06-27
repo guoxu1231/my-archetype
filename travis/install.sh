@@ -20,7 +20,7 @@ echo 'log-bin=mysql-bin'   | sudo tee -a /etc/mysql/conf.d/replication.cnf
 echo 'server-id=1'         | sudo tee -a /etc/mysql/conf.d/replication.cnf
 echo 'binlog-format = row' | sudo tee -a /etc/mysql/conf.d/replication.cnf
 sudo /etc/init.d/mysql start || true
-sudo tail -1000 /var/log/syslog
+#sudo tail -1000 /var/log/syslog
 cd ..
 
 #install kafka & standalone zookeeper
