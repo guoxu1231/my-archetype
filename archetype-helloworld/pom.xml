@@ -268,6 +268,11 @@
                     <artifactId>groovy-jsr223</artifactId>
                     <version>2.4.6</version>
                 </dependency>
+                <dependency>
+                    <groupId>org.codehaus.groovy</groupId>
+                    <artifactId>groovy-all</artifactId>
+                    <version>2.4.6</version>
+                </dependency>
 
                 <!--Sqoop Java Client API-->
                 <dependency>
@@ -431,6 +436,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <!-- Misc -->
                         <include>dominus.intg.scripting.GroovyIntgTest</include>
                         <include>dominus.intg.ws.jaxb.XmlBindingTest</include>
+                        <include>dominus.intg.jmx.TestGroovyMBean</include>
                         <!-- RPC -->
                         <!--<include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>-->
                         <!-- Kafka & ZK -->
@@ -473,6 +479,32 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <source>src/main/resources/ws/xml/Person.xsd</source>
                     </sources>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${basedir}/src/main/groovy"/>
+                                <taskdef name="groovyc"
+                                         classname="org.codehaus.groovy.ant.Groovyc">
+                                    <classpath refid="maven.compile.classpath"/>
+                                </taskdef>
+                                <mkdir dir="${project.build.outputDirectory}"/>
+                                <groovyc destdir="${project.build.outputDirectory}"
+                                         srcdir="${basedir}/src/main/groovy/" listfiles="true">
+                                    <classpath refid="maven.compile.classpath"/>
+                                </groovyc>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
