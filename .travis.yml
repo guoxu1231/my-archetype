@@ -7,6 +7,9 @@ os:
 
 sudo: required
 
+env:
+  - JMX_PORT=9991
+
 install:
   - ./travis/install.sh
 
