@@ -27,7 +27,7 @@ cd ..
 mkdir $HOME/download -p
 wget http://www.us.apache.org/dist/kafka/0.10.0.0/kafka_2.11-0.10.0.0.tgz -O $HOME/download/kafka.tgz
 mkdir -p kafka && tar xzf $HOME/download/kafka.tgz -C kafka --strip-components 1
-export JMX_PORT=9991
+#export JMX_PORT=9991
 nohup bash -c "cd kafka && bin/zookeeper-server-start.sh config/zookeeper.properties &"
 nohup bash -c "cd kafka && bin/kafka-server-start.sh config/server.properties &"
 
