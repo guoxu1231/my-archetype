@@ -206,7 +206,11 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
             long runtime = new Date().getTime();
             String ip = "192.168.2." + rnd.nextInt(255);
             String info = runtime + ",www.example.com," + ip;
-            ProducerRecord<String, String> message = new ProducerRecord<String, String>(topicName, ip, info);
+            ProducerRecord<String, String> message;
+            if (nEvents >= count / 2)
+                message = new ProducerRecord<String, String>(topicName, null, new Date().getTime() - oneDay, ip, info); //old message
+            else
+                message = new ProducerRecord<String, String>(topicName, ip, info); // new message
 
             RecordMetadata medadata = ((RecordMetadata) producer.send(message).get(10, TimeUnit.SECONDS));
             logger.info("[acknowledged message]:{}, {}, {}", medadata.topic(), medadata.partition(), medadata.offset());

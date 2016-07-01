@@ -4,6 +4,7 @@ package dominus.intg.jms.kafka09;
 import dominus.framework.junit.annotation.MessageQueueTest;
 import kafka.common.MessageFormatter;
 import kafka.coordinator.GroupMetadataManager;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.TopicPartition;
@@ -52,18 +53,23 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         consumer = this.createDefaultConsumer(testTopicName, null, true);
 
         long count = 0;
+        long todayCount = 0;
+        Long startOfDay = DateUtils.truncate(new Date(), Calendar.DATE).getTime();
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
             logger.info("kafka consumer received {} records", records.count());
             for (ConsumerRecord<String, String> record : records) {
-                logger.info("consumed message [key]={} [partition]={} [offset]={}",
-                        record.key(), record.partition(), record.offset());
+                logger.info("consumed message [key]={} [partition]={} [offset]={} [timestamp]={}",
+                        record.key(), record.partition(), record.offset(), simpleDateFormat.format(record.timestamp()));
                 count++;
+                if (record.timestamp() > startOfDay)
+                    todayCount++;
             }
             consumer.commitSync();
             if (count == messageQueueAnnotation.count()) break;
         }
         assertEquals(messageQueueAnnotation.count(), count);
+        assertEquals(messageQueueAnnotation.count() / 2, todayCount);
     }
 
     @MessageQueueTest(produceTestMessage = true, count = 1000)

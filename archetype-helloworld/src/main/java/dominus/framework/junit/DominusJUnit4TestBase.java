@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.Random;
 
@@ -89,6 +90,8 @@ public class DominusJUnit4TestBase {
     protected static final int KB = 1024;
     protected static final int MB = 1048576;
     protected static final long GB = 1073741824L;
+    protected static final long oneDay = 1000 * 60 * 60 * 24;
+    protected static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd-HH:mm:ss.SSS");
 
     protected static final long Minute = 60000;
     protected static final long Second = 1000;
