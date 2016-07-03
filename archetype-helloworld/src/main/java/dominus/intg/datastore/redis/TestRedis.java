@@ -5,28 +5,44 @@ import dominus.framework.junit.DominusJUnit4TestBase;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
 
+import java.util.Date;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
-public class TestRedis extends DominusJUnit4TestBase {
+public class TestRedis extends RedisBaseTestCase {
 
-    Jedis jedis;
-
-    @Override
-    protected void doSetUp() throws Exception {
-        super.doSetUp();
-        jedis = new Jedis(properties.getProperty("redis.connect"));
-        out.println(jedis.info());
-    }
-
-    @Override
-    protected void doTearDown() throws Exception {
-        super.doTearDown();
-        jedis.close();
+    @Test
+    public void testGetSet() {
+        assertEquals(SUCCESS_RESPONSE, jedis.set("foo", "bar"));
+        assertEquals("bar", jedis.get("foo"));
+        assertEquals(0, jedis.setnx("foo", "bar").intValue());
     }
 
     @Test
-    public void testSetGet() {
-        jedis.set("foo", "bar");
-        assertEquals("bar", jedis.get("foo"));
+    public void testHashValue() {
+//        jedis.hset
     }
+
+    @Test
+    public void testListValue() {
+
+    }
+
+    /**
+     * In Redis 2.4 the expire might not be pin-point accurate, and it could be between zero to one seconds out.
+     * Since Redis 2.6 the expire error is from 0 to 1 milliseconds.
+     */
+    @Test
+    public void testKeyExpire() throws InterruptedException {
+        jedis.set(uniqueKey, "hello world", NX, EX, 3);
+        Thread.sleep(4 * Second);
+        assertNull(jedis.get(uniqueKey));
+    }
+
+    @Test
+    public void testExceedMaxMemory() {
+
+    }
+
 }
