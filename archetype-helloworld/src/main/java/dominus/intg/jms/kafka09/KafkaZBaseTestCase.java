@@ -164,8 +164,8 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     }
 
     protected boolean deleteTestTopic(String testTopic) {
-        AdminUtils.deleteTopic(zkUtils, testTopicName);
-        out.printf("Kafka Topic[%s] is deleted!\n", testTopicName);
+        AdminUtils.deleteTopic(zkUtils, testTopic);
+        out.printf("Kafka Topic[%s] is deleted!\n", testTopic);
         return true;
     }
 
