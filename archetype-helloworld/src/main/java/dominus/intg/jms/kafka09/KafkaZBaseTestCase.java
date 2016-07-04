@@ -10,10 +10,14 @@ import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.Producer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.ContextConfiguration;
@@ -55,6 +59,8 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     public static final String TEST_TOPIC_10K = TEST_TOPIC_PREFIX + "10K";
     String testTopicName;
     final String SEEDED_TOPIC = "page_visits_10k";
+    final String COMMAND_TOPIC = "__consumer_command_request";
+    final String COMMAND_REPLAY = "ALL-REPLAY";
 
     String groupId;
 
@@ -108,21 +114,30 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         out.println("[Kafka SecurityMechanism] = " + securityMechanism);
 
         //EE: create seeded topic.
+        Producer producer = this.createDefaultProducer(null);
         if (!AdminUtils.topicExists(zkUtils, SEEDED_TOPIC)) {
             out.println("create seeded topic with 10000 messages");
             this.createTestTopic(SEEDED_TOPIC);
-            Producer producer = this.createDefaultProducer(null);
             //prepare message
             produceTestMessage(producer, SEEDED_TOPIC, 10000);
             assertEquals(10000, sumPartitionOffset(brokerList, SEEDED_TOPIC));
+
+        }
+        if (!AdminUtils.topicExists(zkUtils, COMMAND_TOPIC)) {
+            out.println("create __consumer_command_request topic...");
+            this.createTestTopic(COMMAND_TOPIC, 1, 1);
+            this.produceCommandMessage(producer, COMMAND_TOPIC, COMMAND_REPLAY, String.valueOf(DateUtils.truncate(new Date(), Calendar.DATE).getTime()));
+            //TODO add more commands
+        }
+        if (producer != null) {
             producer.close();
             producer = null;
         }
-
     }
 
     @Override
     protected void doTearDown() throws Exception {
+        this.deleteTestTopic(COMMAND_TOPIC);
         zkUtils.close();
     }
 
@@ -137,7 +152,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         return true;
     }
 
-    protected boolean createTestTopic(String testTopic, int numPartitions) throws InterruptedException {
+    protected boolean createTestTopic(String testTopic, int numPartitions, int replicationFactor) throws InterruptedException {
         AdminUtils.createTopic(zkUtils, testTopic, numPartitions, replicationFactor, new Properties(), RackAwareMode.Disabled$.MODULE$);
         out.printf("Kafka Topic[%s] is created!\n", testTopic);
         assertTrue("Kafka Topic[%s] does not exist!", AdminUtils.topicExists(zkUtils, testTopic));
@@ -208,16 +223,24 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
             String info = runtime + ",www.example.com," + ip;
             ProducerRecord<String, String> message;
             if (nEvents >= count / 2)
-                message = new ProducerRecord<String, String>(topicName, null, new Date().getTime() - oneDay, ip, info); //old message
-            else
                 message = new ProducerRecord<String, String>(topicName, ip, info); // new message
+            else
+                message = new ProducerRecord<String, String>(topicName, null, new Date().getTime() - oneDay, ip, info); //old message
+
 
             RecordMetadata medadata = ((RecordMetadata) producer.send(message).get(10, TimeUnit.SECONDS));
-            logger.info("[acknowledged message]:{}, {}, {}", medadata.topic(), medadata.partition(), medadata.offset());
+            logger.info("[acknowledged message]:{}, {}, {}, {}", medadata.topic(), medadata.partition(),
+                    medadata.offset(), simpleDateFormat.format(medadata.timestamp()));
             testMessageMap.get(medadata.partition()).add(new KafkaTestMessage(medadata, message));
         }
         watch.stop();
         System.out.println(watch);
+    }
+
+    protected void produceCommandMessage(Producer producer, String topicName, String receiver, String command) throws InterruptedException, ExecutionException, TimeoutException {
+        ProducerRecord<String, String> message = new ProducerRecord<String, String>(topicName, receiver, command);
+        RecordMetadata medadata = ((RecordMetadata) producer.send(message).get(10, TimeUnit.SECONDS));
+        logger.info("send [command message]:receiver={} command={} [acknowledged]:{}, {}, {}", receiver, command, medadata.topic(), medadata.partition(), medadata.offset());
     }
 
     protected Consumer createDefaultConsumer(String subscribeTopic, Properties overrideProps, boolean autoAssign) {
@@ -230,6 +253,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         if (overrideProps != null)
             kafkaConsumerProps.putAll(overrideProps);
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumerProps);
+        printf(ANSI_BLUE, "create new consumer - [%s]\n", kafkaConsumerProps.getProperty("group.id"));
         ConsumerRebalanceListener rebalanceListener = new ConsumerRebalanceListener() {
             @Override
             public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
@@ -255,6 +279,11 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
             this.medadata = medadata;
             this.message = message;
         }
+    }
+
+    static class KafkaCommandMessage {
+        String key;
+        String value;
     }
 
 }

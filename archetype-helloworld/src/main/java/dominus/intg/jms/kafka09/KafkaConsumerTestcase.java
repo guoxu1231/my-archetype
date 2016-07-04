@@ -8,6 +8,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.WakeupException;
 import org.junit.Test;
 
 import java.util.*;
@@ -242,6 +243,113 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         }.start();
 
         assertEquals(true, latch.await(120, TimeUnit.SECONDS));
+    }
+
+    @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k")
+    @Test
+    public void testMessageReplayByCutoffDay() throws InterruptedException {
+
+        final Long cutoffTimestamp = DateUtils.truncate(new Date(), Calendar.DATE).getTime();
+        final KafkaCommandMessage commandMessage = new KafkaCommandMessage();
+
+        //EE: consumer thread
+        final CountDownLatch latch = new CountDownLatch(messageQueueAnnotation.count());
+        final CountDownLatch cutoffLatch = new CountDownLatch(messageQueueAnnotation.count());
+        final Consumer consumer = createDefaultConsumer(testTopicName, null, true);
+        new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    ConsumerRecords<String, String> records = null;
+                    try {
+                        records = consumer.poll(pollTimeout);
+                        for (ConsumerRecord record : records) {
+                            latch.countDown();
+                            if (record.timestamp() > cutoffTimestamp)
+                                cutoffLatch.countDown();
+                            else {
+                                logger.info("ignore record {} {}", record.partition(), record.offset());
+                            }
+                        }
+                        consumer.commitSync();
+
+                    } catch (WakeupException e) {
+                        try {
+                            //EE: probably get command message and sleep for command executed.
+                            Thread.sleep(1000);
+                            printf(ANSI_BLUE, "interrupted by instructor consumer - %s\n", e.getClass());
+                            //EE: seek to cutoff day
+                            consumer.pause(consumer.assignment());
+                            printf(ANSI_BLUE, "consumer [%s] is paused\n", groupId);
+                            Properties props = new Properties();
+                            props.put("bootstrap.servers", bootstrapServers);
+                            props.put("group.id", String.format("seek-consumer-%s-%d", testTopicName, new Date().getTime()));
+                            props.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+                            props.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+                            Consumer seekConsumer = new KafkaConsumer<>(props);
+                            println(ANSI_BLUE, "seeker consumer is created");
+                            seekConsumer.assign(consumer.assignment());
+                            seekConsumer.seekToBeginning(consumer.assignment());
+                            HashMap<TopicPartition, Long> seekResultMap = new HashMap<>();
+                            while (true) {
+                                ConsumerRecords<String, String> seekRecords = seekConsumer.poll(pollTimeout);
+                                if (!seekRecords.isEmpty()) {
+                                    for (ConsumerRecord seekRecord : seekRecords) {
+                                        if (seekRecord.timestamp() > Long.valueOf(commandMessage.value) &&
+                                                !seekResultMap.containsKey(new TopicPartition(seekRecord.topic(), seekRecord.partition()))) {
+                                            seekResultMap.put(new TopicPartition(seekRecord.topic(), seekRecord.partition()), seekRecord.offset());
+                                            printf(ANSI_BLUE, "partition [%s] re-seek is done, cutoff offset is [%d]\n", seekRecord.partition(), seekRecord.offset());
+                                        }
+                                    }
+                                }
+                                if (seekResultMap.keySet().size() == consumer.assignment().size())
+                                    break;
+                            }
+                            seekConsumer.close();
+                            println(ANSI_BLUE, "all partition re-seek is done");
+                            for (TopicPartition par : seekResultMap.keySet()) {
+                                consumer.seek(par, seekResultMap.get(par));
+                            }
+                            printf(ANSI_BLUE, "consumer [%s] is re-seeked\n", groupId);
+                            consumer.resume(consumer.assignment());
+                            printf(ANSI_BLUE, "consumer [%s] is resumed\n", groupId);
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }.start();
+        assertTrue(latch.await(100, TimeUnit.SECONDS));
+        printf(ANSI_BLUE, "all %s messages are consumed by %s\n", messageQueueAnnotation.count(), groupId);
+
+        new Thread() {
+            @Override
+            public void run() {
+                Properties properties = new Properties();
+                properties.put("group.id", "__consumer_command_request-" + new Date().getTime());
+                properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+                properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
+                final Consumer instructor = createDefaultConsumer(COMMAND_TOPIC, properties, true);
+                while (true) {
+                    ConsumerRecords<String, String> records = instructor.poll(pollTimeout);
+                    if (!records.isEmpty()) {
+                        for (ConsumerRecord<String, String> commandRecord : records) {
+                            if (commandRecord.key().equals(COMMAND_REPLAY)) {
+                                printf(ANSI_BLUE, "Instructor consumer get command message:%s %s\n", commandRecord.key(), commandRecord.value());
+                                //EE: get command message and wakeup consumer
+                                commandMessage.key = commandRecord.key();
+                                commandMessage.value = commandRecord.value();
+                                consumer.wakeup();
+                            } else {
+                                logger.info("ignore command message:{}", commandRecord);
+                            }
+                        }
+                    }
+                }
+            }
+        }.start();
+        assertTrue(cutoffLatch.await(100, TimeUnit.SECONDS));
     }
 
 }
