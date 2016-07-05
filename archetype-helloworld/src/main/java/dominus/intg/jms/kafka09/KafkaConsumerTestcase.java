@@ -196,7 +196,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
                     e.printStackTrace();
                 }
                 Properties properties = new Properties();
-                properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1000");
+                properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "100");
                 Consumer consumer = createDefaultConsumer(testTopicName, groupId, properties, null);
                 while (true) {
                     ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
