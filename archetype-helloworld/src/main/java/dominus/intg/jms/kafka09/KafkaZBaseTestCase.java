@@ -61,6 +61,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     final String SEEDED_TOPIC = "page_visits_10k";
     final String COMMAND_TOPIC = "__consumer_command_request";
     final String COMMAND_REPLAY = "ALL-REPLAY";
+    Producer _producer;
 
     String groupId;
 
@@ -114,30 +115,26 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         out.println("[Kafka SecurityMechanism] = " + securityMechanism);
 
         //EE: create seeded topic.
-        Producer producer = this.createDefaultProducer(null);
+        _producer = this.createDefaultProducer(null);
         if (!AdminUtils.topicExists(zkUtils, SEEDED_TOPIC)) {
             out.println("create seeded topic with 10000 messages");
             this.createTestTopic(SEEDED_TOPIC);
             //prepare message
-            produceTestMessage(producer, SEEDED_TOPIC, 10000);
+            produceTestMessage(_producer, SEEDED_TOPIC, 10000);
             assertEquals(10000, sumPartitionOffset(brokerList, SEEDED_TOPIC));
-
         }
         if (!AdminUtils.topicExists(zkUtils, COMMAND_TOPIC)) {
             out.println("create __consumer_command_request topic...");
             this.createTestTopic(COMMAND_TOPIC, 1, 1);
-            this.produceCommandMessage(producer, COMMAND_TOPIC, COMMAND_REPLAY, String.valueOf(DateUtils.truncate(new Date(), Calendar.DATE).getTime()));
-            //TODO add more commands
         }
-        if (producer != null) {
-            producer.close();
-            producer = null;
-        }
+
     }
 
     @Override
     protected void doTearDown() throws Exception {
-        this.deleteTestTopic(COMMAND_TOPIC);
+        if (_producer != null) {
+            _producer.close();
+        }
         zkUtils.close();
     }
 
@@ -237,15 +234,21 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         System.out.println(watch);
     }
 
-    protected void produceCommandMessage(Producer producer, String topicName, String receiver, String command) throws InterruptedException, ExecutionException, TimeoutException {
+    protected void produceCommandMessage(Producer producer, String topicName, String receiver, String command) {
         ProducerRecord<String, String> message = new ProducerRecord<String, String>(topicName, receiver, command);
-        RecordMetadata medadata = ((RecordMetadata) producer.send(message).get(10, TimeUnit.SECONDS));
+        RecordMetadata medadata = null;
+        try {
+            medadata = ((RecordMetadata) producer.send(message).get(10, TimeUnit.SECONDS));
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            e.printStackTrace();
+            logger.error(e.toString());
+        }
         logger.info("send [command message]:receiver={} command={} [acknowledged]:{}, {}, {}", receiver, command, medadata.topic(), medadata.partition(), medadata.offset());
     }
 
-    protected Consumer createDefaultConsumer(String subscribeTopic, Properties overrideProps, boolean autoAssign) {
+    protected Consumer createDefaultConsumer(String subscribeTopic, String consumerGroupId, Properties overrideProps, Collection<TopicPartition> assignment) {
         kafkaConsumerProps.put("bootstrap.servers", bootstrapServers);
-        kafkaConsumerProps.put("group.id", groupId);
+        kafkaConsumerProps.put("group.id", consumerGroupId);
         if (System.getProperty("java.security.auth.login.config") != null) {
             kafkaConsumerProps.put("security.protocol", "SASL_PLAINTEXT");
             kafkaConsumerProps.put("sasl.mechanism", "PLAIN");
@@ -265,8 +268,10 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
                 out.println("partitions assigned:" + partitions);
             }
         };
-        if (autoAssign)
-            consumer.subscribe(Arrays.asList(subscribeTopic), rebalanceListener);
+        if (assignment == null)
+            consumer.subscribe(Arrays.asList(subscribeTopic), rebalanceListener); //EE: auto-balance
+        else
+            consumer.assign(assignment); //EE: manually assignment
 
         return consumer;
     }

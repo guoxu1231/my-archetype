@@ -51,7 +51,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     @Test
     public void testSimpleConsumer() throws InterruptedException {
 
-        consumer = this.createDefaultConsumer(testTopicName, null, true);
+        consumer = this.createDefaultConsumer(testTopicName, groupId, null, null);
 
         long count = 0;
         long todayCount = 0;
@@ -77,14 +77,14 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     @Test
     public void testCommitByRecord() {
 
-        consumer = this.createDefaultConsumer(testTopicName, null, true);
+        consumer = this.createDefaultConsumer(testTopicName, groupId, null, null);
 
         int pollingTime = 0;
         int[] offsetLog = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         while (true) {
             ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
             pollingTime++;
-            out.printf("[%d th], polling size:%d\n", pollingTime, records.count());
+            logger.info("[{} th], polling size:{}", pollingTime, records.count());
 
             //EE:only consume first record of partitions
             for (TopicPartition partition : records.partitions()) {
@@ -111,9 +111,8 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     @MessageQueueTest(produceTestMessage = true, count = 1000)
     @Test
     public void testMessageOrderInPartition() {
-        consumer = this.createDefaultConsumer(testTopicName, null, false);
         //EE:only assign partition 0 to consumer
-        consumer.assign(Collections.singletonList(new TopicPartition(testTopicName, 0)));
+        consumer = this.createDefaultConsumer(testTopicName, groupId, null, Collections.singletonList(new TopicPartition(testTopicName, 0)));
 
         int expectedOffset = 0;
         while (true) {
@@ -137,9 +136,8 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     @MessageQueueTest(produceTestMessage = true, count = 1000)
     @Test
     public void testRandomSeekInPartition() {
-        consumer = this.createDefaultConsumer(testTopicName, null, false);
         //EE:only assign partition 0 to consumer
-        consumer.assign(Collections.singletonList(new TopicPartition(testTopicName, 0)));
+        consumer = this.createDefaultConsumer(testTopicName, groupId, null, Collections.singletonList(new TopicPartition(testTopicName, 0)));
 
         for (int i = 0; i < 10; i++) {
             KafkaTestMessage expectedMsg = testMessageMap.get(0).get(random.nextInt(testMessageMap.get(0).size()));
@@ -164,7 +162,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k")
     @Test
     public void testPollingRecords() {
-        consumer = this.createDefaultConsumer(testTopicName, null, true);
+        consumer = this.createDefaultConsumer(testTopicName, groupId, null, null);
         final int POLLING_RECORDS = Integer.valueOf(kafkaConsumerProps.getProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG)).intValue();
         long count = 0;
 
@@ -198,8 +196,8 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
                     e.printStackTrace();
                 }
                 Properties properties = new Properties();
-                properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "100");
-                Consumer consumer = createDefaultConsumer(testTopicName, properties, true);
+                properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1000");
+                Consumer consumer = createDefaultConsumer(testTopicName, groupId, properties, null);
                 while (true) {
                     ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
                     if (!records.isEmpty()) {
@@ -255,7 +253,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         //EE: consumer thread
         final CountDownLatch latch = new CountDownLatch(messageQueueAnnotation.count());
         final CountDownLatch cutoffLatch = new CountDownLatch(messageQueueAnnotation.count());
-        final Consumer consumer = createDefaultConsumer(testTopicName, null, true);
+        final Consumer consumer = createDefaultConsumer(testTopicName, groupId, null, null);
         new Thread() {
             @Override
             public void run() {
@@ -281,14 +279,9 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
                             //EE: seek to cutoff day
                             consumer.pause(consumer.assignment());
                             printf(ANSI_BLUE, "consumer [%s] is paused\n", groupId);
-                            Properties props = new Properties();
-                            props.put("bootstrap.servers", bootstrapServers);
-                            props.put("group.id", String.format("seek-consumer-%s-%d", testTopicName, new Date().getTime()));
-                            props.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-                            props.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-                            Consumer seekConsumer = new KafkaConsumer<>(props);
+                            Consumer seekConsumer = createDefaultConsumer(null, String.format("seek-consumer-%s-%d",
+                                    testTopicName, new Date().getTime()), null, consumer.assignment());
                             println(ANSI_BLUE, "seeker consumer is created");
-                            seekConsumer.assign(consumer.assignment());
                             seekConsumer.seekToBeginning(consumer.assignment());
                             HashMap<TopicPartition, Long> seekResultMap = new HashMap<>();
                             while (true) {
@@ -326,11 +319,8 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         new Thread() {
             @Override
             public void run() {
-                Properties properties = new Properties();
-                properties.put("group.id", "__consumer_command_request-" + new Date().getTime());
-                properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-                properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
-                final Consumer instructor = createDefaultConsumer(COMMAND_TOPIC, properties, true);
+                final Consumer instructor = createDefaultConsumer(COMMAND_TOPIC, "__consumer_command_request-" + new Date().getTime(), null, null);
+                produceCommandMessage(_producer, COMMAND_TOPIC, COMMAND_REPLAY, String.valueOf(DateUtils.truncate(new Date(), Calendar.DATE).getTime()));
                 while (true) {
                     ConsumerRecords<String, String> records = instructor.poll(pollTimeout);
                     if (!records.isEmpty()) {
