@@ -407,6 +407,13 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <artifactId>mysql-binlog-connector-java</artifactId>
                     <version>0.3.1</version>
                 </dependency>
+
+                <!--EE:aliyun jingwei -->
+                <!--<dependency>-->
+                    <!--<groupId>com.taobao.jingwei</groupId>-->
+                    <!--<artifactId>jingwei-core</artifactId>-->
+                    <!--<version>2.1.1-SNAPSHOT</version>-->
+                <!--</dependency>-->
             </dependencies>
         </profile>
     </profiles>
@@ -417,8 +424,8 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${java-version}</source>
+                    <target>${java-version}</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -506,10 +513,17 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.5</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-    <repositories>
-
-    </repositories>
 
 </project>
