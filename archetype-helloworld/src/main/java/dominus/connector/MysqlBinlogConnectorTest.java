@@ -57,7 +57,9 @@ public class MysqlBinlogConnectorTest extends MySqlZBaseTestCase {
 
             @Override
             public void onEvent(Event event) {
-                out.println(event);
+
+                if (event.getData() instanceof WriteRowsEventData || event.getData() instanceof UpdateRowsEventData || event.getData() instanceof DeleteRowsEventData)
+                    out.println(event);
                 if (event.getData() instanceof WriteRowsEventData)
                     insert += ((WriteRowsEventData) event.getData()).getRows().size();
                 else if (event.getData() instanceof DeleteRowsEventData)
