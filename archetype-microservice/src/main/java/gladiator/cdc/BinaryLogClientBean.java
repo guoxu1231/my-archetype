@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 public class BinaryLogClientBean {
 
-    BinaryLogClient client;
+    final BinaryLogClient client;
     protected final Logger logger = LoggerFactory.getLogger(BinaryLogClientBean.class);
 
     public BinaryLogClientBean(String hostname, int port, String schema, String username, String password) {
@@ -26,20 +26,32 @@ public class BinaryLogClientBean {
     }
 
     public void init() throws IOException {
-        //EE: binlog event listener
-        logger.info("initialize binaryLog client....");
-        client.registerEventListener(new BinaryLogClient.EventListener() {
-
+        //EE: prevent blocking main thread during boot initialization.
+        Thread t = new Thread() {
             @Override
-            public void onEvent(Event event) {
+            public void run() {
+                //EE: binlog event listener
+                logger.info("Initializing binaryLog client....");
+                client.registerEventListener(new BinaryLogClient.EventListener() {
 
-                if (event.getData() instanceof WriteRowsEventData || event.getData() instanceof UpdateRowsEventData || event.getData() instanceof DeleteRowsEventData) {
-                    logger.info(event.toString());
-                    //TODO publish to kafka
+                    @Override
+                    public void onEvent(Event event) {
+
+                        if (event.getData() instanceof WriteRowsEventData || event.getData() instanceof UpdateRowsEventData || event.getData() instanceof DeleteRowsEventData) {
+                            logger.info(event.toString());
+                            //TODO publish to kafka
+                        }
+                    }
+                });
+                try {
+                    client.connect();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-        });
-        client.connect();
+        };
+        t.setName("binaryLog-client-thread");
+        t.start();
     }
 
     public void cleanup() throws IOException {
