@@ -13,12 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- AssertJ is not a part of Spring IO platform, so the version must be provided explicitly -->
         <assertj-core-version>3.1.0</assertj-core-version>
-        <scala.version>2.10.5</scala.version>
-        <scala.binary.version>2.10</scala.binary.version>
-        <spark.home>/opt/Development/middleware/bigdata/spark-1.5.2-bin-hadoop2.6</spark.home>
-        <spark.snapshot.assemblePath>
-            /opt/Development/github_repo/spark/dist/lib/spark-assembly-2.0.0-SNAPSHOT-hadoop2.6.0.jar
-        </spark.snapshot.assemblePath>
+        <scala.version>2.11.8</scala.version>
         <cxf.version>3.1.4</cxf.version>
     </properties>
     <parent>
@@ -139,7 +134,7 @@
                 <dependency>
                     <groupId>org.scala-lang</groupId>
                     <artifactId>scala-library</artifactId>
-                    <version>2.11.8</version>
+                    <version>${scala.version}</version>
                 </dependency>
                 <!-- EE: Apache Kafka end -->
                 <!-- 0.4 with kafka 0.8.2.2, 0.7 with kafka 0.9-->
@@ -410,9 +405,9 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
 
                 <!--EE:aliyun jingwei -->
                 <!--<dependency>-->
-                    <!--<groupId>com.taobao.jingwei</groupId>-->
-                    <!--<artifactId>jingwei-core</artifactId>-->
-                    <!--<version>2.1.1-SNAPSHOT</version>-->
+                <!--<groupId>com.taobao.jingwei</groupId>-->
+                <!--<artifactId>jingwei-core</artifactId>-->
+                <!--<version>2.1.1-SNAPSHOT</version>-->
                 <!--</dependency>-->
             </dependencies>
         </profile>
@@ -459,6 +454,8 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.datastore.persistent.mybatis.TestMyBatisDao</include>
                         <!-- java language -->
                         <include>dominus.language.threads.TestSynchronizer</include>
+                        <!--scala language -->
+                        <include>dominus.language.scala.TestHelloWorld</include>
                     </includes>
                 </configuration>
             </plugin>
@@ -514,13 +511,21 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.5</version>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
+                    <scalaVersion>${scala.version}</scalaVersion>
                 </configuration>
             </plugin>
         </plugins>
