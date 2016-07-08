@@ -7,6 +7,9 @@ CREATE TABLE `departments` (
   UNIQUE KEY `dept_name` (`dept_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+SET autocommit=0;
+
+BEGIN;
 INSERT INTO `departments` VALUES ('d001','Marketing');
 INSERT INTO `departments` VALUES ('d002','Finance');
 INSERT INTO `departments` VALUES ('d003','Human Resources');
@@ -18,3 +21,4 @@ INSERT INTO `departments` VALUES ('d008','Research');
 INSERT INTO `departments` VALUES ('d009','Customer Service');
 UPDATE `departments` SET dept_name = 'DELL Alienware' WHERE dept_no = 'd009';
 DELETE FROM `departments`;
+COMMIT;

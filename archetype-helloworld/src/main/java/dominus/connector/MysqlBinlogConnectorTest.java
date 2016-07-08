@@ -2,10 +2,7 @@ package dominus.connector;
 
 
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
-import com.github.shyiko.mysql.binlog.event.DeleteRowsEventData;
-import com.github.shyiko.mysql.binlog.event.Event;
-import com.github.shyiko.mysql.binlog.event.UpdateRowsEventData;
-import com.github.shyiko.mysql.binlog.event.WriteRowsEventData;
+import com.github.shyiko.mysql.binlog.event.*;
 import dominus.intg.datastore.mysql.MySqlZBaseTestCase;
 import org.junit.Test;
 import org.springframework.jdbc.datasource.init.ScriptParseException;
@@ -13,7 +10,11 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class MysqlBinlogConnectorTest extends MySqlZBaseTestCase {
@@ -47,31 +48,48 @@ public class MysqlBinlogConnectorTest extends MySqlZBaseTestCase {
         super.doTearDown();
     }
 
+    private void disconnect() {
+        try {
+            client.disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     //Prior to MySQL 5.7.7, statement-based format was the default.
     // In MySQL 5.7.7 and later, row-based format is the default.
     @Test
     public void testListenerBinlogEvent() throws IOException, SQLException {
         //EE: binlog event listener
         client.registerEventListener(new BinaryLogClient.EventListener() {
-            int insert = 0, update = 0, delete = 0;
+            //EE: Transaction Event Flow: GTID event (if gtid_mode=ON) -> QUERY event with "BEGIN" as sql -> ... -> XID event
+            EventType[] expectedEvents = {EventType.QUERY, EventType.QUERY, EventType.QUERY,
+                    EventType.TABLE_MAP, EventType.EXT_WRITE_ROWS,
+                    EventType.TABLE_MAP, EventType.EXT_WRITE_ROWS,
+                    EventType.TABLE_MAP, EventType.EXT_WRITE_ROWS,
+                    EventType.TABLE_MAP, EventType.EXT_WRITE_ROWS,
+                    EventType.TABLE_MAP, EventType.EXT_WRITE_ROWS,
+                    EventType.TABLE_MAP, EventType.EXT_WRITE_ROWS,
+                    EventType.TABLE_MAP, EventType.EXT_WRITE_ROWS,
+                    EventType.TABLE_MAP, EventType.EXT_WRITE_ROWS,
+                    EventType.TABLE_MAP, EventType.EXT_WRITE_ROWS,
+                    EventType.TABLE_MAP, EventType.EXT_UPDATE_ROWS,
+                    EventType.TABLE_MAP, EventType.EXT_DELETE_ROWS,
+                    EventType.XID
+            };
+            Queue<EventType> eventTypeQueue = new LinkedList<EventType>(Arrays.asList(expectedEvents));
 
             @Override
             public void onEvent(Event event) {
 
-                if (event.getData() instanceof WriteRowsEventData || event.getData() instanceof UpdateRowsEventData || event.getData() instanceof DeleteRowsEventData)
-                    out.println(event);
-                if (event.getData() instanceof WriteRowsEventData)
-                    insert += ((WriteRowsEventData) event.getData()).getRows().size();
-                else if (event.getData() instanceof DeleteRowsEventData)
-                    delete += ((DeleteRowsEventData) event.getData()).getRows().size();
-                else if (event.getData() instanceof UpdateRowsEventData)
-                    update += ((UpdateRowsEventData) event.getData()).getRows().size();
-                if (insert == 9 && delete == 9 && update == 1) {
-                    try {
-                        client.disconnect();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                out.println(event);
+                EventType eventType = event.getHeader().getEventType();
+                //ignore trivial events
+                if (EventType.ROTATE.equals(eventType) || EventType.FORMAT_DESCRIPTION.equals(eventType))
+                    return;
+                else {
+                    assertEquals(eventTypeQueue.poll(), eventType);
+                    if (eventTypeQueue.isEmpty()) disconnect();
                 }
             }
         });
