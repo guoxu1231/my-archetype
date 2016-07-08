@@ -20,5 +20,7 @@ INSERT INTO `departments` VALUES ('d007','Sales');
 INSERT INTO `departments` VALUES ('d008','Research');
 INSERT INTO `departments` VALUES ('d009','Customer Service');
 UPDATE `departments` SET dept_name = 'DELL Alienware' WHERE dept_no = 'd009';
+--SELECT DOES NOT generate binlog event
+SELECT * FROM `departments`;
 DELETE FROM `departments`;
 COMMIT;
