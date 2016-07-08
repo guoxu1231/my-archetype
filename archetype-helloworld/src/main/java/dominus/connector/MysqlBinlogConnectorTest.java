@@ -88,7 +88,12 @@ public class MysqlBinlogConnectorTest extends MySqlZBaseTestCase {
                 if (EventType.ROTATE.equals(eventType) || EventType.FORMAT_DESCRIPTION.equals(eventType))
                     return;
                 else {
-                    assertEquals(eventTypeQueue.poll(), eventType);
+                    EventType expected = eventTypeQueue.poll();
+                    assertTrue(expected.equals(eventType)
+                            || (EventType.isWrite(eventType) && EventType.isWrite(expected))
+                            || (EventType.isUpdate(eventType) && EventType.isUpdate(expected)
+                            || (EventType.isDelete(eventType) && EventType.isDelete(expected))
+                    ));
                     if (eventTypeQueue.isEmpty()) disconnect();
                 }
             }
