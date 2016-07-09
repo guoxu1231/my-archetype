@@ -31,8 +31,8 @@ public class XmlBindingTest extends DominusJUnit4TestBase {
 
     @Override
     protected void doSetUp() throws Exception {
-        personXml = IOUtils.toString(resourceLoader.getResource("classpath:ws/xml/Person.xml").getURI(), "UTF-8");
-        invalidPersonXml = IOUtils.toString(resourceLoader.getResource("classpath:ws/xml/InvalidPerson.xml").getURI(), "UTF-8");
+        personXml = IOUtils.toString(resourceLoader.getResource("classpath:data/xml/Person.xml").getURI(), "UTF-8");
+        invalidPersonXml = IOUtils.toString(resourceLoader.getResource("classpath:data/xml/InvalidPerson.xml").getURI(), "UTF-8");
         System.out.println("[JUnit].setUp\n" + personXml);
         System.out.println("[JUnit].setUp\n" + invalidPersonXml);
     }
@@ -47,7 +47,7 @@ public class XmlBindingTest extends DominusJUnit4TestBase {
     @Test(expected = javax.xml.bind.UnmarshalException.class)
     public void testSchemaValidation() throws SAXException, JAXBException, IOException {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = sf.newSchema(resourceLoader.getResource("classpath:ws/xml/Person.xsd").getURL());
+        Schema schema = sf.newSchema(resourceLoader.getResource("classpath:data/xml/Person.xsd").getURL());
         Unmarshaller unmarshaller = JAXBContext.newInstance(PersonType.class).createUnmarshaller();
         unmarshaller.setSchema(schema);
         unmarshaller.setEventHandler(new MyValidationEventHandler());
