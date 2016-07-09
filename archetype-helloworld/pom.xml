@@ -409,6 +409,14 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                 <!--<artifactId>jingwei-core</artifactId>-->
                 <!--<version>2.1.1-SNAPSHOT</version>-->
                 <!--</dependency>-->
+
+                <!--EE: Elastic search -->
+                <dependency>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch</artifactId>
+                    <version>2.3.4</version>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>
@@ -447,9 +455,10 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.jms.kafka09.KafkaConsumerTestcase</include>
                         <include>dominus.intg.jms.kafka09.KafkaAdminTestCase</include>
                         <!--<include>dominus.intg.jms.kafka09.SpringKafkaTestCase</include>-->
-                        <!-- Mongodb -->
+                        <!-- Datastore -->
                         <include>dominus.intg.datastore.mongodb.MongoIntgTest</include>
                         <include>dominus.intg.datastore.redis.TestRedis</include>
+                        <include>dominus.intg.datastore.elasticsearch.TestElasticSearchClient</include>
                         <!-- ORM integration -->
                         <include>dominus.intg.datastore.persistent.mybatis.TestMyBatisDao</include>
                         <!-- java language -->

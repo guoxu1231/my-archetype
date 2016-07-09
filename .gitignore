@@ -1,3 +1,6 @@
+/archetype-microservice/target
+/archetype-microservice/.idea
+/archetype-microservice/archetype-microservice.iml
 /archetype-helloworld/derby.log
 /archetype-helloworld/archetype-helloworld.iml
 /archetype-helloworld/.idea
