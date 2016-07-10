@@ -489,7 +489,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <!-- The package of your generated sources -->
                     <packageName>dominus.intg.ws.jaxb.javabean</packageName>
                     <sources>
-                        <source>src/main/resources/ws/xml/Person.xsd</source>
+                        <source>src/main/resources/data/xml/Person.xsd</source>
                     </sources>
                 </configuration>
             </plugin>
