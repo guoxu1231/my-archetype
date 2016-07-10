@@ -8,7 +8,7 @@ os:
 sudo: required
 
 before_install:
-  - curl -O https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-2.3.4.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.4.deb && sudo service elasticsearch restart
+  - curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.4/elasticsearch-2.3.4.tar.gz && tar zxvf elasticsearch-2.3.4.tar.gz && elasticsearch-2.3.4/bin/elasticsearch
 
 install:
   - ./travis/install.sh
@@ -27,4 +27,3 @@ services:
   - mysql
   - mongodb
   - redis-server
-  - elasticsearch
