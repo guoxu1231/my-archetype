@@ -184,7 +184,7 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
      */
     @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k")
     @Test
-    public void testInvalidateConsumerSession() throws InterruptedException {
+    public void testDynamicPartitionTimeout() throws InterruptedException {
         Properties prop = new Properties();
         prop.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1");
         consumer = this.createDefaultConsumer(testTopicName, groupId, prop, null);
@@ -207,9 +207,31 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         }
     }
 
+    /**
+     * Manual Partition Assignment, Dynamic partition assignment and
+     * consumer group coordination(session.timeout.ms) are disabled.
+     *
+     * @throws InterruptedException
+     */
+    @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k")
     @Test
-    public void testDisableConsumerRebalance() {
+    public void testStaticPartition() throws InterruptedException {
+        Properties prop = new Properties();
+        prop.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1");
+        consumer = this.createDefaultConsumer(testTopicName, groupId, prop, Collections.singletonList(new TopicPartition(testTopicName, 0)));
+        String sessionTimeoutMS = kafkaConsumerProps.getProperty(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG);
 
+        while (true) {
+            ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
+            if (records.count() != 0) {
+                logger.info("kafka consumer received {} records", records.count());
+                assertTrue(records.count() == 1);
+                logger.info("sleep for SESSION_TIMEOUT_MS plus additional 10 seconds: {}", sessionTimeoutMS + 10 * Second);
+                //EE: manual assignment will never session timeout
+                Thread.sleep(Long.valueOf(sessionTimeoutMS) + 10 * Second);
+                consumer.commitSync();
+            }
+        }
     }
 
 
