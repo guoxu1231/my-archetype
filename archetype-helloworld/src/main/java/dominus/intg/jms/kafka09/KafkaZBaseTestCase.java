@@ -216,7 +216,7 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
         watch.start();
         for (long nEvents = 0; nEvents < count; nEvents++) {
             long runtime = new Date().getTime();
-            String ip = "192.168.2." + rnd.nextInt(255);
+            String ip = String.format("nEvents=%d 192.168.2.%d", nEvents, rnd.nextInt(255));
             String info = runtime + ",www.example.com," + ip;
             ProducerRecord<String, String> message;
             if (nEvents >= count / 2)
