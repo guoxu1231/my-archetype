@@ -247,16 +247,18 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
     }
 
     protected Consumer createDefaultConsumer(String subscribeTopic, String consumerGroupId, Properties overrideProps, Collection<TopicPartition> assignment) {
-        kafkaConsumerProps.put("bootstrap.servers", bootstrapServers);
-        kafkaConsumerProps.put("group.id", consumerGroupId);
+        Properties prop = new Properties();
+        prop.putAll(kafkaConsumerProps);
+        prop.put("bootstrap.servers", bootstrapServers);
+        prop.put("group.id", consumerGroupId);
         if (System.getProperty("java.security.auth.login.config") != null) {
-            kafkaConsumerProps.put("security.protocol", "SASL_PLAINTEXT");
-            kafkaConsumerProps.put("sasl.mechanism", "PLAIN");
+            prop.put("security.protocol", "SASL_PLAINTEXT");
+            prop.put("sasl.mechanism", "PLAIN");
         }
         if (overrideProps != null)
-            kafkaConsumerProps.putAll(overrideProps);
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(kafkaConsumerProps);
-        printf(ANSI_BLUE, "create new consumer - [%s]\n", kafkaConsumerProps.getProperty("group.id"));
+            prop.putAll(overrideProps);
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(prop);
+        printf(ANSI_BLUE, "create new consumer - [%s]\n", prop.getProperty("group.id"));
         ConsumerRebalanceListener rebalanceListener = new ConsumerRebalanceListener() {
             @Override
             public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
