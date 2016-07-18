@@ -446,6 +446,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <!-- Misc -->
                         <include>dominus.intg.scripting.GroovyIntgTest</include>
                         <include>dominus.intg.ws.jaxb.XmlBindingTest</include>
+                        <include>dominus.framework.retry.TestRetryTemplate</include>
                         <!--<include>dominus.intg.jmx.TestGroovyMBean</include>-->
                         <!-- RPC -->
                         <!--<include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>-->
