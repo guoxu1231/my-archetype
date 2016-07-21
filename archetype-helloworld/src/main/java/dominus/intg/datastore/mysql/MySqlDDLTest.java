@@ -1,6 +1,7 @@
 package dominus.intg.datastore.mysql;
 
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,7 +17,7 @@ import static junit.framework.TestCase.assertTrue;
 
 public class MySqlDDLTest extends MySqlZBaseTestCase {
 
-    JdbcTemplate ddlTemplate;
+    protected JdbcTemplate ddlTemplate;
 
     @Autowired
     @Qualifier("mysql_ddl_dataSource")
@@ -56,7 +57,10 @@ public class MySqlDDLTest extends MySqlZBaseTestCase {
     }
 
     @Test
-    public void testCreateDatabase() {
-        ddlTemplate.execute("CREATE DATABASE IF NOT EXISTS test01");
+    public void testCreateDatabaseDDL() {
+        String testDatabase = "TEST_DB_" + RandomStringUtils.randomAlphabetic(15);
+        ddlTemplate.execute("CREATE DATABASE IF NOT EXISTS " + testDatabase);
+        assertEquals(testDatabase, ddlTemplate.queryForObject(String.format("show databases like \'%s\'", testDatabase), String.class));
+        ddlTemplate.execute("DROP DATABASE IF EXISTS " + testDatabase);
     }
 }
