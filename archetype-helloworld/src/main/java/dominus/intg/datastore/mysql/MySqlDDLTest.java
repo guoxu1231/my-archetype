@@ -2,8 +2,11 @@ package dominus.intg.datastore.mysql;
 
 
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,23 +16,27 @@ import static junit.framework.TestCase.assertTrue;
 
 public class MySqlDDLTest extends MySqlZBaseTestCase {
 
-    JdbcTemplate stageDSTemplate;
+    JdbcTemplate ddlTemplate;
+
+    @Autowired
+    @Qualifier("mysql_ddl_dataSource")
+    protected DataSource ddlDS;
 
     @Override
     protected void doSetUp() throws Exception {
-        stageDSTemplate = new JdbcTemplate(stageMysqlDS);
+        ddlTemplate = new JdbcTemplate(ddlDS);
     }
 
     @Override
     protected void doTearDown() throws Exception {
-        stageDSTemplate.execute("DROP TABLE IF EXISTS iops_schema.test_employees");
+        ddlTemplate.execute("DROP TABLE IF EXISTS iops_schema.test_employees");
     }
 
     //CREATE TABLE ... LIKE Syntax
     @Test
     public void testCreateStageTable() throws SQLException {
-        stageDSTemplate.execute("DROP TABLE IF EXISTS iops_schema.test_employees");
-        stageDSTemplate.execute("CREATE TABLE iops_schema.test_employees LIKE employees.employees");
+        ddlTemplate.execute("DROP TABLE IF EXISTS iops_schema.test_employees");
+        ddlTemplate.execute("CREATE TABLE iops_schema.test_employees LIKE employees.employees");
 
         //compare column metadata
         DatabaseMetaData sourceMetaData = sourceMysqlDS.getConnection().getMetaData();
@@ -46,5 +53,10 @@ public class MySqlDDLTest extends MySqlZBaseTestCase {
             assertEquals(sourceColumns.getString("TYPE_NAME"), stageColumns.getString("TYPE_NAME"));
             assertEquals(sourceColumns.getString("COLUMN_SIZE"), stageColumns.getString("COLUMN_SIZE"));
         }
+    }
+
+    @Test
+    public void testCreateDatabase() {
+        ddlTemplate.execute("CREATE DATABASE IF NOT EXISTS test01");
     }
 }
