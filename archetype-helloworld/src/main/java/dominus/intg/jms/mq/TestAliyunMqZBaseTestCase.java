@@ -207,7 +207,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
         OnsSubscriptionDeleteResponse response = null;
         try {
             response = iAcsClient.getAcsResponse(request);
-            System.out.printf("[AliyunMq TestConsumer] %s is created for %s!\nRequestId=%s, HelpUrl=%s\n",
+            System.out.printf("[AliyunMq TestConsumer] %s is deleted for %s!\nRequestId=%s, HelpUrl=%s\n",
                     testConsumerId, testTopicId, response.getRequestId(), response.getHelpUrl());
         } catch (ClientException e) {
             System.out.printf("[AliyunMq TestConsumer] %s fail to be deleted %s!\n",
