@@ -405,10 +405,17 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
 
                 <!--EE:aliyun jingwei -->
                 <!--<dependency>-->
-                <!--<groupId>com.taobao.jingwei</groupId>-->
-                <!--<artifactId>jingwei-core</artifactId>-->
-                <!--<version>2.1.1-SNAPSHOT</version>-->
+                    <!--<groupId>com.taobao.jingwei</groupId>-->
+                    <!--<artifactId>jingwei-core</artifactId>-->
+                    <!--<version>2.1.1-SNAPSHOT</version>-->
                 <!--</dependency>-->
+
+                <!-- EE: aliyun RDS -->
+                <dependency>
+                    <groupId>com.aliyun</groupId>
+                    <artifactId>aliyun-java-sdk-rds</artifactId>
+                    <version>2.0.2</version>
+                </dependency>
 
                 <!--EE: Elastic search -->
                 <dependency>
@@ -442,6 +449,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <!-- JDBC begin-->
                         <include>dominus.intg.datastore.mysql.MySqlDDLTest</include>
                         <include>dominus.intg.datastore.mysql.MySqlMetaDataTest</include>
+                        <include>dominus.intg.datastore.mysql.MySqlJDBCShardTest</include>
                         <include>dominus.connector.MysqlBinlogConnectorTest</include>
                         <!-- Misc -->
                         <include>dominus.intg.scripting.GroovyIntgTest</include>

@@ -19,4 +19,8 @@ public class MySqlZBaseTestCase extends DominusJUnit4TestBase {
     @Qualifier("mysql_dataSource_local_iops")
     protected DataSource stageMysqlDS;
 
+    @Autowired
+    @Qualifier("mysql_ddl_dataSource")
+    protected DataSource ddlDS;
+
 }

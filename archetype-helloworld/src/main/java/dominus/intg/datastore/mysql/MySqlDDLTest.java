@@ -3,11 +3,8 @@ package dominus.intg.datastore.mysql;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,10 +15,6 @@ import static junit.framework.TestCase.assertTrue;
 public class MySqlDDLTest extends MySqlZBaseTestCase {
 
     protected JdbcTemplate ddlTemplate;
-
-    @Autowired
-    @Qualifier("mysql_ddl_dataSource")
-    protected DataSource ddlDS;
 
     @Override
     protected void doSetUp() throws Exception {
