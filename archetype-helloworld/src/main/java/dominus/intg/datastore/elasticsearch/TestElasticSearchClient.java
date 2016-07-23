@@ -51,6 +51,8 @@ public class TestElasticSearchClient extends DominusJUnit4TestBase {
                         setSource(accountsArray[i + 1]).get();
                 logger.info(indexResponse.toString());
             }
+            //wait for index analyzing. //TODO indexing status??
+            Thread.sleep(10 * Second);
         }
 
         //TODO import employee & department one-to-many relationshop.
