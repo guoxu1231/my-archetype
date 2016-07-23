@@ -87,6 +87,14 @@ public class DominusJUnit4TestBase {
         out.print(ANSI_RESET);
     }
 
+    public void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     protected static final int KB = 1024;
     protected static final int MB = 1048576;
     protected static final long GB = 1073741824L;
