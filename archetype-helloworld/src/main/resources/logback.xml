@@ -23,7 +23,7 @@
         <appender-ref ref="STDOUT_SHORT"/>
     </root>
 
-    <logger name="dominus" level="INFO"/>
+    <logger name="dominus" level="WARN"/>
     <!--<logger name="org.springframework.jms" level="ALL" />-->
     <!--<logger name="org.apache.activemq" level="ALL" />-->
     <logger name="net.spy.memcached" level="INFO"/>
