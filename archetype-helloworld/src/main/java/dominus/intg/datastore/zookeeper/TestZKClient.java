@@ -8,8 +8,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class TestZKClient extends DominusJUnit4TestBase implements Watcher {
 
@@ -68,5 +71,15 @@ public class TestZKClient extends DominusJUnit4TestBase implements Watcher {
         assertEquals("[active-node-01]", Arrays.toString(_zkClient.getChildren(ACTIVE_NODE_PATH, true).toArray()));
         testClient.close();
         sleep(100);
+    }
+
+    @Test
+    public void testSessionTimeout() throws IllegalAccessException, InterruptedException {
+        Thread sendThread = (Thread) FieldUtils.readDeclaredField(_clientCnxn, "sendThread", true);
+        sendThread.suspend();
+        sleep(CONN_TIMEOUT);
+        sendThread.resume();//Unable to reconnect to ZooKeeper service, session 0x15618178233000d has expired, closing socket connection
+        sleep(1000);
+        assertFalse(_zkClient.getState().isAlive());
     }
 }
