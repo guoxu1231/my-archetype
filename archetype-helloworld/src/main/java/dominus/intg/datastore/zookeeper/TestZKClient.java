@@ -77,7 +77,7 @@ public class TestZKClient extends DominusJUnit4TestBase implements Watcher {
         sendThread.suspend();
         sleep(CONN_TIMEOUT);
         sendThread.resume();//Unable to reconnect to ZooKeeper service, session 0x15618178233000d has expired, closing socket connection
-        sleep(1000);
+        sleep(2000);
         assertFalse(_zkClient.getState().isAlive());
     }
 }
