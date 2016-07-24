@@ -4,9 +4,13 @@ package dominus.intg.datastore.elasticsearch;
 import dominus.framework.junit.DominusJUnit4TestBase;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequest;
+import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
+import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -14,11 +18,13 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
 
 import java.net.InetAddress;
+import java.util.Arrays;
+import java.util.List;
 
+import static org.elasticsearch.index.query.QueryBuilders.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -53,6 +59,9 @@ public class TestElasticSearchClient extends DominusJUnit4TestBase {
             }
             //wait for index analyzing. //TODO indexing status??
             Thread.sleep(10 * Second);
+        } else {
+            GetIndexResponse getIndexResponse = client.admin().indices().getIndex(new GetIndexRequest().indices(TEST_INDEX)).get();
+            out.printf("[Index]:%s [Settings]:%s\n", TEST_INDEX, Arrays.toString(getIndexResponse.settings().get(TEST_INDEX).getAsStructuredMap().entrySet().toArray()));
         }
 
         //TODO import employee & department one-to-many relationshop.
@@ -75,22 +84,37 @@ public class TestElasticSearchClient extends DominusJUnit4TestBase {
 
         //EE:Term level queries, the term-level queries operate on the exact terms that are stored in the inverted index.
         // term query, range query
-        QueryBuilder rangeQuery = QueryBuilders.rangeQuery("age").from(40).includeLower(true);
+        QueryBuilder rangeQuery = rangeQuery("age").from(40).includeLower(true);
         /**
          * Every fields are analyzed by default. It means that "ABC" will be indexed as "abc" (lower case).
          You have to use term query or term filter with string in LOWER CASE.
          */
-        QueryBuilder termQuery = QueryBuilders.termQuery("firstname", "alexandra");
+        QueryBuilder termQuery = termQuery("firstname", "alexandra");
+        //age=40 and (gender = 'f' or gender = 'm')
+        QueryBuilder boolQuery1 = boolQuery().must(termQuery("age", 40)).
+                must(boolQuery().should(termQuery("gender", "f")).should(termQuery("gender", "m")));
 
-        assertEquals(45, search(TEST_INDEX, rangeQuery, 5).getHits().getTotalHits());
-        assertEquals(1, search(TEST_INDEX, termQuery, 10).getHits().getTotalHits());
+        assertEquals(45, search(TEST_INDEX, rangeQuery, 3).getHits().getTotalHits());
+        assertEquals(1, search(TEST_INDEX, termQuery, 3).getHits().getTotalHits());
+        assertEquals(45, search(TEST_INDEX, boolQuery1, 3).getHits().getTotalHits());
 
         //EE: Full text queries,
         //apply each field’s analyzer (or search_analyzer) to the query string before executing.
-        QueryBuilder matchQuery = QueryBuilders.matchQuery("address", "JOVAL Fenimore WilliamsburG");
+        QueryBuilder matchQuery = matchQuery("address", "JOVAL Fenimore WilliamsburG");
 
-        assertEquals(3, search(TEST_INDEX, matchQuery, 10).getHits().getTotalHits());
+        assertEquals(3, search(TEST_INDEX, matchQuery, 3).getHits().getTotalHits());
 
+    }
+
+    @Test
+    public void testAnalyzer() {
+        AnalyzeRequest request = (new AnalyzeRequest("customer").text("XHDK-A-1293-#fJ3")).analyzer("standard");
+        List<AnalyzeResponse.AnalyzeToken> tokens = client.admin().indices().analyze(request).actionGet().getTokens();
+        for (AnalyzeResponse.AnalyzeToken token : tokens) {
+            //All letters have been lowercased.
+            //We lost the hyphen and the hash (#) sign.
+            out.println(token.getTerm());
+        }
     }
 
 
