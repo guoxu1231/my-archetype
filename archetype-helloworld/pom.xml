@@ -424,6 +424,13 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <version>2.3.4</version>
                 </dependency>
 
+                <!--EE: RocksDB -->
+                <dependency>
+                    <groupId>org.rocksdb</groupId>
+                    <artifactId>rocksdbjni</artifactId>
+                    <version>4.8.0</version>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>
