@@ -4,6 +4,7 @@ package dominus.intg.datastore.zookeeper;
 import dominus.framework.junit.DominusJUnit4TestBase;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.zookeeper.*;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -71,7 +72,7 @@ public class TestZKClient extends DominusJUnit4TestBase implements Watcher {
         sleep(100);
     }
 
-    @Test
+    @Ignore
     public void testSessionTimeout() throws IllegalAccessException, InterruptedException {
         Thread sendThread = (Thread) FieldUtils.readDeclaredField(_clientCnxn, "sendThread", true);
         sendThread.suspend();
