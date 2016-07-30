@@ -31,11 +31,12 @@ public class TestJsonBinding extends DominusJUnit4TestBase {
 
         ObjectMapper mapper = new ObjectMapper();// create once, reuse
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        mapper.setDateFormat(simpleDateFormat);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         mapper.writeValue(out, employee);
         String output = new String(out.toByteArray());
         System.out.println(output);
-        assertEquals("{\"empNo\":21086,\"birthDate\":\"1985-03-18T01:30:30.000+0000\",\"firstName\":\"shawn\",\"lastName\":\"guo\",\"gender\":\"M\",\"hireDate\":null}", output);
+        assertEquals("{\"empNo\":21086,\"birthDate\":\"19850318-09:30:30.000\",\"firstName\":\"shawn\",\"lastName\":\"guo\",\"gender\":\"M\",\"hireDate\":null}", output);
     }
 }
