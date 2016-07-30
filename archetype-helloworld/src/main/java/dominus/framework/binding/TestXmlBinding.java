@@ -1,8 +1,8 @@
-package dominus.intg.ws.jaxb;
+package dominus.framework.binding;
 
 
+import dominus.framework.binding.bean.PersonType;
 import dominus.framework.junit.DominusJUnit4TestBase;
-import dominus.intg.ws.jaxb.javabean.PersonType;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
  * 2, Generate XSD schema from XML document;
  * 3, Use XML2JavaCompiler(jxc) to generate java classes;
  */
-public class XmlBindingTest extends DominusJUnit4TestBase {
+public class TestXmlBinding extends DominusJUnit4TestBase {
 
     String personXml;
     String invalidPersonXml;

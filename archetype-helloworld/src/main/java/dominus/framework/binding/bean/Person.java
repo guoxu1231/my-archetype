@@ -1,4 +1,4 @@
-package dominus.intg.ws.jaxb;
+package dominus.framework.binding.bean;
 
 
 import javax.xml.bind.annotation.XmlAccessType;
