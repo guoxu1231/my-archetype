@@ -108,7 +108,7 @@ public class TestElasticSearchClient extends DominusJUnit4TestBase {
 
     @Test
     public void testAnalyzer() {
-        AnalyzeRequest request = (new AnalyzeRequest("customer").text("XHDK-A-1293-#fJ3")).analyzer("standard");
+        AnalyzeRequest request = (new AnalyzeRequest(TEST_INDEX).text("XHDK-A-1293-#fJ3")).analyzer("standard");
         List<AnalyzeResponse.AnalyzeToken> tokens = client.admin().indices().analyze(request).actionGet().getTokens();
         for (AnalyzeResponse.AnalyzeToken token : tokens) {
             //All letters have been lowercased.
