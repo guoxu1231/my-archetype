@@ -1,4 +1,4 @@
-package dominus.intg.jms.kafka09;
+package dominus.intg.jms.kafka;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
@@ -10,7 +10,6 @@ import kafka.utils.ZKStringSerializer$;
 import kafka.utils.ZkUtils;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.ZkConnection;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.KafkaConsumer;

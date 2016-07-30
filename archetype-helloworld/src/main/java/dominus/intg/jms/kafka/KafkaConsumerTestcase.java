@@ -1,4 +1,4 @@
-package dominus.intg.jms.kafka09;
+package dominus.intg.jms.kafka;
 
 
 import dominus.framework.junit.annotation.MessageQueueTest;
@@ -6,7 +6,6 @@ import kafka.common.MessageFormatter;
 import kafka.coordinator.GroupMetadataManager;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.kafka.clients.consumer.*;
-import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.junit.Test;
@@ -20,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 
 public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
 
-    Producer producer;
     Consumer<String, String> consumer;
 
     @Override
@@ -30,9 +28,8 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         //produce test message according to the test annotation
         if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
             this.createTestTopic(testTopicName);
-            producer = this.createDefaultProducer(null);
             //prepare message
-            produceTestMessage(producer, testTopicName, messageQueueAnnotation.count());
+            produceTestMessage(_producer, testTopicName, messageQueueAnnotation.count());
             assertEquals(messageQueueAnnotation.count(), sumPartitionOffset(brokerList, testTopicName));
         }
     }
@@ -40,7 +37,6 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
     @Override
     protected void doTearDown() throws Exception {
         if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
-            if (producer != null) producer.close();
             this.deleteTestTopic(testTopicName);
         }
         if (consumer != null) consumer.close();

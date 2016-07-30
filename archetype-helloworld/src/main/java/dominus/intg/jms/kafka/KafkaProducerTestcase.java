@@ -1,4 +1,4 @@
-package dominus.intg.jms.kafka09;
+package dominus.intg.jms.kafka;
 
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;

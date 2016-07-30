@@ -1,4 +1,4 @@
-package dominus.intg.jms.kafka09.ext;
+package dominus.intg.jms.kafka.ext;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -6,13 +6,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.kafka.common.Cluster;
 import org.apache.log4j.Logger;
 import org.apache.kafka.clients.producer.Partitioner;
-import kafka.utils.VerifiableProperties;
 
 /**
  * Round robin partitioner using a simple thread safe AotmicInteger
  */
 public class RoundRobinPartitioner implements Partitioner {
-    private static final Logger log = Logger.getLogger(dominus.intg.jms.kafka09.ext.RoundRobinPartitioner.class);
+    private static final Logger log = Logger.getLogger(dominus.intg.jms.kafka.ext.RoundRobinPartitioner.class);
 
     final AtomicInteger counter = new AtomicInteger(0);
 

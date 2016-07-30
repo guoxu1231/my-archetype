@@ -75,6 +75,12 @@
                     <version>3.0.6.RELEASE</version>
                 </dependency>
 
+                <!-- EE: JSON Bingding-->
+                <dependency>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                    <version>2.6.7</version>
+                </dependency>
 
                 <!-- JMS -->
                 <dependency>
@@ -135,6 +141,17 @@
                     <groupId>org.scala-lang</groupId>
                     <artifactId>scala-library</artifactId>
                     <version>${scala.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-streams</artifactId>
+                    <version>0.10.0.0</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
                 <!-- EE: Apache Kafka end -->
                 <!-- 0.4 with kafka 0.8.2.2, 0.7 with kafka 0.9-->
@@ -405,9 +422,9 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
 
                 <!--EE:aliyun jingwei -->
                 <!--<dependency>-->
-                    <!--<groupId>com.taobao.jingwei</groupId>-->
-                    <!--<artifactId>jingwei-core</artifactId>-->
-                    <!--<version>2.1.1-SNAPSHOT</version>-->
+                <!--<groupId>com.taobao.jingwei</groupId>-->
+                <!--<artifactId>jingwei-core</artifactId>-->
+                <!--<version>2.1.1-SNAPSHOT</version>-->
                 <!--</dependency>-->
 
                 <!-- EE: aliyun RDS -->
@@ -460,16 +477,18 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.connector.MysqlBinlogConnectorTest</include>
                         <!-- Misc -->
                         <include>dominus.intg.scripting.GroovyIntgTest</include>
-                        <include>dominus.intg.ws.jaxb.XmlBindingTest</include>
+                        <include>dominus.framework.binding.TestXmlBinding</include>
+                        <include>dominus.framework.binding.TestJsonBinding</include>
                         <include>dominus.framework.retry.TestRetryTemplate</include>
                         <!--<include>dominus.intg.jmx.TestGroovyMBean</include>-->
                         <!-- RPC -->
                         <!--<include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>-->
                         <!-- Kafka & ZK -->
-                        <include>dominus.intg.jms.kafka09.KafkaEmbeddedServerTestCase</include>
-                        <include>dominus.intg.jms.kafka09.KafkaProducerTestcase</include>
-                        <include>dominus.intg.jms.kafka09.KafkaConsumerTestcase</include>
-                        <include>dominus.intg.jms.kafka09.KafkaAdminTestCase</include>
+                        <include>dominus.intg.jms.kafka.KafkaEmbeddedServerTestCase</include>
+                        <include>dominus.intg.jms.kafka.KafkaProducerTestcase</include>
+                        <include>dominus.intg.jms.kafka.KafkaConsumerTestcase</include>
+                        <include>dominus.intg.jms.kafka.KafkaAdminTestCase</include>
+                        <include>dominus.intg.jms.kafka.TestKafkaStream</include>
                         <!--<include>dominus.intg.jms.kafka09.SpringKafkaTestCase</include>-->
                         <!-- Datastore -->
                         <include>dominus.intg.datastore.mongodb.MongoIntgTest</include>
@@ -504,7 +523,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                 <configuration>
                     <sourceType>xmlschema</sourceType>
                     <!-- The package of your generated sources -->
-                    <packageName>dominus.intg.ws.jaxb.javabean</packageName>
+                    <packageName>dominus.framework.binding.bean</packageName>
                     <sources>
                         <source>src/main/resources/data/xml/Person.xsd</source>
                     </sources>

@@ -1,4 +1,4 @@
-package dominus.intg.jms.kafka09;
+package dominus.intg.jms.kafka;
 
 
 import dominus.framework.junit.annotation.MessageQueueTest;
