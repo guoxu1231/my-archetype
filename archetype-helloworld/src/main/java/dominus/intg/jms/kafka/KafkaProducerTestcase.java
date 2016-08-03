@@ -15,14 +15,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
  * EE: Consumer API, Producer API, Admin API
- * <p/>
+ * <p>
  * [External Dependencies]
  * CDH Cluster(Kafka Cluster, Zookeeper);
  * Kafka Test Topic;
@@ -108,4 +107,41 @@ public class KafkaProducerTestcase extends KafkaZBaseTestCase {
     }
 
 
+    @MessageQueueTest(produceTestMessage = true, count = 2)
+    @Test
+    public void testBatchSendLinger() throws InterruptedException, ExecutionException, TimeoutException {
+        Properties prop = new Properties();
+        prop.setProperty(ProducerConfig.CLIENT_ID_CONFIG, "kafka-producer-" + testTopicName);
+        prop.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, "500");
+        prop.setProperty(ProducerConfig.LINGER_MS_CONFIG, "6000");
+        //EE: linger.ms
+        // By default a buffer is available to send immediately even if there is additional unused space in the buffer. However if you want to reduce the number of requests you can set linger.ms to something greater than 0.
+        //This will instruct the producer to wait up to that number of milliseconds before sending a request in hope that more records will arrive to fill up the same batch.
+        producer = this.createDefaultProducer(prop);
+        int count = messageQueueAnnotation.count();
+        Random rnd = new Random();
+        CountDownLatch latch = new CountDownLatch(count);
+
+        StopWatch watch = new StopWatch("[KafkaSimpleProducer] message count:" + count);
+        watch.start();
+        for (long nEvents = 0; nEvents < count; nEvents++) {
+            long runtime = new Date().getTime();
+            String ip = "192.168.2." + rnd.nextInt(255);
+            String info = runtime + ",www.example.com," + ip;
+            ProducerRecord<String, String> message = new ProducerRecord<String, String>(testTopicName, ip, info);
+
+            producer.send(message, (medadata, exception) -> {
+                if (exception != null) {
+                    logger.error(exception.toString());
+                } else {
+                    logger.info("[acknowledged message]:{}, {}, {}", medadata.topic(), medadata.partition(), medadata.offset());
+                }
+            });
+            latch.countDown();
+        }
+        assertTrue(latch.await(120, TimeUnit.SECONDS));
+        assertEquals(0, sumPartitionOffset(brokerList, testTopicName));
+        producer.flush();
+        assertEquals(2, sumPartitionOffset(brokerList, testTopicName));
+    }
 }
