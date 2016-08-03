@@ -10,6 +10,8 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,6 +21,15 @@ import static org.junit.Assert.assertEquals;
  * https://github.com/FasterXML/jackson-databind/
  */
 public class TestJsonBinding extends DominusJUnit4TestBase {
+    ObjectMapper mapper;
+
+    @Override
+    protected void doSetUp() throws Exception {
+        super.doSetUp();
+        mapper = new ObjectMapper();// create once, reuse
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        mapper.setDateFormat(simpleDateFormat);
+    }
 
     @Test
     public void testBean2Json() throws IOException, ParseException {
@@ -29,14 +40,29 @@ public class TestJsonBinding extends DominusJUnit4TestBase {
         employee.setEmpNo(21086);
         employee.setGender('M');
 
-        ObjectMapper mapper = new ObjectMapper();// create once, reuse
-        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-        mapper.setDateFormat(simpleDateFormat);
+        String json = convertToJSONString(employee);
+        System.out.println(json);
+        assertEquals("{\"empNo\":21086,\"birthDate\":\"19850318-09:30:30.000\",\"firstName\":\"shawn\",\"lastName\":\"guo\",\"gender\":\"M\",\"hireDate\":null}", json);
+    }
 
+    @Test
+    public void testMap2Json() throws ParseException, IOException {
+        Map<String, Object> empMap = new HashMap<>();
+        empMap.put("firstName", "shawn");
+        empMap.put("birthDate", simpleDateFormat.parse("19850318-09:30:30.000"));
+
+        String json = convertToJSONString(empMap);
+        System.out.println(json);
+        assertEquals("{\"firstName\":\"shawn\",\"birthDate\":\"19850318-09:30:30.000\"}", json);
+    }
+
+    public String convertToJSONString(Object obj) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        mapper.writeValue(out, employee);
-        String output = new String(out.toByteArray());
-        System.out.println(output);
-        assertEquals("{\"empNo\":21086,\"birthDate\":\"19850318-09:30:30.000\",\"firstName\":\"shawn\",\"lastName\":\"guo\",\"gender\":\"M\",\"hireDate\":null}", output);
+        try {
+            mapper.writeValue(out, obj);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new String(out.toByteArray());
     }
 }
