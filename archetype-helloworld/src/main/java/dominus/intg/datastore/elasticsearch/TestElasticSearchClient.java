@@ -6,23 +6,34 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequest;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
+import org.elasticsearch.action.bulk.BulkProcessor;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 import static org.junit.Assert.assertEquals;
@@ -44,9 +55,14 @@ public class TestElasticSearchClient extends DominusJUnit4TestBase {
         client = TransportClient.builder().build()
                 .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(properties.getProperty("elastic.search.address")),
                         Integer.valueOf(properties.getProperty("elastic.search.port"))));
-        //EE: load test data
+        //EE: load test data(manual refresh)
         if (!client.admin().indices().exists(new IndicesExistsRequest(new String[]{TEST_INDEX})).get().isExists()) {
-            CreateIndexResponse response = client.admin().indices().create(new CreateIndexRequest(TEST_INDEX)).get();
+            CreateIndexResponse response = client.admin().indices().prepareCreate(TEST_INDEX).
+                    setSettings(Settings.builder()
+                            .put("index.number_of_shards", 3)
+                            .put("index.number_of_replicas", 1)
+                            .put("index.refresh_interval", -1)).
+                    get();
             assertTrue(response.isAcknowledged());
             out.printf("create test index %s [acknowledged]\n", TEST_INDEX);
 
@@ -57,15 +73,16 @@ public class TestElasticSearchClient extends DominusJUnit4TestBase {
                         setSource(accountsArray[i + 1]).get();
                 logger.info(indexResponse.toString());
             }
-            //wait for index analyzing. //TODO indexing status??
-            Thread.sleep(10 * Second);
-        } else {
-            GetIndexResponse getIndexResponse = client.admin().indices().getIndex(new GetIndexRequest().indices(TEST_INDEX)).get();
-            out.printf("[Index]:%s [Settings]:%s\n", TEST_INDEX, Arrays.toString(getIndexResponse.settings().get(TEST_INDEX).getAsStructuredMap().entrySet().toArray()));
+
+            //EE: refresh index segment to make it searchable
+            assertEquals(0, search(TEST_INDEX, matchAllQuery(), 3).getHits().getTotalHits());
+            client.admin().indices().prepareRefresh(TEST_INDEX).get();
+            assertEquals(1000, search(TEST_INDEX, matchAllQuery(), 3).getHits().getTotalHits());
         }
 
+        GetIndexResponse getIndexResponse = client.admin().indices().getIndex(new GetIndexRequest().indices(TEST_INDEX)).get();
+        out.printf("[Index]:%s [Settings]:%s\n", TEST_INDEX, Arrays.toString(getIndexResponse.settings().get(TEST_INDEX).getAsStructuredMap().entrySet().toArray()));
         //TODO import employee & department one-to-many relationshop.
-
 //        client.search()
     }
 
@@ -103,8 +120,26 @@ public class TestElasticSearchClient extends DominusJUnit4TestBase {
         QueryBuilder matchQuery = matchQuery("address", "JOVAL Fenimore WilliamsburG");
 
         assertEquals(3, search(TEST_INDEX, matchQuery, 3).getHits().getTotalHits());
+    }
+
+
+    @Test
+    public void testAggregation() {
+
+        AbstractAggregationBuilder aggregation =
+                AggregationBuilders
+                        .terms("age_terms").field("age");
+//                        .field("age");
+//        SearchResponse response = client.prepareSearch(TEST_INDEX).setTypes(TEST_INDEX_TYPE)
+//                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+//                .setQuery(matchAllQuery())
+//                .addAggregation(aggregation)
+//                .setSize(0).setExplain(false).execute().actionGet();
+        aggregateSearch(TEST_INDEX, matchAllQuery(), aggregation);
+//        logger.info(response.toString());
 
     }
+
 
     @Test
     public void testAnalyzer() {
@@ -117,14 +152,62 @@ public class TestElasticSearchClient extends DominusJUnit4TestBase {
         }
     }
 
+    @Test
+    public void testBulKLoad() throws IOException, InterruptedException {
+        String indexName = TEST_INDEX + "-" + new Date().getTime();
+
+        CreateIndexResponse response = client.admin().indices().prepareCreate(indexName).get();
+        assertTrue(response.isAcknowledged());
+
+        BulkProcessor bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
+            @Override
+            public void beforeBulk(long executionId, BulkRequest request) {
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request, BulkResponse response) {
+            }
+
+            @Override
+            public void afterBulk(long executionId, BulkRequest request, Throwable failure) {
+
+            }
+        }).
+                setBulkActions(1001).
+                setConcurrentRequests(1).build();
+        String accounts = IOUtils.toString(resourceLoader.getResource("classpath:data/json/accounts.json").getURI(), "UTF-8");
+        String[] accountsArray = accounts.split("\n");
+        for (int i = 0; i < accountsArray.length; i += 2) {
+            bulkProcessor.add(new IndexRequest(indexName, TEST_INDEX_TYPE, StringUtils.substringBetween(accountsArray[i], "\"_id\":", "}")).source(accountsArray[i + 1]));
+        }
+        assertEquals(0, search(indexName, matchAllQuery(), 3).getHits().getTotalHits());
+        bulkProcessor.awaitClose(1, TimeUnit.MINUTES);
+        assertEquals(1000, search(TEST_INDEX, matchAllQuery(), 3).getHits().getTotalHits());
+        client.admin().indices().prepareDelete(indexName).get();
+    }
+
 
     SearchResponse search(String index, QueryBuilder queryBuilder, int size) {
-        println(ANSI_BLUE, "[JSON GENERATED QUERY]\n" + queryBuilder);
-        SearchResponse response = client.prepareSearch(TEST_INDEX).setTypes(TEST_INDEX_TYPE)
+        SearchRequestBuilder builder = client.prepareSearch(index).setTypes(TEST_INDEX_TYPE)
                 .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(queryBuilder)
-                .setFrom(0).setSize(size).setExplain(false).execute().actionGet();
+                .setFrom(0).setSize(size).setExplain(false);
+        println(ANSI_BLUE, "[JSON GENERATED QUERY]\n" + builder);
+        SearchResponse response = builder.execute().actionGet();
         logger.info(response.toString());
         return response;
+    }
+
+    Aggregation aggregateSearch(String index, QueryBuilder queryBuilder, AbstractAggregationBuilder aggBuilder) {
+
+        SearchRequestBuilder builder = client.prepareSearch(index).setTypes(TEST_INDEX_TYPE)
+                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+                .setQuery(queryBuilder)
+                .addAggregation(aggBuilder)
+                .setFrom(0).setSize(0).setExplain(false);
+        println(ANSI_BLUE, "[JSON GENERATED QUERY]\n" + builder);
+        SearchResponse response = builder.execute().actionGet();
+        logger.info(response.toString());
+        return response.getAggregations().get(aggBuilder.getName());
     }
 }
