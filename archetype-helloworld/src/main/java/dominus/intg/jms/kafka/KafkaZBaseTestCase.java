@@ -13,10 +13,7 @@ import org.I0Itec.zkclient.ZkConnection;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.ContextConfiguration;
@@ -189,18 +186,21 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
      * Follow Aliyun ONS behaviours.Load props from property file or constant.
      */
     protected Producer createDefaultProducer(Properties overrideProps) {
-        kafkaProducerProps.put("bootstrap.servers", bootstrapServers);
+        Properties prop = new Properties();
+        prop.putAll(kafkaProducerProps);
+        prop.put("bootstrap.servers", bootstrapServers);
+        prop.setProperty(ProducerConfig.CLIENT_ID_CONFIG, "kafka-producer-" + new Date().getTime());
         if (System.getProperty("java.security.auth.login.config") != null) {
-            kafkaProducerProps.put("security.protocol", "SASL_PLAINTEXT");
-            kafkaProducerProps.put("sasl.mechanism", "PLAIN");
+            prop.put("security.protocol", "SASL_PLAINTEXT");
+            prop.put("sasl.mechanism", "PLAIN");
         }
         //EE: important parameter
 
 
         if (overrideProps != null)
-            kafkaProducerProps.putAll(overrideProps);
+            prop.putAll(overrideProps);
 //        kafkaProducerProps.list(out);
-        Producer<String, String> producer = new KafkaProducer<>(kafkaProducerProps);
+        Producer<String, String> producer = new KafkaProducer<>(prop);
         return producer;
     }
 
