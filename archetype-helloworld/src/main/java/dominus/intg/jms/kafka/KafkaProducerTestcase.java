@@ -5,12 +5,11 @@ import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.PartitionInfo;
 import org.junit.Test;
 import org.springframework.util.StopWatch;
 
-import java.util.Date;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -144,4 +143,12 @@ public class KafkaProducerTestcase extends KafkaZBaseTestCase {
         producer.flush();
         assertEquals(2, sumPartitionOffset(brokerList, testTopicName));
     }
+
+    @Test
+    public void testPartitionsFor() throws InterruptedException {
+        List<PartitionInfo> partitionInfos = _producer.partitionsFor(testTopicName);
+        out.println(Arrays.toString(partitionInfos.toArray()));
+        assertEquals(numPartitions, partitionInfos.size());
+    }
+
 }
