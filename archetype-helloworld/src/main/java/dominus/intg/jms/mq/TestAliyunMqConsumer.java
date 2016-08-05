@@ -5,6 +5,8 @@ import com.aliyun.openservices.ons.api.*;
 import com.aliyuncs.exceptions.ClientException;
 import dominus.framework.junit.annotation.MessageQueueTest;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
 
@@ -23,17 +26,25 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
     @Override
     protected void doSetUp() throws Exception {
         super.doSetUp();
-        if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
-            this.createTestTopic(testTopicId);
-            this.createProducerPublish(testTopicId, testProducerId);
-            producer = this.createProducer(testProducerId);
-            produceTestMessage(producer, testTopicId, messageQueueAnnotation.count());
-        }
-        if (messageQueueAnnotation != null && StringUtils.hasText(messageQueueAnnotation.queueName()))
-            testTopicId = messageQueueAnnotation.queueName();
-        if (messageQueueAnnotation != null && !StringUtils.hasText(messageQueueAnnotation.consumerGroupId()))
-        this.createConsumerSubscription(testTopicId, testConsumerId);
 
+        if (messageQueueAnnotation != null) {
+            //EE: produce test message or re-consume legacy message
+            if (messageQueueAnnotation.produceTestMessage() == false) {
+                testTopicId = messageQueueAnnotation.queueName();
+                assertTrue(StringUtils.hasText(messageQueueAnnotation.queueName()));
+                assertEquals(messageQueueAnnotation.count(), this.getTopicStatus(testTopicId).getTotalCount().intValue());
+            } else {
+                this.createTestTopic(testTopicId);
+                this.createProducerPublish(testTopicId, testProducerId);
+                producer = this.createProducer(testProducerId);
+                produceTestMessage(producer, testTopicId, messageQueueAnnotation.count());
+            }
+            //EE: use specific consumer id or new consumer id
+            if (StringUtils.hasText(messageQueueAnnotation.consumerGroupId()))
+                testConsumerId = messageQueueAnnotation.consumerGroupId();
+            else
+                this.createConsumerSubscription(testTopicId, testConsumerId);
+        }
     }
 
     @Override
@@ -46,13 +57,13 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
         if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
             this.deleteTestTopic(testTopicId);
         }
-        if (messageQueueAnnotation != null && !StringUtils.hasText(messageQueueAnnotation.consumerGroupId())) {
-            this.deleteProducerPublish(testTopicId, testProducerId);
-        }
-
+        //TODO
+//        if (messageQueueAnnotation != null && !StringUtils.hasText(messageQueueAnnotation.consumerGroupId())) {
+//            this.deleteProducerPublish(testTopicId, testProducerId);
+//        }
     }
 
-    @MessageQueueTest(produceTestMessage = true, count = 100)
+    @MessageQueueTest(produceTestMessage = true, count = 1000)
     @Test
     public void testSimpleConsumer() throws ClientException, InterruptedException, IllegalAccessException {
         final CountDownLatch latch = new CountDownLatch(messageQueueAnnotation.count());
@@ -62,7 +73,7 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
             @Override
             public Action consume(Message message, ConsumeContext context) {
                 latch.countDown();
-                out.printf("consumed message, [key]=%s,[value]=%s\n", message.getKey(), new String(message.getBody()));
+                out.printf("[consumed message], [key]=%s,[value]=%s\n", message.getKey(), new String(message.getBody()));
                 return Action.CommitMessage;
             }
         });
@@ -79,23 +90,20 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
         int concurrency = 1000;
 
         consumer = this.createDefaultConsumer(testTopicId, testConsumerId, concurrency, MAX_RECONSUME_TIMES);
-        consumer.subscribe(testTopicId, "*", new MessageListener() {
-            @Override
-            public Action consume(Message message, ConsumeContext context) {
-                latch.countDown();
-                map.putIfAbsent(Thread.currentThread().getId(), new AtomicLong(0));
-                map.get(Thread.currentThread().getId()).incrementAndGet();
-                out.printf("%s -> consumed message, [key]=%s,[value]=%s\n",
-                        Thread.currentThread().getId(), message.getKey(), new String(message.getBody()));
-                return Action.CommitMessage;
-            }
+        consumer.subscribe(testTopicId, "*", (message, context) -> {
+            latch.countDown();
+            map.putIfAbsent(Thread.currentThread().getId(), new AtomicLong(0));
+            map.get(Thread.currentThread().getId()).incrementAndGet();
+            out.printf("%s -> consumed message, [key]=%s,[value]=%s\n",
+                    Thread.currentThread().getId(), message.getKey(), new String(message.getBody()));
+            return Action.CommitMessage;
         });
         consumer.start();
         assertEquals(true, latch.await(5, TimeUnit.MINUTES));
         assertEquals(concurrency, map.keySet().size());
         int total = 0;
         for (Long id : map.keySet()) {
-            out.println(map.get(id));
+            out.println("[thread id]" + id + " ->" + map.get(id));
             total += map.get(id).intValue();
         }
         assertEquals(messageQueueAnnotation.count(), total);
@@ -108,17 +116,19 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
      * DemoMessageListener Receive: ORDERID_19 [0A91883700001F9000000B8F310C2ABF]
      * EE: ONS broker failed, only get 5000 messages.
      */
-    @MessageQueueTest(produceTestMessage = false, consumerGroupId = "CID-D-GUOXU-TEST-1K-05241", queueName = "D-GUOXU-TEST-1K-0524", count = 1000)
+    @MessageQueueTest(produceTestMessage = false, consumerGroupId = "CID-D-SHAWGUO-TEST", queueName = "D-GUOXU-TEST-20K-0620", count = 20000)
     @Test
     public void testConsumeMessage() throws InterruptedException, ClientException {
         final CountDownLatch latch = new CountDownLatch(messageQueueAnnotation.count());
+        final Logger logger = LoggerFactory.getLogger("ONS-OUTPUT");
 
         consumer = this.createDefaultConsumer(testTopicId, testConsumerId, 1, MAX_RECONSUME_TIMES);
         consumer.subscribe(testTopicId, "*", new MessageListener() {
             @Override
             public Action consume(Message message, ConsumeContext context) {
                 latch.countDown();
-                out.printf("consumed message, [key]=%s,[value]=%s\n", message.getKey(), new String(message.getBody()));
+                logger.info(message.toString());
+                logger.info(new String(message.getBody()));
                 return Action.CommitMessage;
             }
         });
@@ -146,6 +156,4 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
         consumer.start();
         assertEquals(true, latch.await(5, TimeUnit.MINUTES));
     }
-
-
 }

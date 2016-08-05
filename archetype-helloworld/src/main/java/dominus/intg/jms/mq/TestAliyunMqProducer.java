@@ -1,13 +1,11 @@
 package dominus.intg.jms.mq;
 
 
-import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.Producer;
-import com.aliyun.openservices.ons.api.SendResult;
 import com.aliyuncs.exceptions.ClientException;
 //EE: public cloud & finance cloud package
 //import com.aliyuncs.ons4financehz.model.v20160405.OnsTopicStatusResponse;
-import com.aliyuncs.ons.model.v20160503.*;
+import dominus.framework.junit.annotation.MessageQueueTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,40 +42,11 @@ public class TestAliyunMqProducer extends TestAliyunMqZBaseTestCase {
      * EE: Producer TPS TODO
      * EE: 10 or 100 million level message produce TODO
      */
+    @MessageQueueTest(count = 1000)
     @Test
     public void testSimpleMessage() throws InterruptedException, ClientException {
-        Integer msgCount = Integer.valueOf(properties.getProperty("aliyun.mq.testTopic.count"));
+        Integer msgCount = messageQueueAnnotation.count();
         produceTestMessage(producer, testTopicId, msgCount);
-    }
-
-    /**
-     * send transactional message
-     */
-    @Test
-    public void testTransactionalMessage() {
-
-    }
-
-
-    @Test
-    public void testOrderMessage() {
-        //send 1 billion ordered message, verify it in consumer
-
-    }
-
-    @Test
-    public void testMessageRetry() {
-        //send 1 billion ordered message, verify it in consumer
-
-    }
-
-    /**
-     * EE: Sync TPS VS ASync TPS
-     */
-    @Test
-    public void testAsyncMessage() {
-        //send 1 billion ordered message, verify it in consumer
-
     }
 
 }

@@ -71,13 +71,7 @@ public class TestAliyunMqZBaseTestCase extends DominusJUnit4TestBase {
 
         //EE: get test method annotation
         messageQueueAnnotation = AnnotationUtils.getAnnotation(this.getClass().getMethod(this.name.getMethodName()), MessageQueueTest.class);
-        messageQueueAnnotation = AnnotationUtils.getAnnotation(this.getClass().getMethod(this.name.getMethodName()), MessageQueueTest.class);
-        if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage() == false) {
-            testTopicId = messageQueueAnnotation.queueName();
-        }
-        if (messageQueueAnnotation != null && StringUtils.hasText(messageQueueAnnotation.consumerGroupId())) {
-            testConsumerId = messageQueueAnnotation.consumerGroupId();
-        }
+
         out.println("[Aliyun MQ test topic name] = " + testTopicId);
         out.println("[Aliyun MQ consumer group id] = " + testConsumerId);
         out.printf("[ONS_REGION_ID] %s [PRODUCT] %s\n", ONS_REGION_ID, productName);
