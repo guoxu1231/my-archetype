@@ -3,10 +3,13 @@ package dominus.intg.scripting;
 
 import com.google.common.io.Files;
 import dominus.framework.junit.DominusJUnit4TestBase;
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
 import org.junit.Test;
 
 import javax.script.*;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 
@@ -47,5 +50,14 @@ public class GroovyIntgTest extends DominusJUnit4TestBase {
         engineScope.put("UICondition", false);
         // evaluate the same code but in a different script context (x = "world")
         assertEquals("show=false,enable=false", scriptEngine.eval(conditionExprScript, newContext));
+    }
+
+    @Test
+    public void testEval() {
+        HashMap bindingValues = new HashMap();
+        GroovyShell shell = new GroovyShell(this.getClass().getClassLoader(), new Binding(bindingValues));
+        Object result = shell.evaluate("33*3");
+        String resultString = result != null ? result.toString() : "null";
+        assertEquals("99", resultString);
     }
 }
