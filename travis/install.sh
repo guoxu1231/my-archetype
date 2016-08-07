@@ -37,6 +37,9 @@ curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/dist
 tar zxvf elasticsearch-2.3.4.tar.gz
 nohup bash -c "elasticsearch-2.3.4/bin/elasticsearch &"
 
+#start micro-service project
+mvn -pl archetype-microservice clean compile spring-boot:run &
+
 #debug dir info
 pwd
 ls -l

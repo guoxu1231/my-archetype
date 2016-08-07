@@ -12,8 +12,6 @@ install:
 
 script:
   - mvn clean -pl archetype-helloworld test
-  - mvn clean -pl archetype-microservice spring-boot:run &
-  - sleep 80
   - mvn -pl archetype-microservice test
 
 after_failure:
