@@ -448,6 +448,13 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <version>4.8.0</version>
                 </dependency>
 
+                <!-- EE: sql parser -->
+                <dependency>
+                    <groupId>com.github.jsqlparser</groupId>
+                    <artifactId>jsqlparser</artifactId>
+                    <version>0.9</version>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>
@@ -480,6 +487,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.framework.binding.TestXmlBinding</include>
                         <include>dominus.framework.binding.TestJsonBinding</include>
                         <include>dominus.framework.retry.TestRetryTemplate</include>
+                        <include>dominus.framework.parser.sql.TestJSqlParser</include>
                         <!--<include>dominus.intg.jmx.TestGroovyMBean</include>-->
                         <!-- RPC -->
                         <!--<include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>-->
