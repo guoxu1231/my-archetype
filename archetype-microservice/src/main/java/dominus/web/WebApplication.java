@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@Import(CdcConfig.class)
+@Import({GlobalConfig.class, CdcConfig.class,})
 public class WebApplication {
 
     public static void main(String[] args) throws Exception {

@@ -82,6 +82,18 @@
             <version>0.3.1</version>
         </dependency>
 
+        <!--EE: groovy console-->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.4.6</version>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.9.4</version>
+        </dependency>
+
 
         <!--EE: service discovery-->
         <!--<dependency>-->
