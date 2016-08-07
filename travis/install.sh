@@ -38,7 +38,7 @@ tar zxvf elasticsearch-2.3.4.tar.gz
 nohup bash -c "elasticsearch-2.3.4/bin/elasticsearch &"
 
 #start micro-service project
-mvn -pl archetype-microservice clean compile spring-boot:run &
+nohup bash -c "mvn -pl archetype-microservice compile spring-boot:run &"
 
 #debug dir info
 pwd
