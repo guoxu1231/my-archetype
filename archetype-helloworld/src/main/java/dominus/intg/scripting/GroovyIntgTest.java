@@ -55,9 +55,11 @@ public class GroovyIntgTest extends DominusJUnit4TestBase {
     @Test
     public void testEval() {
         HashMap bindingValues = new HashMap();
+        bindingValues.put("str", new String("hello world"));
         GroovyShell shell = new GroovyShell(this.getClass().getClassLoader(), new Binding(bindingValues));
-        Object result = shell.evaluate("33*3");
-        String resultString = result != null ? result.toString() : "null";
-        assertEquals("99", resultString);
+        Object r1 = shell.evaluate("33*3");
+        assertEquals("99", r1.toString());
+        Object r2 = shell.evaluate("str.contains(\'world\')");
+        assertEquals("true", r2.toString());
     }
 }
