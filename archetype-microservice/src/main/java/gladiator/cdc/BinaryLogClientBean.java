@@ -57,4 +57,8 @@ public class BinaryLogClientBean {
     public void cleanup() throws IOException {
         client.disconnect();
     }
+
+    public BinaryLogClient getClient() {
+        return client;
+    }
 }

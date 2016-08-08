@@ -1,5 +1,6 @@
 package gladiator.rocksdb;
 
+import dominus.web.GlobalConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,11 +10,7 @@ import org.springframework.core.env.Environment;
 
 @Profile("rocksdb")
 @Configuration
-@PropertySource("classpath:properties/data-store.properties")
-public class RocksDBConfig {
-
-    @Autowired
-    Environment env;
+public class RocksDBConfig extends GlobalConfig {
 
     @Bean(name = "rocksdb")
     public RocksDBPerfTest rocksDBPerfTest() {

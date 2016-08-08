@@ -1,16 +1,13 @@
 package gladiator.cdc;
 
+import dominus.web.GlobalConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 
-@Profile("gladiator-cdc")
+@Profile("binlog")
 @Configuration
-@PropertySource("classpath:properties/data-store.properties")
-public class CdcConfig {
-
-    @Autowired
-    Environment env;
+public class CdcConfig extends GlobalConfig {
 
     @Bean(initMethod = "init", destroyMethod = "cleanup")
     @Description("Run as mysql slave and publish all insert/update/delete events to kafka topics")
