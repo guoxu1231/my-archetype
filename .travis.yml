@@ -12,7 +12,6 @@ install:
 
 script:
   - mvn clean -pl archetype-helloworld test
-  - mvn -pl archetype-microservice test
 
 after_failure:
   - cat archetype-helloworld/target/surefire-reports/*.txt

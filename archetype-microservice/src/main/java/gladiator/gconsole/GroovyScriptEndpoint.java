@@ -5,6 +5,8 @@ import groovy.lang.GroovyShell;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.FormParam;
@@ -19,6 +21,7 @@ import java.util.Map;
 /**
  * http://naleid.com/blog/2013/10/17/embedding-a-groovy-web-console-in-a-java-spring-app
  * curl --data "script=33*3" http://localhost:8090/rest/script
+ * curl --data "script=ctx.getBean('rocksBean').load()" http://localhost:8090/rest/script
  */
 @Produces(MediaType.APPLICATION_JSON)
 //@Consumes(MediaType.TEXT_PLAIN)
@@ -27,6 +30,8 @@ import java.util.Map;
 public class GroovyScriptEndpoint {
     private static final Logger LOG = LoggerFactory.getLogger(GroovyScriptEndpoint.class);
 
+    @Autowired
+    ApplicationContext context;
 
     @POST
     public Map executeScript(@FormParam("script") String script) {
@@ -42,7 +47,7 @@ public class GroovyScriptEndpoint {
             HashMap bindingValues = new HashMap();
             //TODO binding more values
             // bindingValues.put("entityManager", entityManager);
-            // bindingValues.put("ctx", applicationContext);
+            bindingValues.put("ctx", context);
             bindingValues.put("LOG", LOG);
             GroovyShell shell = new GroovyShell(this.getClass().getClassLoader(), new Binding(bindingValues));
 
