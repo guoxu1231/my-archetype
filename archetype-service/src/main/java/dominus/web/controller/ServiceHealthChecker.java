@@ -4,7 +4,7 @@ package dominus.web.controller;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import gladiator.cdc.BinaryLogClientBean;
-import gladiator.rocksdb.RocksDBPerfTest;
+import gladiator.rocksdb.RocksDBPerfTestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,9 +52,9 @@ public class ServiceHealthChecker {
             }
             //EE: rocksdb test
             if (activeProfiles.contains("rocksdb")) {
-                RocksDBPerfTest rocksDBPerfTest = context.getBean(RocksDBPerfTest.class);
+                RocksDBPerfTestService rocksDBPerfTest = context.getBean(RocksDBPerfTestService.class);
                 String sourceCountSql = context.getEnvironment().getProperty("rocks.source.count-sql");
-                long count = rocksDBPerfTest.getTemplate().queryForObject(sourceCountSql, Long.class);
+                long count = rocksDBPerfTest.template.queryForObject(sourceCountSql, Long.class);
                 logger.info("{} count={}", sourceCountSql, count);
                 assertTrue(count > 0);
             }

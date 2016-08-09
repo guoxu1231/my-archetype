@@ -1,4 +1,4 @@
-package gladiator.gconsole;
+package dominus.web.rest.endpoint;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;

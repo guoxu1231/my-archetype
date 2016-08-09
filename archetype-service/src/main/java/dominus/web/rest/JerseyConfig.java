@@ -1,7 +1,7 @@
 package dominus.web.rest;
 
 import dominus.web.rest.endpoint.EchoEndpoint;
-import gladiator.gconsole.GroovyScriptEndpoint;
+import dominus.web.rest.endpoint.GroovyScriptEndpoint;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.stereotype.Component;
 

@@ -27,17 +27,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * Load big table into RocksDB.
  * Test Insert/Query performance.
  */
-public class RocksDBPerfTest {
+public class RocksDBPerfTestService {
 
     static final String ROCKS_PATH = "/tmp/rocksdb";
     @Autowired
-    JdbcTemplate template;
+    public JdbcTemplate template;
 
-    public JdbcTemplate getTemplate() {
-        return template;
-    }
-
-    protected final Logger logger = LoggerFactory.getLogger(RocksDBPerfTest.class);
+    protected final Logger logger = LoggerFactory.getLogger(RocksDBPerfTestService.class);
     RocksDB rocksDB = null;
     Options options;
     String sourceSql;
@@ -45,19 +41,7 @@ public class RocksDBPerfTest {
     String sourceKey;
     ObjectMapper mapper;
 
-    public void setSourceCountSql(String sourceCountSql) {
-        this.sourceCountSql = sourceCountSql;
-    }
-
-    public void setSourceKey(String sourceKey) {
-        this.sourceKey = sourceKey;
-    }
-
-    public void setSourceSql(String sourceSql) {
-        this.sourceSql = sourceSql;
-    }
-
-    public RocksDBPerfTest() {
+    public RocksDBPerfTestService(String sourceSql, String sourceCountSql, String sourceKey) {
         // a static method that loads the RocksDB C++ library.
         RocksDB.loadLibrary();
         // the Options class contains a set of configurable DB options
@@ -76,6 +60,10 @@ public class RocksDBPerfTest {
         mapper = new ObjectMapper();// create once, reuse
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         mapper.setDateFormat(new SimpleDateFormat("MM/dd/yyyy HH:mm:ss"));
+
+        this.sourceCountSql = sourceCountSql;
+        this.sourceSql = sourceSql;
+        this.sourceKey = sourceKey;
     }
 
     public String load() throws SQLException, IOException, RocksDBException {
