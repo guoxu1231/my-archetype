@@ -17,7 +17,7 @@
     <modules>
         <module>archetype-helloworld</module>
         <module>archetype-www</module>
-        <module>archetype-microservice</module>
+        <module>archetype-service</module>
     </modules>
 
     <dependencies>
@@ -117,6 +117,13 @@
         <repository>
             <id>cloudera</id>
             <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>confluent</id>
+            <url>http://packages.confluent.io/maven/</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
