@@ -59,7 +59,7 @@ public class GroovyScriptEndpoint {
         } catch (Throwable t) {
             t.printStackTrace();
             LOG.error(t.toString());
-            resultMap.put("error", t.getMessage());
+            resultMap.put("error", String.format("%s [message]:%s", t.getClass().getName(), t.getMessage()));
         }
 
         //TODO capture stdout

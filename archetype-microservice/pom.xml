@@ -125,11 +125,6 @@
         </dependency>
 
         <!--EE: JDBC & RocksDB -->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.commons</groupId>-->
-            <!--<artifactId>commons-dbcp2</artifactId>-->
-            <!--<version>2.1.1</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -151,6 +146,12 @@
             <version>1.6</version>
         </dependency>
 
+        <!--EE: kafka -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>0.9.0.1</version>
+        </dependency>
         <!--EE: service discovery-->
         <!--<dependency>-->
         <!--<groupId>org.springframework.cloud</groupId>-->
