@@ -95,7 +95,7 @@ public class RocksDBPerfTest {
         while (rs.next()) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             mapper.writeValue(out, rowProcessor.toMap(rs));
-            rocksDB.put(Integer.valueOf(rs.getInt(sourceKey)).toString().getBytes(), out.toByteArray());
+            rocksDB.put(Long.valueOf(rs.getLong(sourceKey)).toString().getBytes(), out.toByteArray());
             logger.info("{}/{}, now {}%...", now.incrementAndGet(), count, now.get() * 100 / count);
         }
         watch.stop();

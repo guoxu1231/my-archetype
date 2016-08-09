@@ -57,6 +57,7 @@ public class GroovyScriptEndpoint {
 
             resultMap.put("result", resultString);
         } catch (Throwable t) {
+            t.printStackTrace();
             LOG.error(t.toString());
             resultMap.put("error", t.getMessage());
         }
