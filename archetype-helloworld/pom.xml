@@ -522,6 +522,8 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <!--<include>dominus.intg.jmx.TestGroovyMBean</include>-->
                         <!-- RPC -->
                         <!--<include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>-->
+                        <!-- amqp -->
+                        <include>dominus.intg.jms.rabbitmq.TestRabbitMQClient</include>
                         <!-- Kafka & ZK -->
                         <include>dominus.intg.jms.kafka.KafkaEmbeddedServerTestCase</include>
                         <include>dominus.intg.jms.kafka.KafkaProducerTestcase</include>
