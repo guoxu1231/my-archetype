@@ -103,6 +103,13 @@
                     <artifactId>activemq-broker</artifactId>
                     <version>5.10.2</version>
                 </dependency>
+                <!--EE: rabbitmq -->
+                <dependency>
+                    <groupId>com.rabbitmq</groupId>
+                    <artifactId>amqp-client</artifactId>
+                    <version>3.6.5</version>
+                </dependency>
+
                 <!--<dependency>-->
                 <!--<groupId>org.apache.activemq</groupId>-->
                 <!--<artifactId>activemq-pool</artifactId>-->
