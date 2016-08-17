@@ -32,7 +32,6 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
             if (messageQueueAnnotation.produceTestMessage() == false) {
                 testTopicId = messageQueueAnnotation.queueName();
                 assertTrue(StringUtils.hasText(messageQueueAnnotation.queueName()));
-                assertEquals(messageQueueAnnotation.count(), this.getTopicStatus(testTopicId).getTotalCount().intValue());
             } else {
                 this.createTestTopic(testTopicId);
                 this.createProducerPublish(testTopicId, testProducerId);
@@ -44,6 +43,8 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
                 testConsumerId = messageQueueAnnotation.consumerGroupId();
             else
                 this.createConsumerSubscription(testTopicId, testConsumerId);
+        } else {
+            this.createConsumerSubscription(testTopicId, testConsumerId);
         }
     }
 
@@ -69,13 +70,10 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
         final CountDownLatch latch = new CountDownLatch(messageQueueAnnotation.count());
 
         consumer = this.createDefaultConsumer(testTopicId, testConsumerId, 2, MAX_RECONSUME_TIMES);
-        consumer.subscribe(testTopicId, "*", new MessageListener() {
-            @Override
-            public Action consume(Message message, ConsumeContext context) {
-                latch.countDown();
-                out.printf("[consumed message], [key]=%s,[value]=%s\n", message.getKey(), new String(message.getBody()));
-                return Action.CommitMessage;
-            }
+        consumer.subscribe(testTopicId, "*", (message, context) -> {
+            latch.countDown();
+            out.printf("[consumed message], [key]=%s,[value]=%s\n", message.getKey(), new String(message.getBody()));
+            return Action.CommitMessage;
         });
         consumer.start();
         assertEquals(true, latch.await(5, TimeUnit.MINUTES));
@@ -156,4 +154,37 @@ public class TestAliyunMqConsumer extends TestAliyunMqZBaseTestCase {
         consumer.start();
         assertEquals(true, latch.await(5, TimeUnit.MINUTES));
     }
+
+//    @MessageQueueTest(produceTestMessage = false, queueName = "D-POLICY-POLICY-151120", count = 10000)
+//    @Test
+//    public void testConsumeJingWeiMessage() throws InterruptedException, ClientException {
+//        final CountDownLatch latch = new CountDownLatch(messageQueueAnnotation.count());
+//
+//        consumer = this.createDefaultConsumer(testTopicId, testConsumerId, 1, 1);
+//        consumer.subscribe(testTopicId, "*", new MessageListener() {
+//            @Override
+//            public Action consume(Message message, ConsumeContext context) {
+//                latch.countDown();
+//                try {
+//                    List<ThriftEvent> eventSet = new ArrayList<ThriftEvent>();
+//                    ThriftHelper.loadThrift(message.getBody(), eventSet);
+//                    logger.info("<ThriftEvent>:{}", eventSet.size());
+//                    for (ThriftEvent e : eventSet) {
+//                        DBMSEvent event = ThriftHelper.getDBMSEvent(e);
+//                        if (event instanceof DBMSRowChange) {
+//                            DBMSRowChange rowChange = (DBMSRowChange) event;
+//                            logger.info("[schema]={}, [table]={} [action]={}", rowChange.getSchema(), rowChange.getTable(), rowChange.getAction());
+//                        }
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                return Action.CommitMessage;
+//            }
+//        });
+//        consumer.start();
+//        assertEquals(true, latch.await(5, TimeUnit.MINUTES));
+//    }
+
+
 }

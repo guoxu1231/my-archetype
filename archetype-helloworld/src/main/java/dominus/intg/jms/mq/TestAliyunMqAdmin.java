@@ -51,10 +51,6 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
     @MessageQueueTest(queueName = "D-FINANCE-ONE-160623")
     public void OnsSubscriptionListRequest() throws ClientException {
         OnsSubscriptionListRequest request = new OnsSubscriptionListRequest();
-        /**
-         *ONSRegionId是指你需要API访问ONS哪个区域的资源。
-         *该值必须要根据OnsRegionList方法获取的列表来选择和配置，因为OnsRegionId是变动的，不能够写固定值
-         */
         request.setOnsRegionId(ONS_REGION_ID);
         request.setPreventCache(System.currentTimeMillis());
         request.setAcceptFormat(FormatType.JSON);
@@ -72,8 +68,8 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
                         subscribeInfoDo.getTopic() + "  " +
                         subscribeInfoDo.getStatus() + "  " +
                         subscribeInfoDo.getStatusName() + " " +
-                        subscribeInfoDo.getCreateTime() + "  " +
-                        subscribeInfoDo.getUpdateTime());
+                        simpleDateFormat.format(subscribeInfoDo.getCreateTime()) + "  " +
+                        simpleDateFormat.format(subscribeInfoDo.getUpdateTime()));
         }
     }
 

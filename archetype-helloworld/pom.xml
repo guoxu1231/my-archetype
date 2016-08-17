@@ -4,7 +4,6 @@
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
         >
     <modelVersion>4.0.0</modelVersion>
-    <groupId>dominus</groupId>
     <artifactId>archetype-helloworld</artifactId>
     <packaging>jar</packaging>
     <version>0.5</version>
@@ -86,6 +85,12 @@
                     <artifactId>jackson-databind</artifactId>
                     <version>2.6.7</version>
                 </dependency>
+                <!-- EE: AVRO Binding -->
+                <dependency>
+                    <groupId>org.apache.avro</groupId>
+                    <artifactId>avro</artifactId>
+                    <version>1.8.1</version>
+                </dependency>
 
                 <!-- JMS -->
                 <dependency>
@@ -151,6 +156,17 @@
                     <groupId>org.apache.kafka</groupId>
                     <artifactId>kafka-streams</artifactId>
                     <version>0.10.0.0</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>io.confluent</groupId>
+                    <artifactId>kafka-avro-serializer</artifactId>
+                    <version>3.0.0</version>
                     <exclusions>
                         <exclusion>
                             <groupId>org.slf4j</groupId>
@@ -347,7 +363,9 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                 <dependency>
                     <groupId>com.aliyun.openservices</groupId>
                     <artifactId>ons-client</artifactId>
-                    <version>1.2.1</version>
+                    <version>1.2.4</version>
+                    <scope>system</scope>
+                    <systemPath>${basedir}/lib/aliyun/ons/ons-client-1.2.4.jar</systemPath>
                 </dependency>
                 <!-- EE:ons open api management-->
                 <!--<dependency>-->
@@ -491,6 +509,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.scripting.GroovyIntgTest</include>
                         <include>dominus.framework.binding.TestXmlBinding</include>
                         <include>dominus.framework.binding.TestJsonBinding</include>
+                        <include>dominus.framework.binding.TestAvroBinding</include>
                         <include>dominus.framework.retry.TestRetryTemplate</include>
                         <include>dominus.framework.parser.sql.TestJSqlParser</include>
                         <!--<include>dominus.intg.jmx.TestGroovyMBean</include>-->

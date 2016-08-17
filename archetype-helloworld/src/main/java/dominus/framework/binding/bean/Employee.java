@@ -1,5 +1,8 @@
 package dominus.framework.binding.bean;
 
+import org.apache.avro.reflect.AvroEncode;
+import org.apache.avro.reflect.DateAsLongEncoding;
+
 import java.util.Date;
 
 
@@ -9,10 +12,12 @@ import java.util.Date;
 public class Employee {
 
     private Integer empNo;
+    @AvroEncode(using = DateAsLongEncoding.class)
     private Date birthDate;
     private String firstName;
     private String lastName;
     private char gender;
+    @AvroEncode(using = DateAsLongEncoding.class)
     private Date hireDate;
 
     public Employee() {
