@@ -8,6 +8,7 @@ import com.github.shyiko.mysql.binlog.event.UpdateRowsEventData;
 import com.github.shyiko.mysql.binlog.event.WriteRowsEventData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StopWatch;
 
 import java.io.IOException;
 
@@ -21,8 +22,15 @@ public class BinaryLogClientBean {
     final BinaryLogClient client;
     protected final Logger logger = LoggerFactory.getLogger(BinaryLogClientBean.class);
 
+    //EE: update batch records and test binlog parser performance. begin event as ..., end event as ...
+    StopWatch stopWatch;
+
     public BinaryLogClientBean(String hostname, int port, String schema, String username, String password) {
         client = new BinaryLogClient(hostname, port, schema, username, password);
+    }
+
+    private void stats(Event event) {
+
     }
 
     public void init() throws IOException {
@@ -60,5 +68,9 @@ public class BinaryLogClientBean {
 
     public BinaryLogClient getClient() {
         return client;
+    }
+
+    static class BinlogParserStopWatch extends StopWatch {
+
     }
 }

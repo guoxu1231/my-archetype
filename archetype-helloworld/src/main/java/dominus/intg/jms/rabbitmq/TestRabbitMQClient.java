@@ -5,6 +5,7 @@ import com.rabbitmq.client.*;
 import com.rabbitmq.client.impl.DefaultExceptionHandler;
 import dominus.framework.junit.DominusJUnit4TestBase;
 import dominus.framework.junit.annotation.MessageQueueTest;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.core.annotation.AnnotationUtils;
 
