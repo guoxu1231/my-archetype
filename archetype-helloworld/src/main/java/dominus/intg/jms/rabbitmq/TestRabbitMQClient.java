@@ -95,7 +95,7 @@ public class TestRabbitMQClient extends DominusJUnit4TestBase {
     }
 
     @MessageQueueTest(count = 100000)
-    @Test
+    @Ignore
     public void testSlowConsumer() throws IOException, InterruptedException, TimeoutException {
 
         int count = messageQueueAnnotation.count();
