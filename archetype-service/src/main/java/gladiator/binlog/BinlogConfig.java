@@ -1,13 +1,11 @@
-package gladiator.cdc;
+package gladiator.binlog;
 
 import dominus.web.GlobalConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
-import org.springframework.core.env.Environment;
 
 @Profile("binlog")
 @Configuration
-public class CdcConfig extends GlobalConfig {
+public class BinlogConfig extends GlobalConfig {
 
     @Bean(initMethod = "init", destroyMethod = "cleanup")
     @Description("Run as mysql slave and publish all insert/update/delete events to kafka topics")

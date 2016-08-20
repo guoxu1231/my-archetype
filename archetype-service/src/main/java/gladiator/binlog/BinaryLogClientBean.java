@@ -1,4 +1,4 @@
-package gladiator.cdc;
+package gladiator.binlog;
 
 
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
