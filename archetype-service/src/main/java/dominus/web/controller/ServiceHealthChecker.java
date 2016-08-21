@@ -3,7 +3,7 @@ package dominus.web.controller;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import gladiator.cdc.BinaryLogClientBean;
+import gladiator.binlog.BinaryLogClientBean;
 import gladiator.rocksdb.RocksDBPerfTestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class ServiceHealthChecker {
                     .field("script", "9*9")
                     .asString();
 
-            System.out.println(jsonResponse.getBody());
+            logger.info(jsonResponse.getBody());
             assertTrue(jsonResponse.getBody().contains("\"result\":\"81\""));
 
             //EE: mysql binlog
