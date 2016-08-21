@@ -7,12 +7,17 @@ import com.alibaba.otter.canal.parse.driver.mysql.packets.server.ResultSetPacket
 import com.alibaba.otter.canal.parse.driver.mysql.utils.PacketManager;
 import com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection;
 import com.alibaba.otter.canal.parse.inbound.mysql.dbsync.DirectLogFetcher;
+import com.alibaba.otter.canal.parse.inbound.mysql.dbsync.LogEventConvert;
+import com.alibaba.otter.canal.protocol.CanalEntry;
 import com.taobao.tddl.dbsync.binlog.LogContext;
 import com.taobao.tddl.dbsync.binlog.LogDecoder;
 import com.taobao.tddl.dbsync.binlog.LogEvent;
+import com.taobao.tddl.dbsync.binlog.event.QueryLogEvent;
+import com.taobao.tddl.dbsync.binlog.event.XidLogEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
+import org.springframework.util.StopWatch;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,21 +27,34 @@ import java.util.List;
 public class CanalLogFetcherBean {
     protected final Logger logger = LoggerFactory.getLogger(CanalLogFetcherBean.class);
     MysqlConnection mysqlConnection;
+    StopWatch stopWatch = new StopWatch();
+
+    private void txEventStats(LogEvent event) {
+        //Begin stopwatch once 'BEGIN' Query event;Stop stopwatch once 'XID' or 'COMMIT' event;
+        if (event instanceof QueryLogEvent && ((QueryLogEvent) event).getQuery().contains("BEGIN")) {
+            stopWatch = new BinlogParserStopWatch();
+            stopWatch.start("canal-tx-event-stat-" + (((QueryLogEvent) event).getDbName()));
+            logger.info("Canal-TX-Binlog-Parser StopWatch start...");
+        } else if (event instanceof XidLogEvent) {
+            stopWatch.stop();
+            logger.info(stopWatch.toString());
+        }
+    }
 
     public void initialize() throws IOException {
         mysqlConnection = new MysqlConnection(new InetSocketAddress("127.0.0.1", 3306), "shawguo", "welcome1");
         mysqlConnection.connect();
-
         Assert.isTrue(mysqlConnection.isConnected(), "mysql connector failed to connect to database");
-        DirectLogFetcher fetcher = new DirectLogFetcher(mysqlConnection.getConnector().getReceiveBufferSize());
-        fetcher.start(mysqlConnection.getConnector().getChannel());
-        LogDecoder decoder = new LogDecoder(LogEvent.UNKNOWN_EVENT, LogEvent.ENUM_END_EVENT);
-        LogContext context = new LogContext();
 
         Thread t = new Thread() {
             @Override
             public void run() {
                 try {
+                    DirectLogFetcher fetcher = new DirectLogFetcher(mysqlConnection.getConnector().getReceiveBufferSize());
+                    fetcher.start(mysqlConnection.getConnector().getChannel());
+                    LogDecoder decoder = new LogDecoder(LogEvent.UNKNOWN_EVENT, LogEvent.ENUM_END_EVENT);
+                    LogContext context = new LogContext();
+
                     //EE:update settings
                     mysqlConnection.update("set wait_timeout=9999999");
                     mysqlConnection.update("set net_write_timeout=1800");
@@ -48,8 +66,6 @@ public class CanalLogFetcherBean {
                     // checksum that master is configured to log
                     // 但也不能乱设置，需要和mysql server的checksum配置一致，不然RotateLogEvent会出现乱码
                     mysqlConnection.update("set @master_binlog_checksum= '@@global.binlog_checksum'");
-                    // mariadb针对特殊的类型，需要设置session变量
-                    mysqlConnection.update("SET @mariadb_slave_capability='" + LogEvent.MARIA_SLAVE_CAPABILITY_MINE + "'");
 
                     //EE:query current binlog position and begin dump.
                     ResultSetPacket packet = mysqlConnection.query("show master status");
@@ -65,12 +81,15 @@ public class CanalLogFetcherBean {
                     binlogDumpHeader.setPacketSequenceNumber((byte) 0x00);
                     PacketManager.write(mysqlConnection.getConnector().getChannel(), new ByteBuffer[]{ByteBuffer.wrap(binlogDumpHeader.toBytes()),
                             ByteBuffer.wrap(cmdBody)});
+                    logger.info("Begin to dump binlog...");
 
+                    LogEventConvert convert = new LogEventConvert();
                     while (true) {
                         if (fetcher.fetch()) {
-                            LogEvent event = null;
-                            event = decoder.decode(fetcher, context);
-                            logger.info(event.toString());
+                            LogEvent event = decoder.decode(fetcher, context);
+                            //convert to protocol buffer
+                            CanalEntry.Entry entry = convert.parse(event);
+                            txEventStats(event);
                         }
                     }
                 } catch (Exception e) {
@@ -82,7 +101,6 @@ public class CanalLogFetcherBean {
         t.setName("canal-binlog-parser-thread");
         t.start();
     }
-
 
     public void close() throws IOException {
         mysqlConnection.disconnect();
