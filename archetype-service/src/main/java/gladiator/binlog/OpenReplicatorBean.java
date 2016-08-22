@@ -11,6 +11,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.util.StopWatch;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 public class OpenReplicatorBean {
@@ -36,14 +39,23 @@ public class OpenReplicatorBean {
         dataSource.setUsername(username);
         dataSource.setPassword(password);
 
+        try (Connection conn = dataSource.getConnection()) {
+            ResultSet rs = conn.prepareStatement("show master status;").executeQuery();
+            rs.next();
+            logger.info("show master status : {}, {}", rs.getString("File"), rs.getLong("Position"));
+            openReplicator.setBinlogFileName(rs.getString("File"));
+            openReplicator.setBinlogPosition(rs.getLong("Position"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void txEventStats(BinlogEventV4 event) {
         //Begin stopwatch once 'BEGIN' Query event;Stop stopwatch once 'XID' or 'COMMIT' event;
         if (event instanceof QueryEvent && ((QueryEvent) event).getSql().toString().contains("BEGIN")) {
             stopWatch = new StopWatch();
-            stopWatch.start("shyiko-tx-event-stat-" + ((QueryEvent) event).getDatabaseName());
-            logger.info("SHYIKO-TX-Binlog-Parser StopWatch start...");
+            stopWatch.start("open-replicator-tx-event-stat-" + ((QueryEvent) event).getDatabaseName());
+            logger.info("Open-Replicator-TX-Binlog-Parser StopWatch start...");
         } else if (event instanceof XidEvent) {
             stopWatch.stop();
             logger.info(stopWatch.toString());
