@@ -114,6 +114,22 @@
             <artifactId>mysql-binlog-connector-java</artifactId>
             <version>0.3.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba.otter</groupId>
+            <artifactId>canal.parse</artifactId>
+            <version>1.0.22</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.zendesk</groupId>
+            <artifactId>open-replicator</artifactId>
+            <version>1.4.3</version>
+        </dependency>
 
         <!--EE: groovy console-->
         <dependency>
@@ -186,6 +202,19 @@
                 <configuration>
                     <argLine>-Xms1024m -Xmx2048m</argLine>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>deploy</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>sources</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
