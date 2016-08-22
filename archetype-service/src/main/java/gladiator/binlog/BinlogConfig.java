@@ -20,7 +20,9 @@ public class BinlogConfig extends GlobalConfig {
             return new BinaryLogClientBean(host, port, user, password, debug);
         } else if (env.getProperty("binlog.parser").equalsIgnoreCase("dbsync")) {
             return new CanalLogFetcherBean(host, port, user, password, debug);
-        } else
-            return null;
+        } else if (env.getProperty("binlog.parser").equalsIgnoreCase("google")) {
+            return new OpenReplicatorBean(host, port, user, password, debug);
+        }
+        return null;
     }
 }
