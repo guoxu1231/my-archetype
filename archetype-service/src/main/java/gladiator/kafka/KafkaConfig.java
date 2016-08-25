@@ -2,6 +2,7 @@ package gladiator.kafka;
 
 
 import dominus.web.GlobalConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -16,13 +17,27 @@ public class KafkaConfig extends GlobalConfig {
     public KafkaProducerService kafkaProducerService() {
         Properties kafkaProducerProps = new Properties();
         kafkaProducerProps.put("bootstrap.servers", env.getProperty("kafka.bootstrap.servers"));
-        kafkaProducerProps.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        kafkaProducerProps.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        kafkaProducerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer");
+        kafkaProducerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.ByteArraySerializer");
         kafkaProducerProps.put("acks", "all");
         kafkaProducerProps.put("batch.size", 0);
-        kafkaProducerProps.put("retries", 1);
+        kafkaProducerProps.put("retries", 2);
 
         KafkaProducerService kafkaProducerService = new KafkaProducerService(kafkaProducerProps, env.getProperty("kafka.topic"), true);
         return kafkaProducerService;
+    }
+
+    @Bean(name = "kafka-consumer")
+    public KafkaConsumerService kafkaConsumerService() {
+        Properties kafkaConsumerProps = new Properties();
+        kafkaConsumerProps.put("bootstrap.servers", env.getProperty("kafka.bootstrap.servers"));
+        kafkaConsumerProps.put("auto.offset.reset", "earliest");
+        kafkaConsumerProps.put("enable.auto.commit", "false");
+        kafkaConsumerProps.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        kafkaConsumerProps.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        kafkaConsumerProps.put("max.partition.fetch.bytes", "1048576"); //1Mb
+
+        KafkaConsumerService kafkaConsumerService = new KafkaConsumerService(kafkaConsumerProps);
+        return kafkaConsumerService;
     }
 }
