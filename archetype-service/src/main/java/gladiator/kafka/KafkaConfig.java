@@ -23,7 +23,7 @@ public class KafkaConfig extends GlobalConfig {
         kafkaProducerProps.put("batch.size", 0);
         kafkaProducerProps.put("retries", 2);
 
-        KafkaProducerService kafkaProducerService = new KafkaProducerService(kafkaProducerProps, env.getProperty("kafka.topic"), true);
+        KafkaProducerService kafkaProducerService = new KafkaProducerService(kafkaProducerProps);
         return kafkaProducerService;
     }
 
