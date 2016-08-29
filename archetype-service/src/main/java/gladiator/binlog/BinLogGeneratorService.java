@@ -86,10 +86,10 @@ public class BinLogGeneratorService {
                 return localCount;
             }));
         }
-        long assertCount = 0;
+        long actual = 0;
         for (int i = 0; i < concurrency; i++)
-            assertCount += result.get(i).get();
-        Assert.isTrue(running.get() ? assertCount == total : true, String.format("expected:%s,actual:%", total, assertCount));
+            actual += result.get(i).get();
+        Assert.isTrue(running.get() ? actual == total : true, String.format("expected:%s,actual:%s", total, actual));
 
         stopWatch.stop();
         return stopWatch.toString();
@@ -97,6 +97,7 @@ public class BinLogGeneratorService {
 
     public String stop() {
         this.running.set(false);
+        this.pkBlockingQueue.clear();
         return String.format("binlog generator is stopped. %s/%s", count, total);
     }
 }
