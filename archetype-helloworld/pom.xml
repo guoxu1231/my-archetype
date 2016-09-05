@@ -51,7 +51,7 @@
                     <version>2.9.4</version>
                 </dependency>
 
-                <!-- Spring -->
+                <!-- EE:Spring -->
                 <dependency>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-core</artifactId>
@@ -77,6 +77,11 @@
                     <groupId>org.springframework.batch</groupId>
                     <artifactId>spring-batch-core</artifactId>
                     <version>3.0.6.RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
+                    <version>${spring.version}</version>
                 </dependency>
 
                 <!-- EE: JSON Bingding-->
@@ -387,7 +392,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <artifactId>aliyun-java-sdk-ons</artifactId>
                     <version>1.1.1-SNAPSHOT</version>
                     <scope>system</scope>
-                    <systemPath>${basedir}/lib/aliyun/aliyun-java-sdk-ons-1.2.0-SNAPSHOT.jar</systemPath>
+                    <systemPath>${basedir}/lib/aliyun/aliyun-java-sdk-ons-1.2.1-SNAPSHOT.jar</systemPath>
                 </dependency>
                 <dependency>
                     <groupId>com.aliyun</groupId>
