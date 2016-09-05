@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="GB2312"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-autowire="byName">
+    <bean id="petServiceProvider" class="com.taobao.hsf.app.spring.util.HSFSpringProviderBean">
+        <property name="serviceInterface" value="tstack.hsf.PetService"/>
+        <property name="target" ref="petService"/>
+        <property name="serviceVersion" value="1.0.0"/>
+        <property name="clientTimeout" value="3000"/>
+        <property name="clientIdleTimeout" value="3000"/>
+        <property name="serializeType" value="java"/>
+    </bean>
+</beans>

@@ -18,6 +18,7 @@
         <module>archetype-helloworld</module>
         <module>archetype-www</module>
         <module>archetype-service</module>
+        <module>archetype-tstack</module>
     </modules>
 
     <dependencies>
