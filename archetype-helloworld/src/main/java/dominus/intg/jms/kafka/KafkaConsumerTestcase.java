@@ -2,13 +2,16 @@ package dominus.intg.jms.kafka;
 
 
 import dominus.framework.junit.annotation.MessageQueueTest;
+import kafka.admin.AdminClient;
 import kafka.common.MessageFormatter;
 import kafka.coordinator.GroupMetadataManager;
+import kafka.coordinator.MemberSummary;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.junit.Test;
+import scala.collection.JavaConverters;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -20,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
 
     Consumer<String, String> consumer;
+    AdminClient adminClient;
 
     @Override
     protected void doSetUp() throws Exception {
@@ -32,6 +36,10 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
             produceTestMessage(_producer, testTopicName, messageQueueAnnotation.count());
             assertEquals(messageQueueAnnotation.count(), sumPartitionOffset(brokerList, testTopicName));
         }
+        Properties properties = new Properties();
+        properties.setProperty("bootstrap.servers", this.bootstrapServers);
+        adminClient = AdminClient.create(properties);
+
     }
 
     @Override
@@ -39,6 +47,8 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
             this.deleteTestTopic(testTopicName);
         }
+        MemberSummary memberSummary = (MemberSummary) JavaConverters.asJavaCollectionConverter(adminClient.describeGroup(groupId).members()).asJavaCollection().toArray()[0];
+        println(ANSI_RED, "Consumer Host:" + memberSummary.clientHost());
         if (consumer != null) consumer.close();
         super.doTearDown();
     }
