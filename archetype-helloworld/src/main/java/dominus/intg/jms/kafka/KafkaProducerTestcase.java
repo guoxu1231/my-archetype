@@ -74,7 +74,7 @@ public class KafkaProducerTestcase extends KafkaZBaseTestCase {
     public void testBatchSend() throws InterruptedException, ExecutionException, TimeoutException {
         Properties prop = new Properties();
         prop.setProperty(ProducerConfig.CLIENT_ID_CONFIG, "kafka-producer-" + testTopicName);
-        prop.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, "500");
+        prop.setProperty(ProducerConfig.BATCH_SIZE_CONFIG, "204800");
         //EE "Batch Expired" exception when queueing records at a faster rate than they can be sent.
         prop.setProperty(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, "3000");
         producer = this.createDefaultProducer(prop);
