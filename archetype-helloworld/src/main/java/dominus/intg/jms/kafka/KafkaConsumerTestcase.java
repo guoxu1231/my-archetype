@@ -47,8 +47,9 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         if (messageQueueAnnotation != null && messageQueueAnnotation.produceTestMessage()) {
             this.deleteTestTopic(testTopicName);
         }
-        MemberSummary memberSummary = (MemberSummary) JavaConverters.asJavaCollectionConverter(adminClient.describeGroup(groupId).members()).asJavaCollection().toArray()[0];
-        println(ANSI_RED, "Consumer Host:" + memberSummary.clientHost());
+        MemberSummary[] summaries = JavaConverters.asJavaCollectionConverter(adminClient.describeGroup(groupId).members()).asJavaCollection().toArray(new MemberSummary[0]);
+        if (summaries.length == 1)
+            println(ANSI_RED, "Consumer Host:" + summaries[0].clientHost());
         if (consumer != null) consumer.close();
         super.doTearDown();
     }
