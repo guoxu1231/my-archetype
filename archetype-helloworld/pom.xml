@@ -489,6 +489,12 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <artifactId>jsqlparser</artifactId>
                     <version>0.9</version>
                 </dependency>
+                <!-- EE: H2 Database-->
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <version>1.4.192</version>
+                </dependency>
 
             </dependencies>
         </profile>
@@ -541,6 +547,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.datastore.redis.TestRedis</include>
                         <include>dominus.intg.datastore.elasticsearch.TestElasticSearchClient</include>
                         <include>dominus.intg.datastore.zookeeper.TestZKClient</include>
+                        <include>dominus.intg.datastore.h2database.TestH2Database</include>
                         <!-- ORM integration -->
                         <include>dominus.intg.datastore.persistent.mybatis.TestMyBatisDao</include>
                         <!-- java language -->
