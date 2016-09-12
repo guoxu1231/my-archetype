@@ -10,6 +10,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -256,9 +257,10 @@ public class TestAliyunMqAdmin extends TestAliyunMqZBaseTestCase {
 
         OnsTopicListResponse response = iAcsClient.getAcsResponse(request);
         List<OnsTopicListResponse.PublishInfoDo> publishInfoDoList = response.getData();
+        Collections.sort(publishInfoDoList, (o1, o2) -> o1.getTopic().compareTo(o2.getTopic()));
         for (OnsTopicListResponse.PublishInfoDo publishInfoDo : publishInfoDoList) {
-            if (publishInfoDo.getTopic().contains("D-FINANCE-ONE"))
-                System.out.println(publishInfoDo.getTopic() + "     " + new Date(publishInfoDo.getCreateTime()));
+//            if (publishInfoDo.getTopic().contains("D-FINANCE-ONE"))
+            System.out.println(publishInfoDo.getTopic() + "     " + new Date(publishInfoDo.getCreateTime()));
         }
     }
 
