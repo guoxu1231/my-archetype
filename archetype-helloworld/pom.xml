@@ -13,6 +13,7 @@
         <!-- AssertJ is not a part of Spring IO platform, so the version must be provided explicitly -->
         <assertj-core-version>3.1.0</assertj-core-version>
         <scala.version>2.11.8</scala.version>
+        <scala.version.short>2.11</scala.version.short>
         <cxf.version>3.1.4</cxf.version>
     </properties>
     <parent>
@@ -263,6 +264,24 @@
                     <groupId>org.springframework.data</groupId>
                     <artifactId>spring-data-mongodb</artifactId>
                     <version>1.6.3.RELEASE</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mongodb</groupId>
+                            <artifactId>mongo-java-driver</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <!--EE: scala mongodb-->
+                <dependency>
+                    <groupId>org.mongodb</groupId>
+                    <artifactId>casbah-core_${scala.version.short}</artifactId>
+                    <version>3.1.1</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.github.salat</groupId>
+                    <artifactId>salat-core_${scala.version.short}</artifactId>
+                    <version>1.10.0</version>
                 </dependency>
 
                 <!-- EE: Redis -->
@@ -554,6 +573,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.language.threads.TestSynchronizer</include>
                         <!--scala language -->
                         <include>dominus.language.scala.TestHelloWorld</include>
+                        <include>dominus.scala.intg.datastore.mongodb.TestMongoDBScalaApi</include>
                     </includes>
                 </configuration>
             </plugin>
