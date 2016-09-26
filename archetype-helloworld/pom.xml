@@ -266,18 +266,6 @@
                     <version>1.6.3.RELEASE</version>
                 </dependency>
 
-                <!--EE: scala mongodb-->
-                <!--<dependency>-->
-                    <!--<groupId>org.mongodb</groupId>-->
-                    <!--<artifactId>casbah-core_${scala.version.short}</artifactId>-->
-                    <!--<version>3.1.1</version>-->
-                <!--</dependency>-->
-                <!--<dependency>-->
-                    <!--<groupId>com.github.salat</groupId>-->
-                    <!--<artifactId>salat-core_${scala.version.short}</artifactId>-->
-                    <!--<version>1.10.0</version>-->
-                <!--</dependency>-->
-
                 <!-- EE: Redis -->
                 <dependency>
                     <groupId>redis.clients</groupId>
@@ -565,9 +553,6 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.datastore.persistent.mybatis.TestMyBatisDao</include>
                         <!-- java language -->
                         <include>dominus.language.threads.TestSynchronizer</include>
-                        <!--scala language -->
-                        <include>dominus.language.scala.TestHelloWorld</include>
-                        <!--<include>dominus.scala.intg.datastore.mongodb.TestMongoDBScalaApi</include>-->
                     </includes>
                 </configuration>
             </plugin>
@@ -621,24 +606,6 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>scala-maven-plugin</artifactId>
-                <version>3.2.1</version>
-                <executions>
-                    <execution>
-                        <id>scala-compile-first</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <scalaVersion>${scala.version}</scalaVersion>
-                </configuration>
             </plugin>
         </plugins>
     </build>
