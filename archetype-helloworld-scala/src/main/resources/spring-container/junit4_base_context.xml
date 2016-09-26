@@ -1,0 +1,34 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+
+    <beans profile="local">
+        <context:property-placeholder location="classpath:spring-container/props/local/*.properties"/>
+    </beans>
+
+    <beans profile="intg">
+        <context:property-placeholder location="classpath:spring-container/props/intg/*.properties"/>
+    </beans>
+
+    <beans profile="travis-ci">
+        <context:property-placeholder location="classpath:spring-container/props/travis-ci/*.properties"/>
+    </beans>
+
+    <beans profile="local">
+        <util:properties id="globalProps" location="classpath:spring-container/props/local/*.properties"/>
+    </beans>
+
+    <beans profile="intg">
+        <util:properties id="globalProps" location="classpath:spring-container/props/intg/*.properties"/>
+    </beans>
+
+    <beans profile="travis-ci">
+        <util:properties id="globalProps" location="classpath:spring-container/props/travis-ci/*.properties"/>
+    </beans>
+
+</beans>

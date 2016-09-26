@@ -12,6 +12,7 @@ install:
 
 script:
   - mvn clean -pl archetype-helloworld test
+  - mvn clean -pl archetype-helloworld-scala test
 
 after_failure:
   - cat archetype-helloworld/target/surefire-reports/*.txt
