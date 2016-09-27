@@ -1,10 +1,9 @@
 package dominus.language.scala
 
-import dominus.framework.junit.DominusJUnit4TestBase
-import org.junit.Test
 import org.junit.Assert._
+import org.junit.Test
 
-class TestHelloWorld extends DominusJUnit4TestBase {
+class TestHelloWorld {
 
   @Test def verifyEasy(): Unit = {
     val greeting = "Hello World";

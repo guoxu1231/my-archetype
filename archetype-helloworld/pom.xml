@@ -13,6 +13,7 @@
         <!-- AssertJ is not a part of Spring IO platform, so the version must be provided explicitly -->
         <assertj-core-version>3.1.0</assertj-core-version>
         <scala.version>2.11.8</scala.version>
+        <scala.version.short>2.11</scala.version.short>
         <cxf.version>3.1.4</cxf.version>
     </properties>
     <parent>
@@ -552,8 +553,6 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.datastore.persistent.mybatis.TestMyBatisDao</include>
                         <!-- java language -->
                         <include>dominus.language.threads.TestSynchronizer</include>
-                        <!--scala language -->
-                        <include>dominus.language.scala.TestHelloWorld</include>
                     </includes>
                 </configuration>
             </plugin>
@@ -607,24 +606,6 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>scala-maven-plugin</artifactId>
-                <version>3.2.1</version>
-                <executions>
-                    <execution>
-                        <id>scala-compile-first</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <scalaVersion>${scala.version}</scalaVersion>
-                </configuration>
             </plugin>
         </plugins>
     </build>
