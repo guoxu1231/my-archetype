@@ -3,6 +3,7 @@ package dominus.intg.jms.kafka;
 
 import dominus.framework.junit.annotation.MessageQueueTest;
 import kafka.admin.AdminClient;
+import kafka.admin.ConsumerGroupCommand;
 import kafka.common.MessageFormatter;
 import kafka.coordinator.GroupMetadataManager;
 import kafka.coordinator.MemberSummary;
@@ -240,6 +241,42 @@ public class KafkaConsumerTestcase extends KafkaZBaseTestCase {
         assertTrue("manual assignment should be never session timeout", true);
     }
 
+
+    @Test
+    @MessageQueueTest(produceTestMessage = false, count = 10000, queueName = "page_visits_10k")
+    public void testPrintConsumerGroupInfo() throws InterruptedException {
+
+        Properties properties = new Properties();
+        properties.setProperty(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, "1000");
+        Consumer consumer = createDefaultConsumer(testTopicName, groupId, properties, null);
+        long count = 0;
+        while (true) {
+            ConsumerRecords<String, String> records = consumer.poll(pollTimeout);
+            if (!records.isEmpty()) {
+                assertEquals(1000, records.count());
+                logger.info("polling {} records", records.count());
+                consumer.commitSync();
+                count += records.count();
+                if (count == messageQueueAnnotation.count())
+                    break;
+            }
+        }
+        logger.info("{} consume all messages in {}", groupId, testTopicName);
+
+        ConsumerGroupCommand.ConsumerGroupCommandOptions descOptions = new ConsumerGroupCommand.ConsumerGroupCommandOptions(
+                new String[]{String.format("--bootstrap-server=%s ", bootstrapServers),
+                        String.format("--group=%s", groupId), "--new-consumer", "--describe",
+                        String.format("--topic=%s", testTopicName),
+                });
+        ConsumerGroupCommand.ConsumerGroupCommandOptions listOptions = new ConsumerGroupCommand.ConsumerGroupCommandOptions(
+                new String[]{String.format("--bootstrap-server=%s ", bootstrapServers),
+                        "--new-consumer", "--list",
+                });
+        ConsumerGroupCommand.KafkaConsumerGroupService consumerGroupService = new ConsumerGroupCommand.KafkaConsumerGroupService(descOptions);
+        consumerGroupService.describe();
+        consumerGroupService = new ConsumerGroupCommand.KafkaConsumerGroupService(listOptions);
+        consumerGroupService.list();
+    }
 
     /**
      * test consumer the __consumer_offsets topic.
