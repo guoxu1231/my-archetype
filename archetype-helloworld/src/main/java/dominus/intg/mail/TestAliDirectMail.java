@@ -1,4 +1,4 @@
-package dominus.intg.notification.directmail;
+package dominus.intg.mail;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
