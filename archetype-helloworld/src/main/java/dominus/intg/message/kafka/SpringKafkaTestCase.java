@@ -1,4 +1,4 @@
-package dominus.intg.jms.kafka;
+package dominus.intg.message.kafka;
 
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;

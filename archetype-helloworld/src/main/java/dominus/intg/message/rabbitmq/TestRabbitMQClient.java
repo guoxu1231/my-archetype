@@ -1,4 +1,4 @@
-package dominus.intg.jms.rabbitmq;
+package dominus.intg.message.rabbitmq;
 
 
 import com.rabbitmq.client.*;

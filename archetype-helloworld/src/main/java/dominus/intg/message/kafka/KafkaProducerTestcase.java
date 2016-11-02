@@ -1,4 +1,4 @@
-package dominus.intg.jms.kafka;
+package dominus.intg.message.kafka;
 
 import dominus.framework.junit.annotation.MessageQueueTest;
 import org.apache.kafka.clients.producer.Producer;

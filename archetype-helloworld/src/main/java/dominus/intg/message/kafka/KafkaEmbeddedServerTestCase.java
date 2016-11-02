@@ -1,4 +1,4 @@
-package dominus.intg.jms.kafka;
+package dominus.intg.message.kafka;
 
 import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
@@ -71,7 +71,7 @@ public class KafkaEmbeddedServerTestCase extends KafkaZBaseTestCase {
         _kafkaServer.startup();
 
 
-        _zkClient = new ZkClient("localhost:10002", dominus.intg.jms.kafka.KafkaZBaseTestCase.zkSessionTimeout, dominus.intg.jms.kafka.KafkaZBaseTestCase.zkConnectionTimeout,
+        _zkClient = new ZkClient("localhost:10002", dominus.intg.message.kafka.KafkaZBaseTestCase.zkSessionTimeout, dominus.intg.message.kafka.KafkaZBaseTestCase.zkConnectionTimeout,
                 ZKStringSerializer$.MODULE$);
         ZkConnection zkConnection = new ZkConnection(properties.getProperty("zkQuorum"));
         _zkUtils = new ZkUtils(_zkClient, zkConnection, false);

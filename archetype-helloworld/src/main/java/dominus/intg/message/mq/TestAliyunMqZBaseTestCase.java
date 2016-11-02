@@ -1,4 +1,4 @@
-package dominus.intg.jms.mq;
+package dominus.intg.message.mq;
 
 
 import com.aliyun.openservices.ons.api.*;
@@ -15,7 +15,6 @@ import dominus.framework.junit.DominusJUnit4TestBase;
 import dominus.framework.junit.annotation.MessageQueueTest;
 import org.junit.Test;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.Properties;

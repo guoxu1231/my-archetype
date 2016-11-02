@@ -1,12 +1,6 @@
-package dominus.intg.jms.activemq;
+package dominus.intg.message.activemq;
 
-import java.io.File;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileSystemUtils;
 
 import javax.jms.Message;
 import javax.jms.MessageListener;

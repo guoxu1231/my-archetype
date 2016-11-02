@@ -1,11 +1,9 @@
-package dominus.intg.jms.mq.endpoint;
+package dominus.intg.message.mq.endpoint;
 
 import com.aliyun.openservices.ons.api.Action;
 import com.aliyun.openservices.ons.api.ConsumeContext;
 import com.aliyun.openservices.ons.api.Message;
 import com.aliyun.openservices.ons.api.MessageListener;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 
 public class ResumeMessageListener implements MessageListener {

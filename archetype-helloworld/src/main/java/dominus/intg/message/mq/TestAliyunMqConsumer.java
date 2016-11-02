@@ -1,4 +1,4 @@
-package dominus.intg.jms.mq;
+package dominus.intg.message.mq;
 
 
 import com.aliyun.openservices.ons.api.*;

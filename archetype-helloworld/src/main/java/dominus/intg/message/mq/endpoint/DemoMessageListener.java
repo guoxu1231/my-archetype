@@ -1,4 +1,4 @@
-package dominus.intg.jms.mq.endpoint;
+package dominus.intg.message.mq.endpoint;
 
 import com.aliyun.openservices.ons.api.Action;
 import com.aliyun.openservices.ons.api.ConsumeContext;
