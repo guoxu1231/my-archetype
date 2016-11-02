@@ -29,7 +29,7 @@
             </props>
         </constructor-arg>
     </bean>
-    <bean id="msgListener" class="dominus.intg.jms.mq.endpoint.DemoMessageListener"></bean>
+    <bean id="msgListener" class="dominus.intg.message.mq.endpoint.DemoMessageListener"></bean>
     <bean id="consumer" class="com.aliyun.openservices.ons.api.bean.ConsumerBean" init-method="start"
           destroy-method="shutdown">
         <property name="properties" ref="consumerProp"/>

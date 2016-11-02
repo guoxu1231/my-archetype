@@ -14,7 +14,7 @@
             </props>
         </constructor-arg>
     </bean>
-    <bean id="msgListener" class="dominus.intg.jms.mq.TestAliyunMqConsumer$DemoMessageListener"></bean>
+    <bean id="msgListener" class="dominus.intg.message.mq.TestAliyunMqConsumer$DemoMessageListener"></bean>
 
 
     <bean id="consumer" class="com.aliyun.openservices.ons.api.bean.ConsumerBean" init-method="start"
