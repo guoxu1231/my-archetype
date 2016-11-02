@@ -89,13 +89,23 @@
                 <dependency>
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-databind</artifactId>
-                    <version>2.6.7</version>
+                    <version>2.7.4</version>
                 </dependency>
                 <!-- EE: AVRO Binding -->
                 <dependency>
                     <groupId>org.apache.avro</groupId>
                     <artifactId>avro</artifactId>
                     <version>1.8.1</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.codehaus.jackson</groupId>
+                            <artifactId>jackson-core-asl</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>org.codehaus.jackson</groupId>
+                            <artifactId>jackson-mapper-asl</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
 
                 <!-- JMS -->
