@@ -9,7 +9,6 @@ import dominus.intg.datastore.mysql.MySqlDDLTest;
 import dominus.intg.datastore.mysql.MySqlJDBCShardTest;
 import dominus.intg.datastore.mysql.MySqlMetaDataTest;
 import dominus.intg.datastore.persistent.mybatis.TestMyBatisDao;
-import dominus.intg.datastore.redis.TestRedis;
 import dominus.intg.datastore.zookeeper.TestZKClient;
 import dominus.intg.scripting.GroovyIntgTest;
 import dominus.framework.binding.TestXmlBinding;
@@ -21,7 +20,7 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({MySqlDDLTest.class, MySqlMetaDataTest.class, MySqlJDBCShardTest.class, MysqlBinlogConnectorTest.class,
         GroovyIntgTest.class, TestXmlBinding.class, TestRetryTemplate.class,
-        MongoIntgTest.class, TestRedis.class, TestElasticSearchClient.class, TestZKClient.class,
+        MongoIntgTest.class, TestElasticSearchClient.class, TestZKClient.class,
         TestMyBatisDao.class, TestSynchronizer.class})
 public class BigDataTestSuite {
 
