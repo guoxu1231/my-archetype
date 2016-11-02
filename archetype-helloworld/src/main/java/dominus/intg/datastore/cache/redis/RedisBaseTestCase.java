@@ -1,4 +1,4 @@
-package dominus.intg.datastore.redis;
+package dominus.intg.datastore.cache.redis;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;

@@ -1,4 +1,4 @@
-package dominus.intg.memcache;
+package dominus.intg.datastore.cache.memcache;
 
 import net.spy.memcached.MemcachedClient;
 import org.springframework.context.ApplicationContext;

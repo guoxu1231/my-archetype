@@ -1,11 +1,7 @@
-package dominus.intg.datastore.redis;
+package dominus.intg.datastore.cache.redis;
 
 
-import dominus.framework.junit.DominusJUnit4TestBase;
 import org.junit.Test;
-import redis.clients.jedis.Jedis;
-
-import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;

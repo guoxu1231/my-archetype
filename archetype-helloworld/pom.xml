@@ -551,7 +551,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <!--<include>dominus.intg.jms.kafka09.SpringKafkaTestCase</include>-->
                         <!-- Datastore -->
                         <include>dominus.intg.datastore.mongodb.MongoIntgTest</include>
-                        <include>dominus.intg.datastore.redis.TestRedis</include>
+                        <include>dominus.intg.datastore.cache.redis.TestRedis</include>
                         <include>dominus.intg.datastore.elasticsearch.TestElasticSearchClient</include>
                         <include>dominus.intg.datastore.zookeeper.TestZKClient</include>
                         <include>dominus.intg.datastore.h2database.TestH2Database</include>
