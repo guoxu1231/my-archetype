@@ -14,7 +14,7 @@ install:
   - ./travis/install.sh
 
 script:
-  - nohup ./consul agent -dev
+  - nohup ./consul agent -dev &
   - mvn clean -pl archetype-helloworld test
   - mvn clean -pl archetype-helloworld-scala test
 
