@@ -7,10 +7,14 @@ os:
 
 sudo: required
 
+before_install:
+  - ./travis/travis_install_consul.sh
+
 install:
   - ./travis/install.sh
 
 script:
+  - ./consul agent -dev
   - mvn clean -pl archetype-helloworld test
   - mvn clean -pl archetype-helloworld-scala test
 

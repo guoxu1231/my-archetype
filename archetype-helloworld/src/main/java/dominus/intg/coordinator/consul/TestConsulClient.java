@@ -28,7 +28,7 @@ public class TestConsulClient extends DominusJUnit4TestBase {
     protected void doSetUp() throws Exception {
         super.doSetUp();
 
-        consul = Consul.builder().withUrl("http://10.253.11.216:8500").build(); // connect to Consul on localhost
+        consul = Consul.builder().withUrl(properties.getProperty("consul.url")).build(); // connect to Consul on localhost
 
     }
 

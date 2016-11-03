@@ -573,6 +573,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.datastore.elasticsearch.TestElasticSearchClient</include>
                         <include>dominus.intg.datastore.zookeeper.TestZKClient</include>
                         <include>dominus.intg.datastore.h2database.TestH2Database</include>
+                        <include>dominus.intg.coordinator.consul.TestConsulClient</include>
                         <!-- ORM integration -->
                         <include>dominus.intg.datastore.persistent.mybatis.TestMyBatisDao</include>
                         <!-- java language -->
