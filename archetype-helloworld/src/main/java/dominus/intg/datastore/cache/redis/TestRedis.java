@@ -1,12 +1,23 @@
 package dominus.intg.datastore.cache.redis;
 
 
+import com.google.common.io.Files;
 import org.junit.Test;
+
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class TestRedis extends RedisBaseTestCase {
+
+    String luaScript;
+
+    @Override
+    protected void doSetUp() throws Exception {
+        super.doSetUp();
+        luaScript = Files.toString(resourceLoader.getResource("classpath:script/redis_lua_sum_values.lua").getFile(), StandardCharsets.UTF_8);
+    }
 
     @Test
     public void testGetSet() {
@@ -37,8 +48,10 @@ public class TestRedis extends RedisBaseTestCase {
     }
 
     @Test
-    public void testExceedMaxMemory() {
-
+    public void testEvalScript() {
+        this.produceTestKVs(100);
+        String result = jedis.eval(luaScript).toString();
+        assertEquals("4950", result); //0..99
     }
 
 }

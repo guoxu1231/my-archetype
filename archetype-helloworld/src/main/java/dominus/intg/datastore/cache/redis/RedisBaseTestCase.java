@@ -33,6 +33,7 @@ public class RedisBaseTestCase extends DominusJUnit4TestBase {
     @Override
     protected void doTearDown() throws Exception {
         super.doTearDown();
+        jedis.flushDB();
         jedis.close();
     }
 
@@ -44,7 +45,8 @@ public class RedisBaseTestCase extends DominusJUnit4TestBase {
         for (long nEvents = 0; nEvents < count; nEvents++) {
             long runtime = new Date().getTime();
             String ip = "192.168.2." + nEvents;
-            String info = runtime + ",www.example.com," + ip;
+//            String info = runtime + ",www.example.com," + ip;
+            String info = String.valueOf(nEvents);
             logger.info("jedis set [key]:{}, [value]:{}, [status]:{}", ip, info, jedis.set(ip, info));
         }
         watch.stop();
