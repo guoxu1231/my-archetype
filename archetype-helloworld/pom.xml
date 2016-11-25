@@ -521,6 +521,19 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <version>0.13.2</version>
                 </dependency>
 
+                <!-- Google Pub/Sub-->
+                <dependency>
+                    <groupId>com.google.cloud</groupId>
+                    <artifactId>google-cloud-pubsub</artifactId>
+                    <version>0.4.0</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>io.dropwizard.metrics</groupId>
+                    <artifactId>metrics-core</artifactId>
+                    <version>3.1.0</version>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>
