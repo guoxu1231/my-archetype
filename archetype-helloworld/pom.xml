@@ -37,6 +37,12 @@
                     <version>1.1.6</version>
                 </dependency>
 
+                <dependency>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                    <version>3.4</version>
+                </dependency>
+
                 <!--Utility -->
                 <!-- Google Core Libraries for Java
                 http://google.github.io/guava/releases/19.0/api/docs/-->
@@ -285,26 +291,6 @@
                     <scope>compile</scope>
                 </dependency>
 
-                <!--hdfs & mapreduce also match CDH 5.4.x-->
-                <!-- Hadoop main client artifact -->
-                <dependency>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-client</artifactId>
-                    <version>2.6.2</version>
-                    <exclusions><!-- find out how log4j is getting on your path run mvn dependency:tree and comb through -->
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-yarn-client</artifactId>
-                    <version>2.6.2</version>
-                </dependency>
-
                 <!-- NIO framework -->
                 <dependency>
                     <groupId>io.netty</groupId>
@@ -330,32 +316,6 @@
                     <version>2.4.6</version>
                 </dependency>
 
-                <!--Sqoop Java Client API-->
-                <dependency>
-                    <groupId>org.apache.sqoop</groupId>
-                    <artifactId>sqoop-client</artifactId>
-                    <version>1.99.6</version>
-                </dependency>
-
-                <!-- Oozie Java Client API-->
-                <dependency>
-                    <groupId>org.apache.oozie</groupId>
-                    <artifactId>oozie-client</artifactId>
-                    <version>4.2.0</version>
-                    <!--
-                    SLF4J: Class path contains multiple SLF4J bindings.
-SLF4J: Found binding in [jar:file:/opt/Development/maven_repo/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-SLF4J: Found binding in [jar:file:/opt/Development/maven_repo/org/slf4j/slf4j-simple/1.6.6/slf4j-simple-1.6.6.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
-SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
-                    -->
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-simple</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
 
                 <!-- template engine -->
                 <dependency>
@@ -532,6 +492,67 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     <groupId>io.dropwizard.metrics</groupId>
                     <artifactId>metrics-core</artifactId>
                     <version>3.1.0</version>
+                </dependency>
+
+                <!--EE: Apache Hadoop Related Project, order by version-->
+                <!--EE: Apache HBase -->
+                <dependency>
+                    <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-shaded-client</artifactId>
+                    <version>1.2.4</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <!--hdfs & mapreduce also match CDH 5.4.x-->
+                <!-- EE: Hadoop main client artifact -->
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-client</artifactId>
+                    <version>2.6.2</version>
+                    <exclusions><!-- find out how log4j is getting on your path run mvn dependency:tree and comb through -->
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-yarn-client</artifactId>
+                    <version>2.6.2</version>
+                </dependency>
+
+                <!--EE:Sqoop Java Client API-->
+                <dependency>
+                    <groupId>org.apache.sqoop</groupId>
+                    <artifactId>sqoop-client</artifactId>
+                    <version>1.99.6</version>
+                </dependency>
+
+                <!-- EE:Oozie Java Client API-->
+                <dependency>
+                    <groupId>org.apache.oozie</groupId>
+                    <artifactId>oozie-client</artifactId>
+                    <version>4.2.0</version>
+                    <!--
+                    SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/opt/Development/maven_repo/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/opt/Development/maven_repo/org/slf4j/slf4j-simple/1.6.6/slf4j-simple-1.6.6.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+                    -->
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-simple</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
 
             </dependencies>

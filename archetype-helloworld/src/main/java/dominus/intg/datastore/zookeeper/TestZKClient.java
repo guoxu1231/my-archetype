@@ -2,7 +2,7 @@ package dominus.intg.datastore.zookeeper;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
-import org.apache.commons.lang.reflect.FieldUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.zookeeper.*;
 import org.junit.Ignore;
 import org.junit.Test;
