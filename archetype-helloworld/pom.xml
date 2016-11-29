@@ -589,6 +589,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.framework.binding.TestAvroBinding</include>
                         <include>dominus.framework.retry.TestRetryTemplate</include>
                         <include>dominus.framework.parser.sql.TestJSqlParser</include>
+                        <include>dominus.framework.metrics.TestMetricsIntg</include>
                         <!--<include>dominus.intg.jmx.TestGroovyMBean</include>-->
                         <!-- RPC -->
                         <!--<include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>-->
@@ -612,6 +613,8 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.datastore.persistent.mybatis.TestMyBatisDao</include>
                         <!-- java language -->
                         <include>dominus.language.threads.TestSynchronizer</include>
+                        <!--Big data -->
+                        <include>dominus.bigdata.hbase.TestHBaseClient</include>
                     </includes>
                 </configuration>
             </plugin>
