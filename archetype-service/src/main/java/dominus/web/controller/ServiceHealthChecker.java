@@ -32,7 +32,7 @@ public class ServiceHealthChecker {
     JavaMailSender mailSender;
 
 
-    @RequestMapping("/health")
+    @RequestMapping("/health-check")
     @ResponseBody
     String healthCheck() {
         logger.info("[{}] prepare to start service health check...", activeProfiles);
