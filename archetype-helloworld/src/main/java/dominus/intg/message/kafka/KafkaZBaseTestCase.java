@@ -51,10 +51,9 @@ public class KafkaZBaseTestCase extends DominusJUnit4TestBase {
 
     //test topic
     public static final String TEST_TOPIC_PREFIX = "page_visits_";
-    public static final String TEST_TOPIC_100K = TEST_TOPIC_PREFIX + "100K";
-    public static final String TEST_TOPIC_10K = TEST_TOPIC_PREFIX + "10K";
     String testTopicName;
     final String SEEDED_TOPIC = "page_visits_10k";
+    final Long SEEDED_TOPIC_COUNT = 10000L;
     final String COMMAND_TOPIC = "__consumer_command_request";
     final String COMMAND_REPLAY = "ALL-REPLAY";
     Producer _producer;

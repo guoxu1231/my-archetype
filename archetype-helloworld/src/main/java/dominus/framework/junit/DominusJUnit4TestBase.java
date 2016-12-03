@@ -25,6 +25,8 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -74,6 +76,8 @@ public class DominusJUnit4TestBase {
     public static final String ANSI_WHITE = "\u001B[37m";
 
     protected Random random = new Random();
+
+    protected ExecutorService executorService= Executors.newFixedThreadPool(4);
 
     public static void println(String color, Object x) {
         out.print(color);

@@ -601,6 +601,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.message.kafka.KafkaConsumerTestcase</include>
                         <include>dominus.intg.message.kafka.KafkaAdminTestCase</include>
                         <include>dominus.intg.message.kafka.TestKafkaStream</include>
+                        <include>dominus.intg.message.kafka.KafkaIntgTestCase</include>
                         <!--<include>dominus.intg.jms.kafka09.SpringKafkaTestCase</include>-->
                         <!-- Datastore -->
                         <include>dominus.intg.datastore.mongodb.MongoIntgTest</include>
