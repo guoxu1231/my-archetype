@@ -10,6 +10,7 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.io.compress.Compression.Algorithm;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -29,8 +30,17 @@ public class TestHBaseClient extends DominusJUnit4TestBase {
         super.doSetUp();
         //load hbase-default.xml and hbase-site.xml from java classpath.
         //habas-default.xml is packaged inside HBase.jar, hbase-site.xml will need to be added to the CLASSPATH.
-        Configuration config = HBaseConfiguration.create();
-        connection = ConnectionFactory.createConnection(config);
+        Configuration conf = new Configuration();
+        conf.addResource(String.format("cdh-clientconfig/%s/hbase/hbase-site.xml", activeProfile()));
+        //kerberos config
+        if ("kerberos".equals(properties.getProperty("hadoop.security.authentication"))) {
+            conf.setBoolean("hadoop.security.authorization", true);
+            conf.setStrings("hadoop.security.authentication", "kerberos");
+            UserGroupInformation.setConfiguration(conf);
+            UserGroupInformation.loginUserFromKeytab(properties.getProperty("hadoop.user"), properties.getProperty("hadoop.kerberos.keytab"));
+        }
+        Configuration hbaseConfig = HBaseConfiguration.create(conf);
+        connection = ConnectionFactory.createConnection(hbaseConfig);
         admin = connection.getAdmin();
 
         //construct HTable

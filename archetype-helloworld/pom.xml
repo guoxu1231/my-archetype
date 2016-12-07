@@ -495,19 +495,6 @@
                 </dependency>
 
                 <!--EE: Apache Hadoop Related Project, order by version-->
-                <!--EE: Apache HBase -->
-                <dependency>
-                    <groupId>org.apache.hbase</groupId>
-                    <artifactId>hbase-shaded-client</artifactId>
-                    <version>1.2.4</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
                 <!--hdfs & mapreduce also match CDH 5.4.x-->
                 <!-- EE: Hadoop main client artifact -->
                 <dependency>
@@ -539,7 +526,7 @@
                 <dependency>
                     <groupId>org.apache.oozie</groupId>
                     <artifactId>oozie-client</artifactId>
-                    <version>4.2.0</version>
+                    <version>4.3.0</version>
                     <!--
                     SLF4J: Class path contains multiple SLF4J bindings.
 SLF4J: Found binding in [jar:file:/opt/Development/maven_repo/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
@@ -551,6 +538,19 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <exclusion>
                             <groupId>org.slf4j</groupId>
                             <artifactId>slf4j-simple</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+
+                <!--EE: Apache HBase -->
+                <dependency>
+                    <groupId>org.apache.hbase</groupId>
+                    <artifactId>hbase-shaded-client</artifactId>
+                    <version>1.2.4</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
                         </exclusion>
                     </exclusions>
                 </dependency>
