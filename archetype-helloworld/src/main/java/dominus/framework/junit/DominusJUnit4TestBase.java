@@ -77,7 +77,7 @@ public class DominusJUnit4TestBase {
 
     protected Random random = new Random();
 
-    protected ExecutorService executorService= Executors.newFixedThreadPool(4);
+    protected ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     public static void println(String color, Object x) {
         out.print(color);
@@ -120,6 +120,10 @@ public class DominusJUnit4TestBase {
         return environment.getActiveProfiles()[0].contains("local");
     }
 
+    protected String activeProfile() {
+        return environment.getActiveProfiles()[0];
+    }
+
     protected File createSampleFile(int size) throws IOException {
         File file = File.createTempFile("DominusBaseTestCase", ".txt");
         file.deleteOnExit();
@@ -131,7 +135,7 @@ public class DominusJUnit4TestBase {
             writer.write("0123456789011234567890\n");
         }
         writer.close();
-        out.printf("Create Sample File: %sb\n", size);
+        logger.info("Create Sample File: {}b", size);
         return file;
     }
 
