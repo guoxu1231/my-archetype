@@ -1,62 +1,74 @@
 package dominus.bigdata.hdfs;
 
 
-import dominus.framework.junit.DominusBaseTestCase;
+import dominus.framework.junit.DominusJUnit4TestBase;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+
+import static org.junit.Assert.*;
 
 /**
  * Hadoop’s org.apache.hadoop.fs.FileSystem is generic class to access and manage HDFS files/directories located in distributed environment.
  * EE: HDFS Configuration Files(core-site.xml and hdfs-site.xml) from Cloudera Manager
  */
-public class HdfsClientTest extends DominusBaseTestCase {
+public class HdfsClientTest extends DominusJUnit4TestBase {
 
     FileSystem fs;
-    Path TEMP_DIR_PATH = new Path("/user/shawguo/tmp4test");
-    String TEMP_DIR_STR = "/user/shawguo/tmp4test/";
+    String tempDir;
+    Path tempDirPath;
     Configuration conf;
 
     @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    protected void doSetUp() throws Exception {
+
+        tempDir = properties.getProperty("hadoop.hdfs.tmp");
+        tempDirPath = new Path(tempDir);
+
         conf = new Configuration();
-        conf.addResource("hdfs-clientconfig-cdh/core-site.xml");
-        conf.addResource("hdfs-clientconfig-cdh/hdfs-site.xml");
-        //EE: disable file system cache
+        conf.addResource(String.format("cdh-clientconfig/%s/hdfs/core-site.xml", activeProfile()));
+        conf.addResource(String.format("cdh-clientconfig/%s/hdfs/hdfs-site.xml", activeProfile()));
+        //disable file system cache
         conf.setBoolean("fs.hdfs.impl.disable.cache", true);
-        try {
-            fs = FileSystem.get(conf);
-            out.printf("File System Capacity:%sG\n", fs.getStatus().getCapacity() / GB);
-        } catch (IOException e) {
-            e.printStackTrace();
+        //kerberos config
+        if ("kerberos".equals(properties.getProperty("hadoop.security.authentication"))) {
+            conf.setBoolean("hadoop.security.authorization", true);
+            conf.setStrings("hadoop.security.authentication", "kerberos");
+            UserGroupInformation.setConfiguration(conf);
+            UserGroupInformation.loginUserFromKeytab(properties.getProperty("hadoop.user"), properties.getProperty("hadoop.kerberos.keytab"));
         }
-        assertNotNull(fs);
+        fs = FileSystem.get(conf);
+        logger.info("File System Capacity:{}G", fs.getStatus().getCapacity() / GB);
+
         assertEquals(fs.getScheme(), "hdfs");
-        fs.mkdirs(TEMP_DIR_PATH);
+        if (fs.mkdirs(tempDirPath))
+            logger.info("create temp dir {}", tempDir);
     }
 
     @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-        fs.delete(TEMP_DIR_PATH, true);
+    protected void doTearDown() throws Exception {
+        if (fs.delete(tempDirPath, true))
+            logger.info(tempDir + " is deleted.");
         if (fs != null) fs.close();
     }
 
+    @Test
     public void testCopyFromLocalFile() throws IOException {
 
-        assertTrue(fs.exists(TEMP_DIR_PATH));
+        assertTrue(fs.exists(tempDirPath));
         //copy single file, overwrite
-        fs.copyFromLocalFile(false, true, new Path(resourceLoader.getResource("classpath:log4j.properties").getURI()), TEMP_DIR_PATH);
-        assertTrue(fs.exists(new Path(TEMP_DIR_STR + "log4j.properties")));
+        fs.copyFromLocalFile(false, true, new Path(resourceLoader.getResource("classpath:log4j.properties").getURI()), tempDirPath);
+        assertTrue(fs.exists(new Path(tempDir + "/log4j.properties")));
         //copy folder
-        fs.copyFromLocalFile(false, true, new Path(resourceLoader.getResource("classpath:oozie/apps/demo").getURI()), TEMP_DIR_PATH);
-        assertTrue(fs.isDirectory(new Path(TEMP_DIR_STR + "demo")));
-        assertTrue(fs.exists(new Path(TEMP_DIR_STR + "demo")));
+        fs.copyFromLocalFile(false, true, new Path(resourceLoader.getResource("classpath:oozie/apps/demo").getURI()), tempDirPath);
+        assertTrue(fs.isDirectory(new Path(tempDir + "/demo")));
+        assertTrue(fs.exists(new Path(tempDir + "/demo")));
     }
 
     /**
@@ -65,30 +77,17 @@ public class HdfsClientTest extends DominusBaseTestCase {
      *
      * @throws IOException
      */
+    @Test
     public void testBlockAndReplication() throws IOException {
-        /**
-         * The default block size for new files, in bytes.
-         * You can use the following suffix (case insensitive): k(kilo), m(mega), g(giga), t(tera), p(peta), e(exa) to specify the size (such as 128k, 512m, 1g, etc.),
-         * Or provide complete size in bytes (such as 134217728 for 128 MB).
-         */
-        conf.set("dfs.blocksize", "2m");
-        //EE:org.apache.hadoop.ipc.RemoteException(java.io.IOException): Specified block size is less than configured minimum value (dfs.namenode.fs-limits.min-block-size): 20480 < 1048576
-        /**
-         * Default block replication. The actual number of replications can be specified when the file is created.
-         * The default is used if replication is not specified in create time.
-         */
-        conf.set("dfs.replication", "1");
-        //TODO replication factor large than cluster size
-        //EE:org.apache.hadoop.ipc.RemoteException(java.io.IOException): Requested replication factor of 1000 exceeds maximum of 512
 
-        FileSystem test_fs = null;
-        test_fs = FileSystem.get(conf);
+        conf.set("dfs.blocksize", "2m");
+        conf.set("dfs.replication", "2");
 
         final File sampleFile = this.createSampleFile(1 * MB);
-        test_fs.copyFromLocalFile(false, true, new Path(sampleFile.toURI()), TEMP_DIR_PATH);
-        FileStatus status = test_fs.getFileStatus(new Path(TEMP_DIR_PATH, sampleFile.getName()));
-        out.println(status);
-        assertEquals(1, status.getReplication());
-        assertEquals(2 * MB, status.getBlockSize());
+        fs.copyFromLocalFile(false, true, new Path(sampleFile.toURI()), tempDirPath);
+        FileStatus status = fs.getFileStatus(new Path(tempDir, sampleFile.getName()));
+        logger.info(status.toString());
+        assertEquals(2, status.getReplication());
+        assertEquals(2 * MB, status.getBlockSize());//TODO
     }
 }
