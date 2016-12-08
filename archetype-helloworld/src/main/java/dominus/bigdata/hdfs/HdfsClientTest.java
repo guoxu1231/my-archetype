@@ -80,14 +80,19 @@ public class HdfsClientTest extends DominusJUnit4TestBase {
     @Test
     public void testBlockAndReplication() throws IOException {
 
+        //overridden dfs parameters
         conf.set("dfs.blocksize", "2m");
         conf.set("dfs.replication", "2");
 
+        FileSystem overriddenFS = FileSystem.get(conf);
+
         final File sampleFile = this.createSampleFile(1 * MB);
-        fs.copyFromLocalFile(false, true, new Path(sampleFile.toURI()), tempDirPath);
+        overriddenFS.copyFromLocalFile(false, true, new Path(sampleFile.toURI()), tempDirPath);
         FileStatus status = fs.getFileStatus(new Path(tempDir, sampleFile.getName()));
         logger.info(status.toString());
         assertEquals(2, status.getReplication());
-        assertEquals(2 * MB, status.getBlockSize());//TODO
+        assertEquals(2 * MB, status.getBlockSize());
+
+        overriddenFS.close();
     }
 }
