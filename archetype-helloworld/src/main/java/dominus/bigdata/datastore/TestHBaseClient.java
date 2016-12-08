@@ -1,4 +1,4 @@
-package dominus.bigdata.hbase;
+package dominus.bigdata.datastore;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
@@ -61,7 +61,6 @@ public class TestHBaseClient extends DominusJUnit4TestBase {
         admin.createTable(table);
     }
 
-
     @Override
     protected void doTearDown() throws Exception {
         super.doTearDown();
@@ -73,7 +72,7 @@ public class TestHBaseClient extends DominusJUnit4TestBase {
         Table table = connection.getTable(TableName.valueOf(HBASE_TEST_TABLE));
         Put put1 = new Put(Bytes.toBytes("row1"));
         put1.addColumn(toBytes(CF_DEFAULT), toBytes("col1"), toBytes("val1"));
-        put1.addColumn(toBytes(CF_DEFAULT),toBytes("col2"),toBytes("val2"));
+        put1.addColumn(toBytes(CF_DEFAULT), toBytes("col2"), toBytes("val2"));
         table.put(put1);
         table.close();
     }
