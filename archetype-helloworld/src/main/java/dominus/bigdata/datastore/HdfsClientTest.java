@@ -1,16 +1,16 @@
-package dominus.bigdata.hdfs;
+package dominus.bigdata.datastore;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -60,7 +60,6 @@ public class HdfsClientTest extends DominusJUnit4TestBase {
 
     @Test
     public void testCopyFromLocalFile() throws IOException {
-
         assertTrue(fs.exists(tempDirPath));
         //copy single file, overwrite
         fs.copyFromLocalFile(false, true, new Path(resourceLoader.getResource("classpath:log4j.properties").getURI()), tempDirPath);
@@ -82,17 +81,50 @@ public class HdfsClientTest extends DominusJUnit4TestBase {
 
         //overridden dfs parameters
         conf.set("dfs.blocksize", "2m");
-        conf.set("dfs.replication", "2");
+        conf.set("dfs.replication", "3");
 
+        //overridden DFS client
         FileSystem overriddenFS = FileSystem.get(conf);
-
         final File sampleFile = this.createSampleFile(1 * MB);
         overriddenFS.copyFromLocalFile(false, true, new Path(sampleFile.toURI()), tempDirPath);
-        FileStatus status = fs.getFileStatus(new Path(tempDir, sampleFile.getName()));
+        overriddenFS.close();
+
+        Path testDfsFile = new Path(tempDir, sampleFile.getName());
+        FileStatus status = fs.getFileStatus(testDfsFile);
         logger.info(status.toString());
-        assertEquals(2, status.getReplication());
+        assertEquals(3, status.getReplication());
         assertEquals(2 * MB, status.getBlockSize());
 
-        overriddenFS.close();
+        //get file block location info
+        BlockLocation[] locations = fs.getFileBlockLocations(testDfsFile, 0, status.getLen());
+        logger.info("FileBlockLocation: {}", locations.length);
+        for (BlockLocation location : locations)
+            logger.info("hosts:{} offset:{} length:{}", Arrays.toString(location.getNames()), location.getOffset(), location.getLength());
+
+        //check md5sum
+        FileChecksum md51 = fs.getFileChecksum(testDfsFile);
+        logger.info(md51.toString());
+    }
+
+    @Test
+    public void testDFSCopyWrite() throws IOException {
+        final File sampleFile = this.createSampleFile(2 * MB);
+        fs.copyFromLocalFile(false, true, new Path(sampleFile.toURI()), tempDirPath);
+        Path testDfsFile = new Path(tempDir, sampleFile.getName());
+
+        //test DFS copy-write
+        FSDataInputStream in = fs.open(testDfsFile);
+        FSDataOutputStream out = fs.create(new Path(testDfsFile.getParent(), "test-copy-write"));
+        ByteBuffer buffer = ByteBuffer.allocate(1000);
+        int bytesRead;
+        byte[] bytes;
+        while ((bytesRead = in.read(buffer)) > 0) {
+            bytes = buffer.array();
+            out.write(bytes, 0, bytesRead);
+            buffer.clear();
+        }
+        in.close();
+        out.close();
+        assertEquals(fs.getFileChecksum(testDfsFile), fs.getFileChecksum(new Path(testDfsFile.getParent(), "test-copy-write")));
     }
 }
