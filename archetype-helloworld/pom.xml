@@ -615,7 +615,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <!-- java language -->
                         <include>dominus.language.threads.TestSynchronizer</include>
                         <!--Big data -->
-                        <include>dominus.bigdata.hbase.TestHBaseClient</include>
+                        <include>dominus.bigdata.datastore.TestHBaseClient</include>
                     </includes>
                 </configuration>
             </plugin>
