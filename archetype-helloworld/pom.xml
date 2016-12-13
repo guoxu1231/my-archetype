@@ -113,6 +113,11 @@
                         </exclusion>
                     </exclusions>
                 </dependency>
+                <dependency>
+                    <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-java</artifactId>
+                    <version>3.0.0</version>
+                </dependency>
 
                 <!-- JMS -->
                 <dependency>
@@ -586,6 +591,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.scripting.GroovyIntgTest</include>
                         <include>dominus.framework.binding.TestXmlBinding</include>
                         <include>dominus.framework.binding.TestJsonBinding</include>
+                        <include>dominus.framework.binding.TestProtobufBinding</include>
                         <include>dominus.framework.binding.TestAvroBinding</include>
                         <include>dominus.framework.retry.TestRetryTemplate</include>
                         <include>dominus.framework.parser.sql.TestJSqlParser</include>
@@ -666,6 +672,24 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         </configuration>
                         <goals>
                             <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Maven Protocol Buffers Plugin uses Protocol Buffer Compiler (protoc) tool to generate Java source files from .proto (protocol buffer definition) files for the specified project. -->
+            <!-- https://www.xolstice.org/protobuf-maven-plugin/usage.html -->
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.5.0</version>
+                <configuration>
+                    <protocExecutable>${basedir}/lib/protoc-3.0.0/bin/protoc</protocExecutable>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>test-compile</goal>
                         </goals>
                     </execution>
                 </executions>

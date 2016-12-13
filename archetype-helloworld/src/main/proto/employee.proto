@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package dominus.framework.binding.bean;
+
+option java_package = "dominus.framework.binding.bean";
+option java_outer_classname = "EmployeeProtos";
+
+message Employee {
+    int32 empNo = 1;
+    int64 birthDate = 2;
+    string firstName = 3;
+    string lastName = 4;
+    string gender = 5;
+    int64 hireDate = 6;
+}
