@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:spring-container/junit4_base_context.xml")
-@ActiveProfiles("travis-ci")
+@ActiveProfiles("local")
 public class DominusJUnit4TestBase {
 
     @Resource(name = "globalProps")
