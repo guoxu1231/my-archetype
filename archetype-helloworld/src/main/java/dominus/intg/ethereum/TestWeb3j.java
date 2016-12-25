@@ -82,14 +82,37 @@ public class TestWeb3j extends DominusJUnit4TestBase {
 
     //0xed4d2eb2e1ba761ae8147b35c3a9fb797acd832a
     @Test
-    public void testCallContract() throws ExecutionException, InterruptedException {
+    public void testLocalCall() throws ExecutionException, InterruptedException {
         Marriage contract = Marriage.load("0xed4d2eb2e1ba761ae8147b35c3a9fb797acd832a", web3, credentials, gasPrice, gasLimit);
         //local call
         logger.info(new String(contract.partner1().get().getValue()));
         logger.info(new String(contract.partner2().get().getValue()));
         logger.info(new String(contract.marriageStatus().get().getValue()));
-//        logger.info(new String(contract..get().getValue()));
-//        logger.info(ToStringBuilder.reflectionToString(receipt));
+        TransactionReceipt receipt = contract.setStatus(new Bytes32(Arrays.copyOf("happy new year".getBytes(), 32))).get();
+        logger.info(ToStringBuilder.reflectionToString(receipt));
+    }
 
+    //send multiple transaction at the same time without waiting for receipt.
+    @Test
+    public void testSendMultipleTransaction() throws ExecutionException, InterruptedException {
+        Marriage contract = Marriage.load("0xed4d2eb2e1ba761ae8147b35c3a9fb797acd832a", web3, credentials, gasPrice, gasLimit);
+        Future<TransactionReceipt>[] futures = new Future[100];
+
+        for (int i = 0; i < 2; i++) {
+            String status = String.format("married %dth anniversary", i);
+            futures[i] = contract.setStatus(new Bytes32(Arrays.copyOf(status.getBytes(), 32)));
+            logger.info("{} tx-change status to {}", i, status);
+
+//            sleep(14000);
+        }
+        for (int i = 0; i < 2; i++) {
+            TransactionReceipt receipt = futures[i].get();
+            logger.info(ToStringBuilder.reflectionToString(receipt));//TODO failed to send multiple transaction at same time
+        }
+    }
+
+    @Test
+    public void testDuplicateTransaction() {
+        //same content
     }
 }
