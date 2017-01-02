@@ -280,11 +280,27 @@
                     <!-- must match file name -->
                 </dependency>
 
-                <!--mongodb -->
+                <!--EE: mongodb -->
+                <dependency>
+                    <groupId>org.mongodb</groupId>
+                    <artifactId>mongo-java-driver</artifactId>
+                    <version>3.4.1</version>
+                </dependency>
                 <dependency>
                     <groupId>org.springframework.data</groupId>
                     <artifactId>spring-data-mongodb</artifactId>
-                    <version>1.6.3.RELEASE</version>
+                    <version>1.9.6.RELEASE</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.mongodb</groupId>
+                            <artifactId>mongo-java-driver</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.mongodb.morphia</groupId>
+                    <artifactId>morphia</artifactId>
+                    <version>1.3.0</version>
                 </dependency>
 
                 <!-- EE: Redis -->
@@ -622,7 +638,7 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                         <include>dominus.intg.message.kafka.KafkaIntgTestCase</include>
                         <!--<include>dominus.intg.jms.kafka09.SpringKafkaTestCase</include>-->
                         <!-- Datastore -->
-                        <include>dominus.intg.datastore.mongodb.MongoIntgTest</include>
+                        <include>dominus.intg.datastore.mongodb.TestSpringDataClient</include>
                         <include>dominus.intg.datastore.cache.redis.TestRedis</include>
                         <include>dominus.intg.datastore.elasticsearch.TestElasticSearchClient</include>
                         <include>dominus.intg.datastore.zookeeper.TestZKClient</include>

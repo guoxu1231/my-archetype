@@ -1,14 +1,22 @@
 package dominus.intg.datastore.mongodb;
 
 
-import org.springframework.data.annotation.Id;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
 @Document
+//morphia client
+@Entity("employees")
+@Indexes(
+        @Index(value = "emp_no", fields = @Field("emp_no"))
+)
 public class Employee {
     @Id
+    private ObjectId id;
     private Integer emp_no;
     private Date birth_date;
     private String first_name;
@@ -32,7 +40,12 @@ public class Employee {
     @Override
     public String toString() {
         return String.format(
-                "Employee[emp_no=%s, birth_date='%t', first_name='%s', last_name='%s', gender='%c', hire_date='%t']",
-                emp_no, birth_date, first_name, last_name, gender, hire_date);
+                "Employee[emp_no=%s, birth_date='%tF',birth_date_long='%d' first_name='%s', last_name='%s', gender='%s', hire_date='%tF'], hire_date_long='%d'",
+                emp_no, birth_date, birth_date.getTime(), first_name, last_name, gender, hire_date, hire_date.getTime());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
     }
 }
