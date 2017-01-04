@@ -37,7 +37,9 @@
     <properties>
         <java.version>1.8</java.version>
         <start-class>dominus.web.WebApplication</start-class>
-        <docker.image.prefix>springio</docker.image.prefix>
+        <docker.image.prefix>guoxu1231</docker.image.prefix>
+        <scala.version>2.11.8</scala.version>
+        <scalatra.version>2.4.0</scalatra.version>
     </properties>
 
     <dependencies>
