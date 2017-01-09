@@ -4,10 +4,13 @@ package dominus.intg.datastore.cache.redis;
 import dominus.framework.junit.DominusJUnit4TestBase;
 import org.springframework.util.StopWatch;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Protocol;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 public class RedisBaseTestCase extends DominusJUnit4TestBase {
@@ -49,6 +52,24 @@ public class RedisBaseTestCase extends DominusJUnit4TestBase {
             String info = String.valueOf(nEvents);
             logger.info("jedis set [key]:{}, [value]:{}, [status]:{}", ip, info, jedis.set(ip, info));
         }
+        watch.stop();
+        System.out.println(watch);
+    }
+
+    public void pipelineProduceTestKVs(long count) {
+        Random rnd = new Random();
+        StopWatch watch = new StopWatch("[Producer] message count:" + count);
+        watch.start();
+        Pipeline pipeline = jedis.pipelined();
+        for (long nEvents = 0; nEvents < count; nEvents++) {
+            long runtime = new Date().getTime();
+            String ip = "192.168.2." + nEvents;
+//            String info = runtime + ",www.example.com," + ip;
+            String info = String.valueOf(nEvents);
+            logger.info("jedis set [key]:{}, [value]:{}", ip, info, pipeline.set(ip, info));
+        }
+        List<Object> results = pipeline.syncAndReturnAll();
+        logger.info("pipeline response {}", Arrays.toString(results.toArray()));
         watch.stop();
         System.out.println(watch);
     }

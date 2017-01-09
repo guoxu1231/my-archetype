@@ -54,4 +54,10 @@ public class TestRedis extends RedisBaseTestCase {
         assertEquals("4950", result); //0..99
     }
 
+    @Test
+    public void testPipeline() {
+        this.produceTestKVs(1000);
+        this.pipelineProduceTestKVs(1000);
+    }
+
 }
