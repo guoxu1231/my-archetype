@@ -29,7 +29,7 @@ public class TestWeb3j extends DominusJUnit4TestBase {
     protected Web3j web3;
     protected Credentials credentials;
     protected BigInteger gasPrice;
-    protected BigInteger gasLimit = BigInteger.valueOf(300000);//TODO bug in web3j?4712388
+    protected BigInteger gasLimit = BigInteger.valueOf(4000000);//TODO bug in web3j?4712388
 
 
     @Override
@@ -40,6 +40,8 @@ public class TestWeb3j extends DominusJUnit4TestBase {
         gasPrice = web3.ethGasPrice().send().getGasPrice();
         logger.info("current price per gas in wei {}", gasPrice);
         logger.info("transaction nonce:{}", web3.ethGetTransactionCount(properties.getProperty("geth.coinbase.address"), DefaultBlockParameterName.LATEST).send().getTransactionCount());
+        if (web3.ethSyncing().send().isSyncing())
+            logger.error("geth is syncing....");
     }
 
     @Test
@@ -92,7 +94,7 @@ public class TestWeb3j extends DominusJUnit4TestBase {
         logger.info(new String(contract.partner1().get().getValue()));
         logger.info(new String(contract.partner2().get().getValue()));
         logger.info(new String(contract.marriageStatus().get().getValue()));
-        String uniqueStr = "happy new year "+System.currentTimeMillis();
+        String uniqueStr = "happy new year " + System.currentTimeMillis();
         TransactionReceipt receipt = contract.setStatus(new Bytes32(Arrays.copyOf(uniqueStr.getBytes(), 32))).get();
         logger.info(ToStringBuilder.reflectionToString(receipt));
         logger.info(new String(contract.marriageStatus().get().getValue()));

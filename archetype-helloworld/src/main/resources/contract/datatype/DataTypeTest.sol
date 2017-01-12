@@ -35,7 +35,7 @@ contract DataTypeTest
        var2.push(_var2);
     }
 
-    function testStringlibrary() constant returns (uint256) {
+    function testUsinglibrary() constant returns (uint256) {
       return "var2".toSlice().len();
     }
 
