@@ -11,6 +11,7 @@ import org.web3j.crypto.Credentials;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import rx.Subscription;
@@ -24,10 +25,10 @@ import java.util.concurrent.Future;
 import static org.junit.Assert.assertNotNull;
 
 public class TestWeb3j extends DominusJUnit4TestBase {
-    Web3j web3;
-    Credentials credentials;
-    BigInteger gasPrice;
-    BigInteger gasLimit = BigInteger.valueOf(4712388);//TODO bug in web3j?
+    protected Web3j web3;
+    protected Credentials credentials;
+    protected BigInteger gasPrice;
+    protected BigInteger gasLimit = BigInteger.valueOf(4712388);//TODO bug in web3j?4712388
 
 
     @Override
@@ -37,6 +38,7 @@ public class TestWeb3j extends DominusJUnit4TestBase {
         credentials = WalletUtils.loadCredentials(properties.getProperty("geth.coinbase.password"), properties.getProperty("geth.coinbase.wallet.file"));
         gasPrice = web3.ethGasPrice().send().getGasPrice();
         logger.info("current price per gas in wei {}", gasPrice);
+        logger.info("transaction nonce:{}", web3.ethGetTransactionCount(properties.getProperty("geth.coinbase.address"), DefaultBlockParameterName.LATEST).send().getTransactionCount());
     }
 
     @Test
@@ -48,6 +50,7 @@ public class TestWeb3j extends DominusJUnit4TestBase {
         out.printf("\tcoinbase account balance:%s\n", web3.ethGetBalance(properties.getProperty("geth.coinbase.address"), DefaultBlockParameter.valueOf("latest")));
         out.printf("\tmining status:%s\n", web3.ethMining().send().isMining());
         out.printf("\tblock number:%s\n", web3.ethBlockNumber().send().getBlockNumber());
+        out.printf("\tnonce:%s\n", web3.ethGetTransactionCount(properties.getProperty("geth.coinbase.address"), DefaultBlockParameterName.LATEST).send().getTransactionCount());
     }
 
     @Test
@@ -88,8 +91,10 @@ public class TestWeb3j extends DominusJUnit4TestBase {
         logger.info(new String(contract.partner1().get().getValue()));
         logger.info(new String(contract.partner2().get().getValue()));
         logger.info(new String(contract.marriageStatus().get().getValue()));
-        TransactionReceipt receipt = contract.setStatus(new Bytes32(Arrays.copyOf("happy new year".getBytes(), 32))).get();
+        String uniqueStr = "happy new year "+System.currentTimeMillis();
+        TransactionReceipt receipt = contract.setStatus(new Bytes32(Arrays.copyOf(uniqueStr.getBytes(), 32))).get();
         logger.info(ToStringBuilder.reflectionToString(receipt));
+        logger.info(contract.marriageStatus().get().toString());
     }
 
     //send multiple transaction at the same time without waiting for receipt.
