@@ -2,6 +2,7 @@ package dominus.intg.ethereum;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
+import dominus.intg.ethereum.contract.Marriage;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.junit.Test;
 import org.springframework.util.StopWatch;

@@ -1,4 +1,4 @@
-package dominus.intg.ethereum;
+package dominus.intg.ethereum.contract;
 
 import java.lang.String;
 import java.math.BigInteger;
