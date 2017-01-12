@@ -28,7 +28,7 @@ public class TestWeb3j extends DominusJUnit4TestBase {
     protected Web3j web3;
     protected Credentials credentials;
     protected BigInteger gasPrice;
-    protected BigInteger gasLimit = BigInteger.valueOf(4712388);//TODO bug in web3j?4712388
+    protected BigInteger gasLimit = BigInteger.valueOf(300000);//TODO bug in web3j?4712388
 
 
     @Override
@@ -94,7 +94,7 @@ public class TestWeb3j extends DominusJUnit4TestBase {
         String uniqueStr = "happy new year "+System.currentTimeMillis();
         TransactionReceipt receipt = contract.setStatus(new Bytes32(Arrays.copyOf(uniqueStr.getBytes(), 32))).get();
         logger.info(ToStringBuilder.reflectionToString(receipt));
-        logger.info(contract.marriageStatus().get().toString());
+        logger.info(new String(contract.marriageStatus().get().getValue()));
     }
 
     //send multiple transaction at the same time without waiting for receipt.
