@@ -19,7 +19,6 @@
         <module>archetype-helloworld-scala</module>
         <module>archetype-www</module>
         <module>archetype-webapp</module>
-        <module>archetype-tstack</module>
     </modules>
 
     <dependencies>
