@@ -124,6 +124,8 @@ object FlightDelay {
 
     val model = DecisionTree.trainClassifier(trainingData, numClasses, categoricalFeaturesInfo,
       impurity, maxDepth, maxBins)
+    // print out the decision tree
+    println(model.toDebugString)
 
     val labelAndPreds = testData.map { point =>
       val prediction = model.predict(point.features)
