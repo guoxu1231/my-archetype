@@ -10,6 +10,60 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>archetype-hadoop</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>dominus</groupId>
+            <artifactId>archetype-common</artifactId>
+            <version>0.9</version>
+        </dependency>
 
+        <!--EE: Apache Hadoop Related Project, order by version-->
+        <!--hdfs & mapreduce also match CDH 5.4.x-->
+        <!-- EE: Hadoop main client artifact -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+            <version>2.6.2</version>
+            <exclusions><!-- find out how log4j is getting on your path run mvn dependency:tree and comb through -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-yarn-client</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+
+
+        <!--TODO <dependency>-->
+            <!--<groupId>org.apache.hadoop</groupId>-->
+            <!--<artifactId>hadoop-minicluster</artifactId>-->
+            <!--<version>2.6.2</version>-->
+        <!--</dependency>-->
+
+        <!--EE: Apache HBase -->
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-shaded-client</artifactId>
+            <version>1.2.4</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+
+    </dependencies>
 
 </project>
