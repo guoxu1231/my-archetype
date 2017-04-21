@@ -35,8 +35,8 @@ public class HdfsClientTest extends DominusJUnit4TestBase {
 
         //EE: connect to cloudera cdh cluster
         if (!isLocalEnvironment()) {
-            conf.addResource(String.format("cdh-clientconfig/%s/hdfs/core-site.xml", activeProfile()));
-            conf.addResource(String.format("cdh-clientconfig/%s/hdfs/hdfs-site.xml", activeProfile()));
+            conf.addResource("cdh-clientconfig/core-site.xml");
+            conf.addResource("cdh-clientconfig/hdfs-site.xml");
             //disable file system cache
             conf.setBoolean("fs.hdfs.impl.disable.cache", true);
             //kerberos config
