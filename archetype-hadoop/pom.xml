@@ -10,6 +10,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>archetype-hadoop</artifactId>
+    <packaging>jar</packaging>
+    <version>0.5</version>
+
+
     <dependencies>
         <dependency>
             <groupId>dominus</groupId>
@@ -56,6 +60,13 @@
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!--EE:Sqoop Java Client API-->
+        <dependency>
+            <groupId>org.apache.sqoop</groupId>
+            <artifactId>sqoop-client</artifactId>
+            <version>1.99.6</version>
         </dependency>
 
         <dependency>
