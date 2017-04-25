@@ -23,3 +23,8 @@
 /archetype-helloworld/target
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/archetype-common/archetype-common.iml
+/archetype-hadoop/archetype-hadoop.iml
+/archetype-hadoop/src/main/resources/spring-container/props/intg/
+/archetype-hello-scala/target/
+/archetype-hello-scala/archetype-hello-scala.iml
