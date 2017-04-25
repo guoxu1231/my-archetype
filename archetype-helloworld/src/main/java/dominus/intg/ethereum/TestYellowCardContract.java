@@ -1,7 +1,7 @@
 package dominus.intg.ethereum;
 
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.Test;
 import org.springframework.util.StopWatch;
 import org.web3j.abi.datatypes.generated.Bytes32;

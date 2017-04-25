@@ -1,9 +1,8 @@
 package dominus.intg.ethereum;
 
 
-import dominus.framework.junit.DominusJUnit4TestBase;
 import dominus.intg.ethereum.contract.Marriage;
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.Test;
 import org.springframework.util.StopWatch;
 import org.web3j.abi.datatypes.generated.Bytes32;
@@ -15,6 +14,7 @@ import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
+import origin.common.junit.DominusJUnit4TestBase;
 import rx.Subscription;
 
 import java.io.IOException;

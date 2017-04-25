@@ -11,10 +11,10 @@ import com.aliyuncs.http.FormatType;
 import com.aliyuncs.ons.model.v20160503.*;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
-import dominus.framework.junit.DominusJUnit4TestBase;
 import dominus.framework.junit.annotation.MessageQueueTest;
 import org.junit.Test;
 import org.springframework.core.annotation.AnnotationUtils;
+import origin.common.junit.DominusJUnit4TestBase;
 
 import java.util.Date;
 import java.util.Properties;

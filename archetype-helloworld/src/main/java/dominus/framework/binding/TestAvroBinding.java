@@ -2,7 +2,6 @@ package dominus.framework.binding;
 
 
 import dominus.framework.binding.bean.Employee;
-import dominus.framework.junit.DominusJUnit4TestBase;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.DataFileWriter;
@@ -11,8 +10,9 @@ import org.apache.avro.io.DatumWriter;
 import org.apache.avro.reflect.ReflectData;
 import org.apache.avro.reflect.ReflectDatumReader;
 import org.apache.avro.reflect.ReflectDatumWriter;
-import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.Test;
+import origin.common.junit.DominusJUnit4TestBase;
 
 import java.io.File;
 import java.io.IOException;

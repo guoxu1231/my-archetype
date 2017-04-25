@@ -1,9 +1,8 @@
 package dominus.intg.datastore.elasticsearch;
 
 
-import dominus.framework.junit.DominusJUnit4TestBase;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequest;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -27,6 +26,7 @@ import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.junit.Test;
+import origin.common.junit.DominusJUnit4TestBase;
 
 import java.io.IOException;
 import java.net.InetAddress;

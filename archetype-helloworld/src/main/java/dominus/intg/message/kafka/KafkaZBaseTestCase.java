@@ -1,7 +1,6 @@
 package dominus.intg.message.kafka;
 
 
-import dominus.framework.junit.DominusJUnit4TestBase;
 import dominus.framework.junit.annotation.MessageQueueTest;
 import kafka.admin.AdminUtils;
 import kafka.admin.RackAwareMode;
@@ -19,6 +18,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
+import origin.common.junit.DominusJUnit4TestBase;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;

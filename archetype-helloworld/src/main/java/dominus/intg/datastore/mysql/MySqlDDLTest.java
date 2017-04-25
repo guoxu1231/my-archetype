@@ -1,7 +1,7 @@
 package dominus.intg.datastore.mysql;
 
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
