@@ -2,8 +2,6 @@ package dominus.framework.junit;
 
 
 import dominus.framework.junit.annotation.HdfsClient;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -57,7 +55,6 @@ public class DominusJUnit4TestBase {
     protected static ResourceLoader resourceLoader = new DefaultResourceLoader();
     protected static PrintStream out = System.out;
 
-    protected static FileSystem hdfsClient;
     protected static final String TEST_SCHEMA = "employees";
     protected static final String STAGE_SCHEMA = "iops_schema";
     protected static final String TEST_TABLE = "employees";
@@ -147,21 +144,6 @@ public class DominusJUnit4TestBase {
         out.printf("[Spring Active Profile] %s\n", environment.getActiveProfiles()[0]);
         assertTrue("[Global Properties] is empty", properties.size() > 0);
         out.println("[Global Properties]:" + properties.size());
-
-
-        //EE: hdfs client
-        if (isHdfsClientEnabled()) {
-            Configuration conf = new Configuration();
-            conf.addResource("hdfs-clientconfig-cdh/core-site.xml");
-            conf.addResource("hdfs-clientconfig-cdh/hdfs-site.xml");
-            try {
-                hdfsClient = FileSystem.get(conf);
-                out.printf("[Global] HDFS File System Capacity:%sG\n", hdfsClient.getStatus().getCapacity() / GB);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            assertNotNull(hdfsClient);
-        }
 
         assertNotNull(properties);
         doSetUp();

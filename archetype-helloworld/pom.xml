@@ -15,6 +15,7 @@
         <scala.version>2.11.8</scala.version>
         <scala.version.short>2.11</scala.version.short>
         <cxf.version>3.1.4</cxf.version>
+        <org.jooq.version>3.9.2</org.jooq.version>
     </properties>
     <parent>
         <groupId>dominus</groupId>
@@ -30,17 +31,10 @@
             </activation>
             <dependencies>
 
-                <!-- slf4j logging -->
                 <dependency>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                    <version>1.1.6</version>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.commons</groupId>
-                    <artifactId>commons-lang3</artifactId>
-                    <version>3.4</version>
+                    <groupId>dominus</groupId>
+                    <artifactId>archetype-common</artifactId>
+                    <version>0.9</version>
                 </dependency>
 
                 <!--Utility -->
@@ -197,17 +191,17 @@
                         </exclusion>
                     </exclusions>
                 </dependency>
-                <dependency>
-                    <groupId>io.confluent</groupId>
-                    <artifactId>kafka-avro-serializer</artifactId>
-                    <version>3.0.0</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
+                <!--<dependency>-->
+                    <!--<groupId>io.confluent</groupId>-->
+                    <!--<artifactId>kafka-avro-serializer</artifactId>-->
+                    <!--<version>3.0.0</version>-->
+                    <!--<exclusions>-->
+                        <!--<exclusion>-->
+                            <!--<groupId>org.slf4j</groupId>-->
+                            <!--<artifactId>slf4j-log4j12</artifactId>-->
+                        <!--</exclusion>-->
+                    <!--</exclusions>-->
+                <!--</dependency>-->
                 <!-- EE: Apache Kafka end -->
                 <!-- 0.4 with kafka 0.8.2.2, 0.7 with kafka 0.9-->
                 <dependency>
@@ -269,6 +263,23 @@
                     <groupId>mysql</groupId>
                     <artifactId>mysql-connector-java</artifactId>
                     <version>5.1.37</version>
+                </dependency>
+
+                <!--EE JOOQ(Java Object Oriented Querying) Open Source Edition-->
+                <dependency>
+                    <groupId>org.jooq</groupId>
+                    <artifactId>jooq</artifactId>
+                    <version>${org.jooq.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jooq</groupId>
+                    <artifactId>jooq-meta</artifactId>
+                    <version>${org.jooq.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jooq</groupId>
+                    <artifactId>jooq-codegen</artifactId>
+                    <version>${org.jooq.version}</version>
                 </dependency>
 
                 <dependency>
@@ -343,6 +354,12 @@
                     <groupId>org.apache.velocity</groupId>
                     <artifactId>velocity</artifactId>
                     <version>1.7</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>commons-lang</groupId>
+                            <artifactId>commons-lang</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
 
                 <!--EE: alibaba dubbo rpc framework -->
@@ -527,67 +544,6 @@
                     <version>1.1.0</version>
                 </dependency>
 
-                <!--EE: Apache Hadoop Related Project, order by version-->
-                <!--hdfs & mapreduce also match CDH 5.4.x-->
-                <!-- EE: Hadoop main client artifact -->
-                <dependency>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-client</artifactId>
-                    <version>2.6.2</version>
-                    <exclusions><!-- find out how log4j is getting on your path run mvn dependency:tree and comb through -->
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <dependency>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-yarn-client</artifactId>
-                    <version>2.6.2</version>
-                </dependency>
-
-                <!--EE:Sqoop Java Client API-->
-                <dependency>
-                    <groupId>org.apache.sqoop</groupId>
-                    <artifactId>sqoop-client</artifactId>
-                    <version>1.99.6</version>
-                </dependency>
-
-                <!-- EE:Oozie Java Client API-->
-                <dependency>
-                    <groupId>org.apache.oozie</groupId>
-                    <artifactId>oozie-client</artifactId>
-                    <version>4.3.0</version>
-                    <!--
-                    SLF4J: Class path contains multiple SLF4J bindings.
-SLF4J: Found binding in [jar:file:/opt/Development/maven_repo/org/slf4j/slf4j-log4j12/1.6.1/slf4j-log4j12-1.6.1.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-SLF4J: Found binding in [jar:file:/opt/Development/maven_repo/org/slf4j/slf4j-simple/1.6.6/slf4j-simple-1.6.6.jar!/org/slf4j/impl/StaticLoggerBinder.class]
-SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
-SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
-                    -->
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-simple</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
-                <!--EE: Apache HBase -->
-                <dependency>
-                    <groupId>org.apache.hbase</groupId>
-                    <artifactId>hbase-shaded-client</artifactId>
-                    <version>1.2.4</version>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.slf4j</groupId>
-                            <artifactId>slf4j-log4j12</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-
             </dependencies>
         </profile>
     </profiles>
@@ -722,6 +678,53 @@ SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- The jOOQ code generator plugin -->
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>${org.jooq.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-mysql</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>5.1.37</version>
+                    </dependency>
+                </dependencies>
+
+                <configuration>
+                    <jdbc>
+                        <driver>com.mysql.jdbc.Driver</driver>
+                        <url>jdbc:mysql://127.0.0.1/employees</url>
+                        <user>shawguo</user>
+                        <password>welcome1</password>
+                    </jdbc>
+                    <generator>
+                        <database>
+                            <name>org.jooq.util.mysql.MySQLDatabase</name>
+                            <includes>.*</includes>
+                            <excludes></excludes>
+                            <inputSchema>employees</inputSchema>
+                        </database>
+                        <target>
+                            <packageName>dominus.framework.dao.jooq.db</packageName>
+                            <directory>target/generated-sources/jooq-mysql</directory>
+                        </target>
+                    </generator>
+                </configuration>
+            </plugin>
+
+
         </plugins>
     </build>
 

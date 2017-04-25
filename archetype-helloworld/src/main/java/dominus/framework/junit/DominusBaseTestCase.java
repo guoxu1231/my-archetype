@@ -4,8 +4,6 @@ package dominus.framework.junit;
 import dominus.framework.junit.annotation.HdfsClient;
 import dominus.framework.junit.annotation.MySqlDataSource;
 import junit.framework.TestCase;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -34,7 +32,6 @@ public class DominusBaseTestCase extends TestCase {
     protected static ResourceLoader resourceLoader = new DefaultResourceLoader();
     protected static PrintStream out = System.out;
     protected static Properties properties;
-    protected static FileSystem hdfsClient;
     protected static final String TEST_SCHEMA = "employees";
     protected static final String STAGE_SCHEMA = "iops_schema";
     protected static final String TEST_TABLE = "employees";
@@ -100,20 +97,6 @@ public class DominusBaseTestCase extends TestCase {
         PropertiesLoaderUtils.fillProperties(properties, resourceLoader.getResource("classpath:jdbc.properties"));
         assertTrue(properties.size() > 0);
         out.println("[Global Properties]:" + properties.size());
-
-        //EE: hdfs client
-        if (isHdfsClientEnabled()) {
-            Configuration conf = new Configuration();
-            conf.addResource("hdfs-clientconfig-cdh/core-site.xml");
-            conf.addResource("hdfs-clientconfig-cdh/hdfs-site.xml");
-            try {
-                hdfsClient = FileSystem.get(conf);
-                out.printf("[Global] HDFS File System Capacity:%sG\n", hdfsClient.getStatus().getCapacity() / GB);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            assertNotNull(hdfsClient);
-        }
 
         if (isMySqlDataSourceEnabled()) {
             ApplicationContext context = new ClassPathXmlApplicationContext(new String[]{"jdbc_context.xml"});
