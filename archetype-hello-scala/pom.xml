@@ -20,11 +20,10 @@
     </parent>
     <dependencies>
 
-        <!-- slf4j logging -->
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.6</version>
+            <groupId>dominus</groupId>
+            <artifactId>archetype-common</artifactId>
+            <version>0.9</version>
         </dependency>
 
         <!--EE: mongodb-->
@@ -39,8 +38,12 @@
             <version>1.10.0</version>
         </dependency>
     </dependencies>
+
+
+
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -55,6 +58,7 @@
                     </includes>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>

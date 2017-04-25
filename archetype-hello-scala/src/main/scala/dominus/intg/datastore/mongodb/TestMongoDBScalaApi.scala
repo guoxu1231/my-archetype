@@ -2,9 +2,9 @@ package dominus.intg.datastore.mongodb
 
 import com.mongodb.BasicDBObject
 import com.mongodb.casbah.Imports._
-import dominus.framework.junit.DominusJUnit4TestBase
 import org.junit.Assert._
 import org.junit.Test
+import origin.common.junit.DominusJUnit4TestBase
 import salat._
 import salat.global._
 
