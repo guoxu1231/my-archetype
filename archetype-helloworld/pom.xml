@@ -706,8 +706,8 @@
                     <jdbc>
                         <driver>com.mysql.jdbc.Driver</driver>
                         <url>jdbc:mysql://127.0.0.1/employees</url>
-                        <user>shawguo</user>
-                        <password>welcome1</password>
+                        <user>root</user>
+                        <password></password>
                     </jdbc>
                     <generator>
                         <database>
