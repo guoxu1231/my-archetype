@@ -4,10 +4,10 @@
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
         >
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>archetype-helloworld-scala</artifactId>
+    <artifactId>archetype-hello-scala</artifactId>
     <packaging>jar</packaging>
     <version>0.1</version>
-    <name>archetype-helloworld-scala</name>
+    <name>archetype-hello-scala</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scala.version>2.11.8</scala.version>
