@@ -7,7 +7,7 @@ import kafka.admin.ConsumerGroupCommand;
 import kafka.common.MessageFormatter;
 import kafka.coordinator.GroupMetadataManager;
 import kafka.coordinator.MemberSummary;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
