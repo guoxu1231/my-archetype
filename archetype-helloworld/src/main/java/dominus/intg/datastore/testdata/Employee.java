@@ -15,6 +15,9 @@ public class Employee {
     private char gender;
     private Date hireDate;
 
+    public Employee() {
+    }
+
     public Employee(Integer empNo, String firstName, String lastName) {
         this.empNo = empNo;
         this.firstName = firstName;
