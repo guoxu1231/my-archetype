@@ -571,6 +571,7 @@
                         <include>dominus.intg.datastore.mysql.MySqlMetaDataTest</include>
                         <include>dominus.intg.datastore.mysql.MySqlJDBCShardTest</include>
                         <include>dominus.connector.MysqlBinlogConnectorTest</include>
+                        <include>dominus.framework.dao.jooq.TestJooQDSL</include>
                         <!-- Misc -->
                         <include>dominus.intg.scripting.GroovyIntgTest</include>
                         <include>dominus.framework.binding.TestXmlBinding</include>
@@ -604,8 +605,6 @@
                         <include>dominus.intg.datastore.persistent.mybatis.TestMyBatisDao</include>
                         <!-- java language -->
                         <include>dominus.language.threads.TestSynchronizer</include>
-                        <!--Big data -->
-                        <include>dominus.bigdata.datastore.TestHBaseClient</include>
                     </includes>
                 </configuration>
             </plugin>

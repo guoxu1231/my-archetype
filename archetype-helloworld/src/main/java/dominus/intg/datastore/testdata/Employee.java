@@ -16,7 +16,12 @@ public class Employee {
     private Date hireDate;
 
     public Employee() {
+    }
 
+    public Employee(Integer empNo, String firstName, String lastName) {
+        this.empNo = empNo;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public Integer getEmpNo() {
