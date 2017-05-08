@@ -40,6 +40,7 @@
         <docker.image.prefix>guoxu1231</docker.image.prefix>
         <scala.version>2.11.8</scala.version>
         <scalatra.version>2.4.0</scalatra.version>
+        <spark-core.version>2.3</spark-core.version>
     </properties>
 
     <dependencies>
@@ -169,6 +170,22 @@
         <!--<groupId>org.springframework.cloud</groupId>-->
         <!--<artifactId>spring-cloud-starter-eureka</artifactId>-->
         <!--</dependency>-->
+
+        <dependency>
+            <groupId>com.sparkjava</groupId>
+            <artifactId>spark-core</artifactId>
+            <version>${spark-core.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
 
         <dependency>
