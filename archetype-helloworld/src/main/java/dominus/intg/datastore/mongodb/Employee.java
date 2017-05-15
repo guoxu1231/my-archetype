@@ -6,7 +6,7 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
+import java.util.*;
 
 @Document
 //morphia client
@@ -24,6 +24,25 @@ public class Employee {
     private String gender;
     private Date hire_date;
 
+    @Embedded("flex_fields")
+    private List<FlexField> flexFields = new ArrayList<FlexField>();
+    @Transient
+    private Map<String, String> flexFieldsMap = new HashMap<>();
+
+    public String getFlexField(String fieldName) {
+        return flexFieldsMap.get(fieldName);
+    }
+
+    public void addFlexField(String fieldName, String fieldValue) {
+        if (getFlexField(fieldName) == null)
+            this.flexFields.add(new FlexField(fieldName, fieldValue));
+    }
+
+    @PostLoad
+    private void initialize() {
+        flexFields.stream().forEach(flexField -> flexFieldsMap.put(flexField.getFieldName(), flexField.getFieldValue()));
+    }
+
     public Employee() {
 
     }
@@ -40,8 +59,9 @@ public class Employee {
     @Override
     public String toString() {
         return String.format(
-                "Employee[emp_no=%s, birth_date='%tF',birth_date_long='%d' first_name='%s', last_name='%s', gender='%s', hire_date='%tF'], hire_date_long='%d'",
-                emp_no, birth_date, birth_date.getTime(), first_name, last_name, gender, hire_date, hire_date.getTime());
+                "Employee[emp_no=%s, birth_date='%tF',birth_date_long='%d' first_name='%s', last_name='%s', gender='%s', hire_date='%tF'], hire_date_long='%d\n" +
+                        "%s'",
+                emp_no, birth_date, birth_date.getTime(), first_name, last_name, gender, hire_date, hire_date.getTime(),Arrays.toString(flexFields.toArray()));
     }
 
     @Override

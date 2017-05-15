@@ -1,7 +1,8 @@
-package dominus.intg.datastore.mongodb;
+package dominus.intg.datastore;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
+import dominus.intg.datastore.mongodb.Employee;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoAdmin;
@@ -22,7 +23,7 @@ import static junit.framework.TestCase.assertTrue;
  * mongodb/bin/mongod --dbpath /opt/Development/middleware/mongodb/data
  */
 @ContextConfiguration(locations = {"classpath:spring-container/mongodb_context.xml"})
-public class TestSpringDataClient extends DominusJUnit4TestBase {
+public class DOCUMENT_MONGODB_TestSpringDataClient extends DominusJUnit4TestBase {
 
     static String TEST_SCHEMA = "test_schema";
 

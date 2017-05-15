@@ -1,4 +1,4 @@
-package dominus.intg.datastore.h2database;
+package dominus.intg.datastore;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
@@ -16,7 +16,7 @@ import java.sql.Statement;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class TestH2Database extends DominusJUnit4TestBase {
+public class RDMS_H2_TestH2Database extends DominusJUnit4TestBase {
 
     Connection h2Connection;
 

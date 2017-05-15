@@ -1,4 +1,4 @@
-package dominus.intg.datastore.cache.redis;
+package dominus.intg.datastore;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-public class RedisBaseTestCase extends DominusJUnit4TestBase {
+public class KV_REDIS_RedisBaseTestCase extends DominusJUnit4TestBase {
 
     Jedis jedis;
     String uniqueKey;

@@ -1,4 +1,4 @@
-package dominus.intg.datastore.rocksdb;
+package dominus.intg.datastore;
 
 
 import dominus.framework.junit.DominusJUnit4TestBase;
@@ -7,7 +7,7 @@ import org.rocksdb.Options;
 import org.rocksdb.RocksDB;
 import org.rocksdb.RocksDBException;
 
-public class TestRocksDB extends DominusJUnit4TestBase {
+public class KV_ROCKSDB_TestRocksDB extends DominusJUnit4TestBase {
     RocksDB db = null;
     Options options;
 

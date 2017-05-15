@@ -1,4 +1,4 @@
-package dominus.intg.datastore.elasticsearch;
+package dominus.intg.datastore;
 
 
 import org.apache.commons.io.IOUtils;
@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
  * Perform standard index, get, delete and search operations on an existing cluster;
  * Perform administrative tasks on a running cluster
  */
-public class TestElasticSearchClient extends DominusJUnit4TestBase {
+public class SEARCH_ELASTICSEARCH_TestElasticSearchClient extends DominusJUnit4TestBase {
 
     Client client;
     final static String TEST_INDEX = "test_index_bank";

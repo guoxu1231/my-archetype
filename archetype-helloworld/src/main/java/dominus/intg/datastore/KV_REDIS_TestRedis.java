@@ -1,4 +1,4 @@
-package dominus.intg.datastore.cache.redis;
+package dominus.intg.datastore;
 
 
 import com.google.common.io.Files;
@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class TestRedis extends RedisBaseTestCase {
+public class KV_REDIS_TestRedis extends KV_REDIS_RedisBaseTestCase {
 
     String luaScript;
 
