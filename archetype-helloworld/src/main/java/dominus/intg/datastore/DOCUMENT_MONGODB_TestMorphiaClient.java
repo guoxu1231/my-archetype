@@ -20,10 +20,12 @@ public class DOCUMENT_MONGODB_TestMorphiaClient extends DominusJUnit4TestBase {
 
     Datastore datastore;
 
+    static {
+        MorphiaLoggerFactory.registerLogger(SLF4JLoggerImplFactory.class);
+    }
+
     @Override
     protected void doSetUp() throws Exception {
-
-        MorphiaLoggerFactory.registerLogger(SLF4JLoggerImplFactory.class);
         java.util.logging.Logger.getLogger("com.mongodb.TRACE").setLevel(java.util.logging.Level.INFO);
         super.doSetUp();
         final Morphia morphia = new Morphia();
