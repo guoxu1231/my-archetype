@@ -313,6 +313,11 @@
                     <artifactId>morphia</artifactId>
                     <version>1.3.0</version>
                 </dependency>
+                <dependency>
+                    <groupId>org.mongodb.morphia</groupId>
+                    <artifactId>morphia-logging-slf4j</artifactId>
+                    <version>1.3.0</version>
+                </dependency>
 
                 <!-- EE: Redis -->
                 <dependency>
@@ -595,11 +600,11 @@
                         <include>dominus.intg.message.kafka.KafkaIntgTestCase</include>
                         <!--<include>dominus.intg.jms.kafka09.SpringKafkaTestCase</include>-->
                         <!-- Datastore -->
-                        <include>dominus.intg.datastore.mongodb.TestSpringDataClient</include>
-                        <include>dominus.intg.datastore.cache.redis.TestRedis</include>
-                        <include>dominus.intg.datastore.elasticsearch.TestElasticSearchClient</include>
+                        <include>dominus.intg.datastore.DOCUMENT_MONGODB_TestSpringDataClient</include>
+                        <include>dominus.intg.datastore.KV_REDIS_TestRedis</include>
+                        <include>dominus.intg.datastore.SEARCH_ELASTICSEARCH_TestElasticSearchClient</include>
                         <include>dominus.intg.datastore.zookeeper.TestZKClient</include>
-                        <include>dominus.intg.datastore.h2database.TestH2Database</include>
+                        <include>dominus.intg.datastore.RDMS_H2_TestH2Database</include>
                         <include>dominus.intg.coordinator.consul.TestConsulClient</include>
                         <!-- ORM integration -->
                         <include>dominus.intg.datastore.persistent.mybatis.TestMyBatisDao</include>
