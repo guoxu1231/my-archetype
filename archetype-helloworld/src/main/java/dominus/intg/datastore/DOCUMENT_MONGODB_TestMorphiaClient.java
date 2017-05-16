@@ -71,6 +71,17 @@ public class DOCUMENT_MONGODB_TestMorphiaClient extends DominusJUnit4TestBase {
         jobs = datastore.createQuery(Employee.class).filter("flex_fields.field_value =", "jobs").get();
         assertTrue(jobs != null);
         System.out.println(jobs);
+
+        //EE:smart translate from java field name to stored field name
+        q = datastore.createQuery(Employee.class);
+        q.field("flexFields.fieldValue").equal("shawguo");
+        jobs = (Employee) q.get();
+        assertTrue(jobs != null);
+        System.out.println(jobs);
+
+        jobs = datastore.createQuery(Employee.class).filter("flexFields.fieldValue =", "shawguo").get();
+        assertTrue(jobs != null);
+        System.out.println(jobs);
     }
 
 
