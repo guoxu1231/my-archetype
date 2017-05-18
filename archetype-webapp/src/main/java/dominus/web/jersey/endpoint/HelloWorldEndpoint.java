@@ -1,4 +1,4 @@
-package dominus.web.rest.endpoint;
+package dominus.web.jersey.endpoint;
 
 import org.springframework.stereotype.Component;
 

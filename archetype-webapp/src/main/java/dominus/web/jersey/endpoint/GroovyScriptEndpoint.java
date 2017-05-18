@@ -1,4 +1,4 @@
-package dominus.web.rest.endpoint;
+package dominus.web.jersey.endpoint;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;

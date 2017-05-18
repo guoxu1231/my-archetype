@@ -1,12 +1,10 @@
-package dominus.web.rest;
+package dominus.web.jersey;
 
-import dominus.web.rest.endpoint.EchoEndpoint;
-import dominus.web.rest.endpoint.GroovyScriptEndpoint;
-import dominus.web.rest.endpoint.HelloWorldEndpoint;
+import dominus.web.jersey.endpoint.EchoEndpoint;
+import dominus.web.jersey.endpoint.GroovyScriptEndpoint;
+import dominus.web.jersey.endpoint.HelloWorldEndpoint;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.stereotype.Component;
-
-import javax.ws.rs.ApplicationPath;
 
 
 @Component

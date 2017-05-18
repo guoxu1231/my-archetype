@@ -1,11 +1,10 @@
-package dominus.web.rest.endpoint;
+package dominus.web.jersey.endpoint;
 
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
