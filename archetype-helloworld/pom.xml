@@ -367,6 +367,12 @@
                     <version>2.4.6</version>
                 </dependency>
 
+                <!--EE: CEP Esper -->
+                <dependency>
+                    <groupId>com.espertech</groupId>
+                    <artifactId>esper</artifactId>
+                    <version>6.0.1</version>
+                </dependency>
 
                 <!-- template engine -->
                 <dependency>
@@ -620,10 +626,14 @@
                         <include>dominus.intg.datastore.zookeeper.TestZKClient</include>
                         <include>dominus.intg.datastore.RDMS_H2_TestH2Database</include>
                         <include>dominus.intg.coordinator.consul.TestConsulClient</include>
+                        <!-- CEP -->
+                        <include>dominus.intg.cep.TestEsperCEP</include>
                         <!-- ORM integration -->
                         <include>dominus.intg.datastore.persistent.mybatis.TestMyBatisDao</include>
                         <!-- java language -->
                         <include>dominus.language.threads.TestSynchronizer</include>
+                        <!-- kotlin language -->
+                        <include>dominus.language.TestKotlinHelloWorld</include>
                     </includes>
                 </configuration>
             </plugin>
