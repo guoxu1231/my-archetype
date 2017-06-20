@@ -618,6 +618,7 @@
                         <include>dominus.framework.retry.TestRetryTemplate</include>
                         <include>dominus.framework.parser.sql.TestJSqlParser</include>
                         <include>dominus.framework.metrics.TestMetricsIntg</include>
+                        <include>dominus.framework.rx.TestRxJava</include>
                         <!--<include>dominus.intg.jmx.TestGroovyMBean</include>-->
                         <!-- RPC -->
                         <!--<include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>-->
