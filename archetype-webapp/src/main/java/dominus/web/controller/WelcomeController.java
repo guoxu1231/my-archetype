@@ -10,13 +10,11 @@ import java.util.Map;
 @Controller
 public class WelcomeController {
 
-    private String message = "Hello World";
-
     @GetMapping("/welcome")
     public String welcome(Map<String, Object> model) {
-        model.put("time", new Date());
-        model.put("message", this.message);
-        return "/jsp/welcome";
+        model.put("time", new Date().toString());
+        model.put("name", "shawguo");
+        return "t2";
     }
 
     @RequestMapping("/foo")
