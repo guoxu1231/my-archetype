@@ -5,6 +5,12 @@ import dominus.web.sparkjava.support.SparkRoute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import spark.ModelAndView;
+import spark.template.velocity.VelocityTemplateEngine;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
@@ -37,7 +43,15 @@ public class HelloSpark implements SparkRoute {
             return "hello world";
         });
 
-
+        // views and templates
+        get("/spark/template", (req, res) -> {
+            Map<String, Object> model = new HashMap<>();
+            model.put("time", new Date().toString());
+            model.put("name", "shawguo");
+            return new VelocityTemplateEngine().render(
+                    new ModelAndView(model, "templates/t2.ftlh")
+            );
+        });
     }
 
 }
