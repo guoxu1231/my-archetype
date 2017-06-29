@@ -581,6 +581,14 @@
                     <!--</exclusions>-->
                 </dependency>
 
+                <dependency>
+                    <groupId>stellar</groupId>
+                    <artifactId>stellar-sdk</artifactId>
+                    <version>0.1.10</version>
+                    <scope>system</scope>
+                    <systemPath>${basedir}/lib/stellar/stellar-sdk.jar</systemPath>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>
