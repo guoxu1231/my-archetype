@@ -550,6 +550,23 @@
                     <version>0.13.2</version>
                 </dependency>
 
+                <!-- EE: Miroservice / HTTP Client / load balancing, etc -->
+                <dependency>
+                    <groupId>io.github.openfeign</groupId>
+                    <artifactId>feign-core</artifactId>
+                    <version>9.5.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.github.openfeign</groupId>
+                    <artifactId>feign-gson</artifactId>
+                    <version>9.5.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.github.openfeign</groupId>
+                    <artifactId>feign-slf4j</artifactId>
+                    <version>9.5.0</version>
+                </dependency>
+
                 <!-- Google Pub/Sub-->
                 <dependency>
                     <groupId>com.google.cloud</groupId>
@@ -657,6 +674,8 @@
                         <include>dominus.language.TestKotlinHelloWorld</include>
                         <!-- blockchain-->
                         <include>dominus.intg.stellar.TestStellarClient</include>
+                        <!--Miroservice -->
+                        <include>dominus.microservice.feign.TestFeignClient</include>
                     </includes>
                 </configuration>
             </plugin>
