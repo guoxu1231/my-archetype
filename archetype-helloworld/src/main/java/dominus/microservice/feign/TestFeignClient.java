@@ -6,13 +6,18 @@ import feign.Retryer;
 import feign.gson.GsonDecoder;
 import feign.ribbon.RibbonClient;
 import feign.slf4j.Slf4jLogger;
-import org.junit.Ignore;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.SocketPolicy;
+import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 import origin.common.junit.DominusJUnit4TestBase;
 
 import java.util.List;
 
 import static com.netflix.config.ConfigurationManager.getConfigInstance;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -20,6 +25,11 @@ import static org.junit.Assert.assertTrue;
  * Author: shawguo
  */
 public class TestFeignClient extends DominusJUnit4TestBase {
+
+    String clientName;
+
+    @Rule
+    public final MockWebServer server1 = new MockWebServer();
 
     @Test
     public void testBasic() {
@@ -38,20 +48,27 @@ public class TestFeignClient extends DominusJUnit4TestBase {
         assertTrue(contributors.size() > 0);
     }
 
-    @Ignore
+    /**
+     * Round Robin Loadbalacing Strategy;
+     * LoadBalancerCommand;
+     * In ribbon, ConnectException and SocketTimeoutException are RetryableException.
+     */
+    @Test
     public void testRibbonClientLoadBalancer() {
 
+        clientName = "github-client";
         // The Sun HTTP Client retries all requests once on an IOException, which makes testing retry code harder than would
         // be ideal. We can only disable it for post, so lets at least do that.
         System.setProperty("sun.net.http.retryPost", "false");
+        server1.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
+        server1.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
+        server1.enqueue(new MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START));
 
-        final String clientName = "github";
-        getConfigInstance().setProperty(clientName + ".ribbon.listOfServers",
-                "https://api.github.com");
-//        getConfigInstance().setProperty(clientName + ".ribbon.MaxAutoRetries", 1);
-//        getConfigInstance().setProperty(clientName + ".ribbon.MaxAutoRetriesNextServer", 1);
-//        getConfigInstance().setProperty(clientName + ".ribbon.ReadTimeout", 2000);
-//        getConfigInstance().setProperty(clientName + ".ribbon.ConnectTimeout", 2000);
+        getConfigInstance().setProperty(clientName + ".ribbon.listOfServers", "api.github.com:443" + "," + "http://localhost:" + server1.getPort());
+        getConfigInstance().setProperty(clientName + ".ribbon.MaxAutoRetries", 2);
+        getConfigInstance().setProperty(clientName + ".ribbon.MaxAutoRetriesNextServer", 1);
+        getConfigInstance().setProperty(clientName + ".ribbon.ReadTimeout", 2000);
+        getConfigInstance().setProperty(clientName + ".ribbon.ConnectTimeout", 2000);
 
         GitHubClient gitHubClient = Feign.builder()
                 .decoder(new GsonDecoder())
@@ -59,11 +76,16 @@ public class TestFeignClient extends DominusJUnit4TestBase {
                 .retryer(Retryer.NEVER_RETRY)
                 .client(RibbonClient.create()).target(GitHubClient.class, "https://" + clientName);
 
-        // Fetch and print a list of the contributors to this library.
         List<Contributor> contributors = gitHubClient.contributors("OpenFeign", "feign");
         for (Contributor contributor : contributors) {
             System.out.println(contributor.login + " (" + contributor.contributions + ")");
         }
         assertTrue(contributors.size() > 0);
+        assertEquals(3, server1.getRequestCount());
+    }
+
+    @After
+    public void clearServerList() {
+        getConfigInstance().clearProperty(clientName + ".ribbon.listOfServers");
     }
 }
