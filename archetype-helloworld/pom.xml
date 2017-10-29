@@ -705,7 +705,7 @@
                         <!-- kotlin language -->
                         <include>dominus.language.TestKotlinHelloWorld</include>
                         <!-- blockchain-->
-                        <include>dominus.intg.stellar.TestStellarClient</include>
+                        <!--<include>dominus.intg.stellar.TestStellarClient</include>-->
                         <!--Miroservice -->
                         <include>dominus.microservice.feign.TestFeignClient</include>
                     </includes>
