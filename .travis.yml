@@ -18,7 +18,7 @@ script:
   - nohup ./consul agent -dev -bind=127.0.0.1 &
   - mvn install -N
   - mvn clean -pl archetype-common install
-  - mvn clean -pl archetype-helloworld test
+  - mvn clean -pl archetype-hadoop test
   - mvn clean -pl archetype-hello-scala test
 
 after_failure:

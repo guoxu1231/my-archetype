@@ -15,11 +15,11 @@
     </properties>
 
     <modules>
-        <module>archetype-helloworld</module>
+        <!--<module>archetype-helloworld</module>-->
         <module>archetype-hello-scala</module>
         <module>archetype-www</module>
         <module>archetype-webapp</module>
-
+        <module>archetype-hadoop</module>
         <module>archetype-common</module>
         <!--<module>archetype-tstack</module>-->
     </modules>
