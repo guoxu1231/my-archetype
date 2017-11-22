@@ -24,6 +24,10 @@ script:
 after_failure:
   - cat archetype-helloworld/target/surefire-reports/*.txt
 
+notifications:
+  email:
+    - guoxu1231@foxmail.com
+
 cache:
   directories:
     - $HOME/.m2

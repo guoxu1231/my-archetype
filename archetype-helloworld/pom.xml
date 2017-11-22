@@ -638,6 +638,13 @@
                     <systemPath>${basedir}/lib/stellar/stellar-sdk.jar</systemPath>
                 </dependency>
 
+                <!--Swagger 2 -->
+                <dependency>
+                    <groupId>io.swagger</groupId>
+                    <artifactId>swagger-parser</artifactId>
+                    <version>1.0.32</version>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>
@@ -708,6 +715,8 @@
                         <!--<include>dominus.intg.stellar.TestStellarClient</include>-->
                         <!--Miroservice -->
                         <include>dominus.microservice.feign.TestFeignClient</include>
+                        <!-- spec -->
+                        <include>dominus.spec.TestSwaggerParser</include>
                     </includes>
                 </configuration>
             </plugin>
