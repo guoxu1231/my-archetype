@@ -683,7 +683,11 @@
                         <include>dominus.framework.parser.sql.TestJSqlParser</include>
                         <include>dominus.framework.metrics.TestMetricsIntg</include>
                         <include>dominus.framework.rx.TestRxJava</include>
+
+                        <!--Groovy DSL -->
                         <include>dominus.intg.jmx.TestGroovyMBean</include>
+                        <include>dominus.dsl.TestJson2XmlDSL</include>
+
                         <!-- RPC -->
                         <!--<include>dominus.intg.rpc.dubbo.TestDubboLocalInvoke</include>-->
                         <!-- amqp -->
