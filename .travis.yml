@@ -18,9 +18,9 @@ script:
   - nohup ./consul agent -dev -bind=127.0.0.1 &
   - mvn install -N
   - mvn clean -pl archetype-common install
-  - if [[ "$HELLO" == "TRUE" ]]; then mvn clean -pl archetype-helloworld test; fi
-  - if [[ "$HADOOP" == "TRUE" ]]; then mvn clean -pl archetype-hadoop test; fi
-  - if [[ "$SCALA" == "TRUE" ]]; then mvn clean -pl archetype-hello-scala test; fi
+  - if [[ "$TEST_HELLO" == "TRUE" ]]; then mvn clean -pl archetype-helloworld test; fi
+  - if [[ "$TEST_HADOOP" == "TRUE" ]]; then mvn clean -pl archetype-hadoop test; fi
+  - if [[ "$TEST_SCALA" == "TRUE" ]]; then mvn clean -pl archetype-hello-scala test; fi
 
 after_failure:
   - cat archetype-helloworld/target/surefire-reports/*.txt
