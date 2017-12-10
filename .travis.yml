@@ -2,18 +2,31 @@ language: java
 
 jdk:
   - oraclejdk8
+
+env:
+  - DOCKER_COMPOSE_VERSION=2.2
+
 os:
   - linux
 
 sudo: required
 
 before_install:
+
+#docker example
 #docker pull carlad/sinatra
 #docker run -d -p 127.0.0.1:80:4567 carlad/sinatra /bin/sh -c "cd /root/sinatra; bundle exec foreman start;"
 #docker ps -a
 #docker run carlad/sinatra /bin/sh -c "cd /root/sinatra; bundle exec rake test"
+
+#upgrade docker-compose
+#sudo rm /usr/local/bin/docker-compose
+#curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+
   - docker-compose --version
   - docker --version
+  - docker run -p 2181:2181 -p 9092:9092 spotify/kafka
+  - docker ps -a
   - ./travis/install_consul.sh
   - ./travis/install_hbase.sh
 
