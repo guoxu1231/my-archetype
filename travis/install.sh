@@ -32,10 +32,10 @@ mkdir $HOME/download -p
 #nohup bash -c "cd kafka && bin/kafka-server-start.sh config/server.properties &"
 
 #install elasticsearch
-cd $HOME/download
-curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.4/elasticsearch-2.3.4.tar.gz
-tar zxvf elasticsearch-2.3.4.tar.gz
-nohup bash -c "elasticsearch-2.3.4/bin/elasticsearch &"
+#cd $HOME/download
+#curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.4/elasticsearch-2.3.4.tar.gz
+#tar zxvf elasticsearch-2.3.4.tar.gz
+#nohup bash -c "elasticsearch-2.3.4/bin/elasticsearch &"
 
 #start micro-service project
 #nohup bash -c "mvn -pl archetype-microservice compile spring-boot:run &"
