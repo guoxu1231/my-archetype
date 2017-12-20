@@ -60,7 +60,7 @@ public class SEARCH_ELASTICSEARCH_TestElasticSearchClient extends DominusJUnit4T
         Settings setting = Settings.builder()
                 .put("transport.type", "netty3")
                 .put("http.type", "netty3")
-                .put("cluster.name", "my-es") //EE: must-have property
+                .put("cluster.name", properties.getProperty("elastic.search.cluster.name")) //EE: must-have property
                 .build();
         client = new PreBuiltTransportClient(setting)
                 .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(properties.getProperty("elastic.search.address")), Integer.valueOf(properties.getProperty("elastic.search.port"))));
