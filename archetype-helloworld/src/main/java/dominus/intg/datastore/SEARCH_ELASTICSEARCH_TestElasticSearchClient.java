@@ -18,13 +18,13 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.junit.Test;
 import origin.common.junit.DominusJUnit4TestBase;
 
@@ -52,9 +52,19 @@ public class SEARCH_ELASTICSEARCH_TestElasticSearchClient extends DominusJUnit4T
     @Override
     protected void doSetUp() throws Exception {
         super.doSetUp();
-        client = TransportClient.builder().build()
-                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(properties.getProperty("elastic.search.address")),
-                        Integer.valueOf(properties.getProperty("elastic.search.port"))));
+        /** obsolete 2.x transport client api
+         client = TransportClient.builder().build()
+         .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(properties.getProperty("elastic.search.address")),
+         Integer.valueOf(properties.getProperty("elastic.search.port"))));
+         **/
+        Settings setting = Settings.builder()
+                .put("transport.type", "netty3")
+                .put("http.type", "netty3")
+                .put("cluster.name", "my-es") //EE: must-have property
+                .build();
+        client = new PreBuiltTransportClient(setting)
+                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(properties.getProperty("elastic.search.address")), Integer.valueOf(properties.getProperty("elastic.search.port"))));
+
         //EE: load test data(manual refresh)
         if (!client.admin().indices().exists(new IndicesExistsRequest(new String[]{TEST_INDEX})).get().isExists()) {
             CreateIndexResponse response = client.admin().indices().prepareCreate(TEST_INDEX).
