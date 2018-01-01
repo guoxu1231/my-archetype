@@ -13,6 +13,7 @@ import static dominus.framework.dao.jooq.db.Tables.EMPLOYEES_;
 import static org.junit.Assert.assertEquals;
 
 //https://www.jooq.org/doc/3.9/manual/getting-started/jooq-and-java-8/
+@Deprecated
 public class TestJooQDSL extends MySqlZBaseTestCase {
 
     @Test
