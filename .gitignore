@@ -28,3 +28,6 @@ hs_err_pid*
 /archetype-hadoop/src/main/resources/spring-container/props/intg/
 /archetype-hello-scala/target/
 /archetype-hello-scala/archetype-hello-scala.iml
+/archetype-hello-stream-flink/archetype-hello-stream-flink.iml
+/archetype-hello-stream-flink/target/
+/archetype-hello-stream-flink/dependency-reduced-pom.xml
