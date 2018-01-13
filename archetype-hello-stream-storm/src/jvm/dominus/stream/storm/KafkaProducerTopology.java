@@ -27,7 +27,7 @@ public class KafkaProducerTopology {
      */
     public static StormTopology newTopology(String brokerUrl, String topicName) {
         final TopologyBuilder builder = new TopologyBuilder();
-        builder.setSpout("Random_Sentence_Spout", new RandomSentenceSpout.TimeStamped(""), 4);
+        builder.setSpout("Random_Sentence_Spout", new RandomSentenceSpout.TimeStamped(""), 4).setNumTasks(200);
 
         /* The output field of the RandomSentenceSpout ("word") is provided as the boltMessageField
           so that this gets written out as the message in the kafka topic. */
@@ -36,7 +36,7 @@ public class KafkaProducerTopology {
                 .withTopicSelector(new DefaultTopicSelector(topicName))
                 .<String, String>withTupleToKafkaMapper(new FieldNameBasedTupleToKafkaMapper<String, String>("key", "word"));
 
-        builder.setBolt("Kafka_Bolt", bolt, 2).shuffleGrouping("Random_Sentence_Spout");
+        builder.setBolt("Kafka_Bolt", bolt, 2).shuffleGrouping("Random_Sentence_Spout").setNumTasks(2);
 
         return builder.createTopology();
     }
