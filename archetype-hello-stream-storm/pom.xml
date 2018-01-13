@@ -32,18 +32,17 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <hbase.version>0.98.4-hadoop2</hbase.version>
-        <storm.version>1.1.1</storm.version>
+        <storm.version>1.0.2</storm.version>
         <guava.version>16.0.1</guava.version>
         <hdrhistogram.version>2.1.7</hdrhistogram.version>
+        <!-- kafka version used by new storm-kafka-client spout code -->
+        <storm.kafka.client.version>0.10.1.0</storm.kafka.client.version>
+        <storm.kafka.artifact.id>kafka_2.10</storm.kafka.artifact.id>
+        <java.version>1.7</java.version>
+        <java7.home>/opt/Development/jdk1.7.0_79</java7.home>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.hdrhistogram</groupId>
-            <artifactId>HdrHistogram</artifactId>
-            <version>${hdrhistogram.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.storm</groupId>
             <artifactId>storm-core</artifactId>
@@ -69,21 +68,38 @@
             <artifactId>storm-metrics</artifactId>
             <version>${storm.version}</version>
         </dependency>
+
+        <!-- storm-kafka integration-->
         <dependency>
             <groupId>org.apache.storm</groupId>
-            <artifactId>storm-hdfs</artifactId>
+            <artifactId>storm-kafka</artifactId>
             <version>${storm.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.storm</groupId>
-            <artifactId>storm-hbase</artifactId>
+            <artifactId>storm-kafka-client</artifactId>
             <version>${storm.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.storm</groupId>
-            <artifactId>storm-redis</artifactId>
-            <version>${storm.version}</version>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka_2.10</artifactId>
+            <version>${storm.kafka.client.version}</version>
+            <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.kafka</groupId>-->
+            <!--<artifactId>kafka-clients</artifactId>-->
+            <!--<version>${storm.kafka.client.version}</version>-->
+            <!--<scope>compile</scope>-->
+        <!--</dependency>-->
     </dependencies>
 
     <build>
@@ -177,6 +193,19 @@
                     <includePluginDependencies>false</includePluginDependencies>
                     <classpathScope>compile</classpathScope>
                     <mainClass>${storm.topology}</mainClass>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <verbose>false</verbose>
+                    <fork>true</fork>
+                    <executable>${java7.home}/bin/javac</executable>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
         </plugins>
