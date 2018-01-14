@@ -40,6 +40,10 @@ public class KafkaSpoutTestTopology {
         KafkaSpoutConfig<String, String> kafkaConf = KafkaSpoutConfig.
                 builder(bootstrapServers, topics)
                 .setGroupId(UUID.randomUUID().toString())
+                .setProp("enable.auto.commit","true")
+                .setProp("auto.offset.reset","earliest")
+                .setProp("fetch.min.bytes","2048")
+                .setProp("session.timeout.ms","20000")
                 .build();
         KafkaSpout spout = new KafkaSpout(kafkaConf);
 
