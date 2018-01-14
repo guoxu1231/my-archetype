@@ -18,7 +18,7 @@ import java.util.Properties;
  * storm/examples/storm-kafka-examples/
  * https://github.com/apache/storm/blob/v1.1.1/examples/storm-kafka-examples/src/main/java/org/apache/storm/kafka/trident/KafkaProducerTopology.java
  */
-public class KafkaProducerTopology {
+public class KafkaBoltTestTopology {
     /**
      * @param brokerUrl Kafka broker URL
      * @param topicName Topic to which publish sentences
@@ -59,10 +59,10 @@ public class KafkaProducerTopology {
 
         if (args != null && args.length > 0) {
             conf.setNumWorkers(2);
-            StormSubmitter.submitTopologyWithProgressBar("KafkaProducerTopology", conf, KafkaProducerTopology.newTopology(args[0], args[1]));
+            StormSubmitter.submitTopologyWithProgressBar("KafkaBoltTestTopology", conf, KafkaBoltTestTopology.newTopology(args[0], args[1]));
         } else {
             LocalCluster cluster = new LocalCluster();
-            cluster.submitTopology("KafkaProducerTopology", conf, KafkaProducerTopology.newTopology("NM-304-HW-XH628V3-BIGDATA-089:9092", "kafka_bolt_test"));
+            cluster.submitTopology("KafkaBoltTestTopology", conf, KafkaBoltTestTopology.newTopology("NM-304-HW-XH628V3-BIGDATA-089:9092", "kafka_bolt_test"));
             Utils.sleep(400000);
             cluster.killTopology("test");
             cluster.shutdown();
