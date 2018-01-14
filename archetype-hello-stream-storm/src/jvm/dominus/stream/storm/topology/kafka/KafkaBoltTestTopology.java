@@ -1,4 +1,4 @@
-package dominus.stream.storm;
+package dominus.stream.storm.topology.kafka;
 
 import dominus.stream.storm.spout.RandomSentenceSpout;
 import org.apache.kafka.clients.producer.ProducerConfig;

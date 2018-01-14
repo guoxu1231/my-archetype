@@ -1,4 +1,4 @@
-package dominus.stream.storm;
+package dominus.stream.storm.topology.kafka;
 
 import dominus.stream.storm.bolt.DevNullBolt;
 import org.apache.storm.Config;
