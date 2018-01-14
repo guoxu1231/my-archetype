@@ -5,7 +5,6 @@ import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.StormSubmitter;
 import org.apache.storm.generated.StormTopology;
-import org.apache.storm.kafka.*;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.utils.Utils;
 
@@ -15,6 +14,7 @@ import java.util.UUID;
  * Storm Kafka Integration (0.8.x)
  * http://storm.apache.org/releases/1.1.1/storm-kafka.html
  */
+@Deprecated
 public class Kafka08SpoutTestTopology {
 
     public static final int DEFAULT_SPOUT_NUM = 1;
