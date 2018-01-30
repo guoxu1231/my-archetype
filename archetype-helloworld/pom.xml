@@ -655,6 +655,13 @@
                     <version>1.0.32</version>
                 </dependency>
 
+                <!-- JSON Web Token (JWT) -->
+                <dependency>
+                    <groupId>io.jsonwebtoken</groupId>
+                    <artifactId>jjwt</artifactId>
+                    <version>0.9.0</version>
+                </dependency>
+
             </dependencies>
         </profile>
     </profiles>
@@ -731,6 +738,7 @@
                         <include>dominus.microservice.feign.TestFeignClient</include>
                         <!-- spec -->
                         <include>dominus.spec.TestSwaggerParser</include>
+                        <include>dominus.spec.TestJJWT</include>
                     </includes>
                 </configuration>
             </plugin>
