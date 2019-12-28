@@ -40,7 +40,7 @@
         <docker.image.prefix>guoxu1231</docker.image.prefix>
         <scala.version>2.11.8</scala.version>
         <scalatra.version>2.4.0</scalatra.version>
-        <spark-core.version>2.3</spark-core.version>
+        <spark-core.version>2.7.2</spark-core.version>
     </properties>
 
     <dependencies>
